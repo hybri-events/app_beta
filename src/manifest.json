@@ -1,0 +1,13 @@
+{
+  "name": "Vou",
+  "short_name": "Vou",
+  "start_url": "index.html",
+  "display": "standalone",
+  "icons": [{
+    "src": "assets/imgs/logo.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }],
+  "background_color": "#652C90",
+  "theme_color": "#652C90"
+}

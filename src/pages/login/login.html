@@ -1,0 +1,37 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Entrar</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <form [formGroup]="loginForm" (submit)="loginUser()" novalidate>
+
+    <ion-item>
+      <ion-label floating>E-mail</ion-label>
+      <ion-input #email formControlName="email" type="email" [class.invalid]="!loginForm.controls.email.valid && loginForm.controls.email.dirty"></ion-input>
+    </ion-item>
+    <ion-item class="error-message" *ngIf="!loginForm.controls.email.valid  && loginForm.controls.email.dirty">
+      <p>Digite um e-mail válido.</p>
+    </ion-item>
+
+    <ion-item>
+      <ion-label floating>Senha</ion-label>
+      <ion-input #password formControlName="password" type="password"></ion-input>
+    </ion-item>
+    <ion-item class="error-message" *ngIf="!loginForm.controls.password.valid  && loginForm.controls.password.dirty">
+      <p>A senha deve ter mais de 6 caracteres.</p>
+    </ion-item>
+
+    <button style="margin-top: 48px !important;" ion-button block type="submit">Entrar</button>
+  </form>
+
+  <button ion-button full (click)="facebookLogin()" style="background: #3b5998;margin-bottom: 48px !important;">Entrar com o Facebook</button>
+
+  <button ion-button block clear (click)="goToResetPassword()">Eu esqueci minha senha 🙁</button>
+
+  <button ion-button block clear (click)="createAccount()">Não tenho uma conta</button>
+</ion-content>

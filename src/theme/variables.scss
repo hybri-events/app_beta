@@ -1,0 +1,145 @@
+// Ionic Variables and Theming. For more info, please see:
+// http://ionicframework.com/docs/v2/theming/
+$font-path: "../assets/fonts";
+
+$icomoon-font-path: "../assets/fonts" !default;
+
+$icon-vous: "\e93e";
+$icon-wifi: "\e938";
+$icon-fumante: "\e939";
+$icon-cartao: "\e93a";
+$icon-comida: "\e93b";
+$icon-dinheiro: "\e93c";
+$icon-bar: "\e93d";
+$icon-promo: "\e933";
+$icon-new-event: "\e920";
+$icon-feed: "\e907";
+$icon-message: "\e925";
+$icon-menu: "\e926";
+$icon-page: "\e900";
+$icon-popup: "\e901";
+$icon-adm: "\e902";
+$icon-tag: "\e903";
+$icon-desc: "\e904";
+$icon-relac: "\e905";
+$icon-genero: "\e906";
+$icon-conv: "\e908";
+$icon-seg-plus: "\e909";
+$icon-del: "\e90a";
+$icon-send: "\e90b";
+$icon-pin-g: "\e90c";
+$icon-pin-n: "\e90d";
+$icon-seg-path1: "\e90e";
+$icon-seg-path2: "\e90f";
+$icon-seg-path3: "\e910";
+$icon-seg-path4: "\e911";
+$icon-seg-path5: "\e912";
+$icon-seg-path6: "\e913";
+$icon-saida: "\e914";
+$icon-entrada: "\e915";
+$icon-location: "\e916";
+$icon-check-off: "\e917";
+$icon-check-on: "\e918";
+$icon-video: "\e919";
+$icon-time-event: "\e91a";
+$icon-one-check: "\e91b";
+$icon-shared: "\e91c";
+$icon-settings: "\e91d";
+$icon-see-password: "\e91e";
+$icon-search: "\e91f";
+$icon-publication: "\e921";
+$icon-profile: "\e922";
+$icon-notifications: "\e923";
+$icon-back: "\e924";
+$icon-like: "\e927";
+$icon-invites: "\e928";
+$icon-home: "\e929";
+$icon-gallery: "\e92a";
+$icon-filter: "\e92b";
+$icon-cancel: "\e92c";
+$icon-events: "\e92d";
+$icon-edit: "\e92e";
+$icon-date-event: "\e92f";
+$icon-confirm: "\e930";
+$icon-comment: "\e931";
+$icon-coin: "\e932";
+$icon-camera: "\e934";
+$icon-next: "\e935";
+$icon-back-page: "\e936";
+$icon-agenda: "\e937";
+
+
+@import "ionic.globals";
+
+
+// Shared Variables
+// --------------------------------------------------
+// To customize the look and feel of this app, you can override
+// the Sass variables found in Ionic's source scss files.
+// To view all the possible Ionic variables, see:
+// http://ionicframework.com/docs/v2/theming/overriding-ionic-variables/
+
+
+
+
+// Named Color Variables
+// --------------------------------------------------
+// Named colors makes it easy to reuse colors on various components.
+// It's highly recommended to change the default colors
+// to match your app's branding. Ionic uses a Sass map of
+// colors so you can add, rename and remove colors as needed.
+// The "primary" color is the only required color in the map.
+
+$colors: (
+  primary:    #652C90,
+  secondary:  #1B97C6,
+  danger:     #f53d3d,
+  light:      #f4f4f4,
+  dark:       #222
+);
+
+
+// App iOS Variables
+// --------------------------------------------------
+// iOS only Sass variables can go here
+
+
+
+
+// App Material Design Variables
+// --------------------------------------------------
+// Material Design only Sass variables can go here
+
+
+
+
+// App Windows Variables
+// --------------------------------------------------
+// Windows only Sass variables can go here
+
+
+
+
+// App Theme
+// --------------------------------------------------
+// Ionic apps can have different themes applied, which can
+// then be future customized. This import comes last
+// so that the above variables are used and Ionic's
+// default are overridden.
+
+@import "ionic.theme.default";
+
+
+// Ionicons
+// --------------------------------------------------
+// The premium icon font for Ionic. For more info, please see:
+// http://ionicframework.com/docs/v2/ionicons/
+
+@import "ionic.ionicons";
+
+
+// Fonts
+// --------------------------------------------------
+
+@import "roboto";
+@import "noto-sans";

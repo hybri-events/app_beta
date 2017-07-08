@@ -1,0 +1,104 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Meus eventos</ion-title>
+  </ion-navbar>
+  <ion-toolbar class="tab_top" no-border-top style="padding:0px;">
+    <ion-segment [(ngModel)]="tabs">
+      <ion-segment-button value="con">
+        Confirmados
+      </ion-segment-button>
+      <ion-segment-button value="cri">
+        Criados
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+
+</ion-header>
+
+
+<ion-content>
+  <div [ngSwitch]="tabs" class="card-background-page">
+    <div *ngSwitchCase="'con'">
+
+      <ion-card style="background-image:url(assets/event_default.png)">
+        <div class="fundo_card">
+          <!--<div class="amigos_list"><img src="img/sets/selo.png"></div>-->
+          <div class="info_list">
+            <div class="icon_list"><ion-icon name="icon-date-event"></ion-icon><div>00/00/0000</div></div>
+            <div class="icon_list"><ion-icon name="icon-time-event"></ion-icon><div>00:00</div></div>
+          </div>
+          <div class="present_list">
+            <div class="name_event">Nome da festa</div>
+            <div class="name_create" id="c">Nome de quem criou</div>
+            <div class="name_locale" id="l">Cidade da festa</div>
+          </div>
+        </div>
+      </ion-card>
+
+      <ion-card style="background-image:url(assets/event_default.png)">
+        <div class="fundo_card">
+          <!--<div class="amigos_list"><img src="img/sets/selo.png"></div>-->
+          <div class="info_list">
+            <div class="icon_list"><ion-icon name="icon-date-event"></ion-icon><div>00/00/0000</div></div>
+            <div class="icon_list"><ion-icon name="icon-time-event"></ion-icon><div>00:00</div></div>
+          </div>
+          <div class="present_list">
+            <div class="name_event">Nome da festa</div>
+            <div class="name_create" id="c">Nome de quem criou</div>
+            <div class="name_locale" id="l">Cidade da festa</div>
+          </div>
+        </div>
+      </ion-card>
+
+      <ion-card style="background-image:url(assets/event_default.png)">
+        <div class="fundo_card">
+          <!--<div class="amigos_list"><img src="img/sets/selo.png"></div>-->
+          <div class="info_list">
+            <div class="icon_list"><ion-icon name="icon-date-event"></ion-icon><div>00/00/0000</div></div>
+            <div class="icon_list"><ion-icon name="icon-time-event"></ion-icon><div>00:00</div></div>
+          </div>
+          <div class="present_list">
+            <div class="name_event">Nome da festa</div>
+            <div class="name_create" id="c">Nome de quem criou</div>
+            <div class="name_locale" id="l">Cidade da festa</div>
+          </div>
+        </div>
+      </ion-card>
+
+    </div>
+    <div *ngSwitchCase="'cri'">
+
+      <ion-card style="background-image:url(assets/event_default.png)">
+        <div class="fundo_card">
+          <!--<div class="amigos_list"><img src="img/sets/selo.png"></div>-->
+          <div class="info_list">
+            <div class="icon_list"><ion-icon name="icon-date-event"></ion-icon><div>00/00/0000</div></div>
+            <div class="icon_list"><ion-icon name="icon-time-event"></ion-icon><div>00:00</div></div>
+          </div>
+          <div class="present_list">
+            <div class="name_event">Nome da festa</div>
+            <div class="name_create" id="c">Nome de quem criou</div>
+            <div class="name_locale" id="l">Cidade da festa</div>
+          </div>
+        </div>
+      </ion-card>
+
+      <ion-card style="background-image:url(assets/event_default.png)">
+        <div class="fundo_card">
+          <!--<div class="amigos_list"><img src="img/sets/selo.png"></div>-->
+          <div class="info_list">
+            <div class="icon_list"><ion-icon name="icon-date-event"></ion-icon><div>00/00/0000</div></div>
+            <div class="icon_list"><ion-icon name="icon-time-event"></ion-icon><div>00:00</div></div>
+          </div>
+          <div class="present_list">
+            <div class="name_event">Nome da festa</div>
+            <div class="name_create" id="c">Nome de quem criou</div>
+            <div class="name_locale" id="l">Cidade da festa</div>
+          </div>
+        </div>
+      </ion-card>
+
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,35 @@
+page-qr-code {
+  .code {
+    margin-top: 16px;
+    width: 100%;
+  }
+  qr-code {
+    width: 100%;
+    display: block;
+  }
+  qr-code img{
+    display: block;
+    margin: 0 auto;
+  }
+  .logo {
+    position: absolute;
+    left: calc(50% - 45px);
+    top: 116px;
+    width: 90px;
+  }
+  .info {
+    margin-top: 32px;
+    padding: 16px;
+    background-color: #C0A0D9;
+  }
+  .info ion-item{
+    background-color: transparent;
+  }
+  .label {
+    padding-right: 4px;
+  }
+  .cont {
+    font-family: Lato-Black;
+    font-size: 1.3em;
+  }
+}

@@ -1,0 +1,67 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Organizadores</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only color="primary" (click)="continuar()" class="btn_search">Pular</button>
+    </ion-buttons>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+  <ion-searchbar style="position:fixed;z-index:500;background-color:white;"></ion-searchbar>
+  <p style="padding-left:16px;margin-top:74px;padding-right:16px;width:100%;text-align:center;">Você pode adicionar as pessoas que você segue como organizadores do seu evento.</p>
+  <ion-list>
+    <ion-item-group>
+      <ion-item-divider>A</ion-item-divider>
+      <button ion-item>
+        <ion-avatar item-start>
+          <img src="assets/profile_default.png">
+        </ion-avatar>
+        <h2>Nome usuário</h2>
+      </button>
+      <button ion-item>
+        <ion-avatar item-start>
+          <img src="assets/profile_default.png">
+        </ion-avatar>
+        <h2>Nome usuário</h2>
+      </button>
+    </ion-item-group>
+    <ion-item-group>
+      <ion-item-divider>B</ion-item-divider>
+      <button ion-item>
+        <ion-avatar item-start>
+          <img src="assets/profile_default.png">
+        </ion-avatar>
+        <h2>Nome usuário</h2>
+      </button>
+      <button ion-item>
+        <ion-avatar item-start>
+          <img src="assets/profile_default.png">
+        </ion-avatar>
+        <h2>Nome usuário</h2>
+      </button>
+    </ion-item-group>
+    <ion-item-group>
+      <ion-item-divider>C</ion-item-divider>
+      <button ion-item>
+        <ion-avatar item-start>
+          <img src="assets/profile_default.png">
+        </ion-avatar>
+        <h2>Nome usuário</h2>
+      </button>
+      <button ion-item>
+        <ion-avatar item-start>
+          <img src="assets/profile_default.png">
+        </ion-avatar>
+        <h2>Nome usuário</h2>
+      </button>
+    </ion-item-group>
+  </ion-list>
+  <div class="orgs">
+    <div class="number">#<span>0</span></div>
+    <div class="org"></div>
+  </div>
+</ion-content>

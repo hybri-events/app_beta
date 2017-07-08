@@ -1,0 +1,89 @@
+<ion-header id="tool">
+
+  <ion-navbar>
+    <ion-title id="title">{{e.nome}}</ion-title>
+    <ion-buttons end *ngIf="uid == e.criador">
+      <button ion-button icon-only color="primary" class="btn_search">
+        <ion-icon name="icon-edit"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+  <div class="fundo_event header_af">
+    <div id="fundo" [ngStyle]="{'background-image': 'url('+e.img+')' }" *ngIf="e.priv == '0'" class="header_event">
+      <div class="fundo_card">
+        <div class="amigos_list" *ngIf="e.coin"><img src="assets/selo.png"></div>
+        <div class="info_list">
+          <div class="icon_list"><ion-icon name="icon-coin"></ion-icon><div>{{(e.faixa_ini==0?'Gratuito':'R$'+e.faixa_ini)}}{{(e.faixa_fim==0?'':(e.faixa_fim!=e.faixa_ini?' - R$'+e.faixa_fim:''))}}</div></div>
+        </div>
+        <div class="bottom_list">
+          <div style="display:table-cell;vertical-align:bottom;width:80px;">
+            <div class="top"><div class="block"></div><div class="block"></div></div>
+            <div class="date_list">
+              <div class="mes_list">{{e.mes}}</div>
+              <div class="dia_list">{{('0'+e.dia).slice(-2)}}</div>
+              <div class="hr_list">{{e.hr_ini}}</div>
+            </div>
+          </div>
+          <div class="present_list">
+            <div class="name_event">{{e.nome}}</div>
+            <div class="name_create" id="c">{{e.nomeCriador}}</div>
+            <div class="name_locale" id="l">{{e.cidade}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tabs_event" id="tabs" *ngIf="data < e.dti">
+    <div class="tab_event" style="width:100%;">
+      <p style="margin: 16px 0px 8px;font-family:Lato-Black">50 CONFIRMADOS</p>
+      <button ion-button icon-left clear full>
+        <ion-icon name="icon-one-check"></ion-icon>
+        Confirmar presença
+      </button>
+    </div>
+  </div>
+  <div class="tabs_event" id="tabs" *ngIf="data >= e.dti">
+    <div class="tab_event">
+      <p style="margin: 16px;font-family:Lato-Black">25<br>CHECK-INS</p>
+    </div>
+    <div class="tab_event">
+      <p style="margin: 16px;font-family:Lato-Black">50<br>CONFIRMADOS</p>
+    </div>
+  </div>
+  <ion-list>
+    <ion-item id="list" *ngIf="e.desc != ''" style="padding-top:8px;">
+      <div class="lab"><ion-icon name="icon-desc" item-start></ion-icon>Descrição</div>
+      <div class="cont">{{e.desc}}</div>
+    </ion-item>
+    <ion-item *ngIf="e.desc != ''">
+      <div class="lab"><ion-icon name="icon-events" item-start></ion-icon>Local</div>
+      <div class="cont"><div #map id="map" style="width:100%;height:150px;"></div></div>
+    </ion-item>
+    <ion-item>
+      <div class="lab"><ion-icon name="icon-home" item-start></ion-icon>Características do local</div>
+      <div class="cont">
+        <ion-icon name="icon-fumante" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Área para fumantes<br>
+        <ion-icon name="icon-wifi" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Wi-fi<br>
+        <ion-icon name="icon-comida" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Comidas<br>
+        <ion-icon name="icon-bar" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Bebidas
+      </div>
+    </ion-item>
+    <ion-item>
+      <div class="lab"><ion-icon name="icon-coin" item-start></ion-icon>Formas de pagamento</div>
+      <div class="cont">
+        <ion-icon name="icon-cartao" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Cartão<br>
+        <ion-icon name="icon-dinheiro" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Dinheiro<br>
+        <div *ngIf="e.coin"><ion-icon name="icon-vous" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Vous</div>
+      </div>
+    </ion-item>
+    <ion-item *ngIf="e.tags != undefined">
+      <div class="lab"><ion-icon name="icon-tag" item-start></ion-icon>Tags</div>
+      <div class="cont"><div class="tag" *ngFor="let t of e.tags">#{{t.nome}}</div></div>
+    </ion-item>
+  </ion-list>
+</ion-content>

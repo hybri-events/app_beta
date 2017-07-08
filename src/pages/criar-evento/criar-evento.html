@@ -1,0 +1,119 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Criar evento</ion-title>
+    <ion-buttons (click)="continuar()" end>
+      <button ion-button icon-only color="primary" class="btn_search"><ion-icon name="icon-one-check"></ion-icon></button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content>
+  <div id="foto_evento">
+    <label for="input" id="button" (click)="openGallery()">Selecionar imagem</label>
+  </div>
+  <ion-list padding>
+    <ion-item>
+      <ion-label floating>Nome do evento</ion-label>
+      <ion-input type="text" [(ngModel)]="nome"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label floating>Data e hora de ínicio</ion-label>
+      <ion-datetime displayFormat="DD/MM/YYYY HH:mm" [(ngModel)]="dt_ini" (ionChange)="updateDt()"></ion-datetime>
+    </ion-item>
+
+    <ion-item class="label_check">
+      <ion-label>Definir data e hora de término</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="termino"></ion-checkbox>
+    </ion-item>
+
+    <div *ngIf="termino" class="fim">
+      <ion-item>
+        <ion-label floating>Data e hora de termino</ion-label>
+        <ion-datetime displayFormat="DD/MM/YYYY HH:mm" [(ngModel)]="dt_fim"></ion-datetime>
+      </ion-item>
+    </div>
+
+    <ion-item style="margin-top: 12px;">
+      <ion-label floating>Descrição</ion-label>
+      <div item-content style="width:100%;">
+        <ion-textarea #ionTxtArea [(ngModel)]="desc" (ngModelChange)='onChange($event)'></ion-textarea>
+      </div>
+    </ion-item>
+
+    <ion-item style="margin-top: 12px;">
+      <ion-label stacked>Tags</ion-label>
+      <ion-input type="text" [(ngModel)]="tagname" (keyup.space)="addTag()" (keyup.enter)="addTag()"></ion-input>
+    </ion-item>
+
+    <ion-item class="label_check" style="margin-top: 4px;">
+      <p>Digite a tag e pressione "espaço" ou "enter" para adicioná-la.</p>
+      <div class="tags">
+        <div class="tag" *ngFor="let tag of tags">#{{tag.nome}}<ion-icon (click)="delTag(tag.id)" name="icon-cancel"></ion-icon></div>
+      </div>
+    </ion-item>
+
+    <!--<ion-item>
+      <ion-label stacked>Privacidade do evento</ion-label>
+      <ion-select interface="action-sheet" [(ngModel)]="priv">
+        <ion-option value="0" selected="true">Público</ion-option>
+        <ion-option value="1">Privado</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item class="label_check" style="margin-top: 4px;">
+      <p>{{info_priv[priv]}}</p>
+    </ion-item>-->
+
+    <ion-item *ngIf="priv == '0'">
+      <ion-label stacked>Faixa de preço dos ingressos</ion-label>
+      <ion-select interface="popover" [(ngModel)]="sel_faixa">
+        <ion-option value="0" selected="true">Digitar valores</ion-option>
+        <ion-option value="1">Selecionar valores</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item class="label_check" *ngIf="sel_faixa == 1 && priv == '0'" style="margin-top:-8px;">
+      <ion-label stacked>
+        De: <ion-badge item-end>{{faixa.lower}}</ion-badge>
+        Até: <ion-badge item-end>{{faixa.upper}}</ion-badge>
+      </ion-label>
+      <ion-range dualKnobs="true" pin="true" [(ngModel)]="faixa" min="0" max="1000" step="5">
+        <ion-label range-left>Grátis</ion-label>
+        <ion-label range-right>+1000</ion-label>
+      </ion-range>
+    </ion-item>
+
+    <ion-item style="width:50%;float:left;margin-top:-8px;margin-bottom:10px;" *ngIf="sel_faixa == 0 && priv == '0'">
+      <ion-label stacked>De</ion-label>
+      <ion-input type="number" [(ngModel)]="faixa.lower"></ion-input>
+    </ion-item>
+
+    <ion-item style="width:50%;margin-top:-8px;" *ngIf="sel_faixa == 0 && priv == '0'">
+      <ion-label stacked>Até</ion-label>
+      <ion-input type="number" [(ngModel)]="faixa.upper"></ion-input>
+    </ion-item>
+
+    <!--<ion-item class="label_check">
+      <ion-label>Permitir publicações de outras pessoas no evento</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="pub"></ion-checkbox>
+    </ion-item>-->
+
+    <ion-item>
+      <ion-label stacked>Repetir evento</ion-label>
+      <ion-select interface="action-sheet" [(ngModel)]="gatilho">
+        <ion-option value="0" selected="true">Apenas uma vez</ion-option>
+        <ion-option value="1">Semanalmente ({{semana}})</ion-option>
+        <ion-option value="2">Mensalmente (todo dia {{dia}})</ion-option>
+        <ion-option value="3">Mensalmente ({{csem}})</ion-option>
+        <ion-option value="4">Anualmente (todo dia {{dia}} de {{mes}})</ion-option>
+        <ion-option value="5">Anualmente ({{csem}} de {{mes}})</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item class="label_check" style="margin-top: 4px;" *ngIf="gatilho != 0">
+      <p>Após o fim do evento, o próximo evento será criado automaticamente. Você pode desativar ou alterar a repetição do evento, quando quiser, nas configurações do mesmo.</p>
+    </ion-item>
+  </ion-list>
+</ion-content>

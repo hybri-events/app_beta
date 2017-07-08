@@ -1,0 +1,94 @@
+page-event-detail {
+  .toolbar{
+    background-color: transparent;
+    z-index: 500;
+  }
+  .scroll-content{
+    margin-top: 0px !important;
+  }
+
+  #title{opacity:0;}
+
+  .header:after{background: transparent;}
+  .header_af:after{
+    left: 0;
+    bottom: -5px;
+    position: absolute;
+    width: 100%;
+    height: 5px;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAHBAMAAADzDtBxAAAAD1BMVEUAAAAAAAAAAAAAAAAAAABPDueNAAAABXRSTlMUCS0gBIh/TXEAAAAaSURBVAjXYxCEAgY4UIICBmMogMsgFLtAAQCNSwXZKOdPxgAAAABJRU5ErkJggg==);
+    background-repeat: repeat-x;
+    background-position: 0 -2px;
+    content: "";
+  }
+
+  .button-inner{
+    font-family: Lato-Medium;
+  }
+
+  .header_event {background-size:cover;background-position:center;color:white;float:left;width:100%;}
+  .fundo_event {background-color:#652C90;float:left;width:100%;}
+
+  .fundo_card{float:left;width:100%;background-image:linear-gradient(rgba(109,95,119,0.5),rgba(109,95,119,0.9));padding:16px;padding-top:72px;}
+  .fundo_card .amigos_list{float:left;font-size:1em;width:48px;}
+  .fundo_card .amigos_list img{float:left;width:100%;}
+  .fundo_card .info_list{float:right;font-size:1em;}
+  .fundo_card .info_list .icon_list{float:right;padding-bottom:8px;clear: both;}
+  .fundo_card .info_list .icon_list div{float:right;}
+  .fundo_card .info_list .icon_list ion-icon{float:right;margin-left:8px;}
+  .fundo_card .bottom_list{float:left;width:100%;margin-top:64px;}
+  .fundo_card .bottom_list .top{float:left;width:80px;}
+  .fundo_card .bottom_list .top .block{float:left;margin-left:10px;width:8px;height:8px;background-color:#652C90;}
+  .fundo_card .bottom_list .top .block:last-child{float:left;margin-left:44px;}
+  .fundo_card .bottom_list .date_list{float:left;background-color:#652C90;border-radius:5px;width:80px;}
+  .fundo_card .bottom_list .date_list .mes_list{float:left;font-size:1.2em;width:100%;text-align:center;font-family:Lato-Medium;line-height:1em;padding:6px;}
+  .fundo_card .bottom_list .date_list .dia_list{float:left;clear:both;width:calc(100% - 16px);text-align:center;font-size:2.3em;line-height:1em;font-family:Lato-Black;margin-left:8px;margin-right:8px;padding:6px;border-radius:5px;background-color:white;color:#652C90;}
+  .fundo_card .bottom_list .date_list .hr_list{float:left;clear:both;width:100%;text-align:center;line-height:1em;padding:6px;}
+  .fundo_card .bottom_list .present_list{display:table-cell;vertical-align:middle;width:calc(100% - 96px);padding-left:16px;}
+  .fundo_card .bottom_list .present_list .name_event{float:left;font-size:1.7em;line-height:1.2em;font-family:Lato-Medium;}
+  .fundo_card .bottom_list .present_list .name_create{float:left;clear:both;font-size:1.2em;line-height:1.5em;}
+  .fundo_card .bottom_list .present_list .name_locale{float:left;clear:both;font-size:1em;line-height:1.5em;}
+
+  .tabs_event{
+    float: left;
+    width: 100%;
+    background-color: white;
+    border-bottom: 1px solid #D2D2D2;
+    z-index: 10;
+  }
+  .content-md .tabs_event{
+    top: 18px;
+  }
+  .content-ios .tabs_event{
+    top: 6px;
+  }
+  .tab_event {
+    float: left;
+    width: 50%;
+    text-align: center;
+    color: #652C90;
+    font-size: 1.1em;
+    font-family: Lato-Medium;
+  }
+  .header-ios .toolbar-ios:last-child .toolbar-background-ios{
+    border-width: 0px;
+  }
+  .toolbar-title-ios, .bar-button-default-ios{
+    color: white;
+  }
+  ion-navbar .icon-ios{
+    color: white !important;
+  }
+
+  ion-label {
+    white-space: normal;
+  }
+
+  .lab{
+    font-size: 0.9em;
+    color: #652C90;
+  }
+  .cont{
+    padding: 4px 16px;
+  }
+}

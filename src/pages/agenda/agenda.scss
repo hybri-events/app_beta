@@ -1,0 +1,51 @@
+page-agenda {
+  ion-card-header {
+    display: table;
+    background-color: #1B97C6;
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  .card-header-md{
+    padding-top: 32px;
+    padding-bottom: 32px;
+  }
+  .column{
+    display: table-cell;
+    width: 50%;
+    vertical-align: middle;
+    color:white;
+  }
+  .cont{
+    font-size: 5em;
+    line-height: 1em;
+    font-family: Lato-Black;
+  }
+  .ano{
+    font-size: 2.9em;
+    line-height: 1em;
+    //font-family: Lato-Medium;
+  }
+
+  ion-card-content{
+    float: left;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+  .day{
+    float: left;
+    width: calc(100% / 7 - 8px);
+    margin: 8px 4px;
+    text-align: center;
+  }
+  .semana{
+    background-color: #BDBDBD;
+    color: white;
+  }
+  .fds{
+    background-color: #652C90;
+  }
+  .sel{
+    font-family: Lato-Black;
+    color: #652C90;
+  }
+}

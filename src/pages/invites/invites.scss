@@ -1,0 +1,24 @@
+page-invites {
+
+}
+
+.card-background-page-mini {
+
+  ion-card {background-size:cover;background-position:center;color:white;}
+
+  ion-card-header span{font-family: Lato-Medium;}
+
+
+  .fundo_card{position:relative;width:100%;background-image:linear-gradient(rgba(109,95,119,0.5),rgba(109,95,119,0.9));padding:5%;}
+  .fundo_card .amigos_list{float:left;font-size:1em;width:15%;}
+  .fundo_card .amigos_list img{float:left;width:100%;}
+  .fundo_card .info_list{float:right;font-size:0.9em;width:35%;}
+  .fundo_card .info_list .icon_list{float:right;padding-bottom:10%;width:100%;}
+  .fundo_card .info_list .icon_list div{float:right;}
+  .fundo_card .info_list .icon_list ion-icon{float:right;margin-left:5%;}
+  .fundo_card .present_list{width:100%;}
+  .fundo_card .present_list .name_event{font-size:1.5em;line-height:1.2em;font-family:Lato-Medium;}
+  .fundo_card .present_list .name_create{font-size:1em;line-height:1.5em;}
+  .fundo_card .present_list .name_locale{font-size:0.8em;line-height:1.5em;}
+
+}

@@ -1,0 +1,48 @@
+<ion-menu [content]="mycontent">
+  <ion-content>
+    <div class="fundo_menu" id="fundo_menu">
+      <div class="header_menu">
+        <div class="ft_menu" id="ft_menu"></div>
+        <div class="name_menu">
+          <div class="label_name" *ngIf="!this.authentic">
+            <button ion-button full menuToggle (click)="openButtonPage(0)">Cadastrar</button>
+            <button ion-button full menuToggle (click)="openButtonPage(1)">Entrar</button>
+          </div>
+          <div class="label_name" *ngIf="this.authentic" id="label_name"></div>
+        </div>
+      </div>
+    </div>
+    <ion-list no-lines>
+      <!--<button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(0)"><ion-icon item-left name="icon-profile"></ion-icon>Perfil</button>-->
+      <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(1)"><ion-icon item-left name="icon-events"></ion-icon>Meus eventos</button>
+      <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(2)"><ion-icon item-left name="icon-agenda"></ion-icon>Agenda</button>
+      <!--<button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(3)"><ion-icon item-left name="icon-invites"></ion-icon>Convites</button>-->
+      <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(7)"><ion-icon item-left name="icon-promo"></ion-icon>Códigos promocionais</button>
+      <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(4)"><ion-icon item-left name="icon-conv"></ion-icon>Convidar amigos</button>
+      <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(5)"><ion-icon item-left name="icon-page"></ion-icon>Meus estabelecimentos</button>
+      <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(6)"><ion-icon item-left name="icon-settings"></ion-icon>Configurações</button>
+      <button ion-item menuToggle (click)="exit()" *ngIf="this.authentic"><ion-icon item-left name="icon-cancel"></ion-icon>Sair</button>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<ion-menu [content]="mycontent" side="right">
+  <ion-content padding>
+    <ion-list>
+      <ion-item>
+        <ion-label stacked>Filtro por data</ion-label>
+        <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="date"></ion-datetime>
+      </ion-item>
+      <ion-item style="padding: 0px;">
+        <div class="tags">
+          <div class="tag" *ngFor="let tag of tags | async" (click)="evidentTag(tag.$key,tag.nome)" id="{{tag.$key}}">#{{tag.nome}}</div>
+        </div>
+      </ion-item>
+    </ion-list>
+    <button ion-button menuToggle="right" (click)="aplicarFiltro()" block>Aplicar</button>
+    <button ion-button menuToggle="right" (click)="resetarFiltro()" color="secondary" block>Resetar filtros</button>
+  </ion-content>
+</ion-menu>
+
+<!-- Disable swipe-to-go-back because it's poor UX to combine STGB with side menus -->
+<ion-nav #mycontent [root]="rootPage" swipeBackEnabled="false"></ion-nav>

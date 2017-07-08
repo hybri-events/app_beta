@@ -1,0 +1,224 @@
+// http://ionicframework.com/docs/v2/theming/
+
+
+// App Global Sass
+// --------------------------------------------------
+// Put style rules here that you want to apply globally. These
+// styles are for the entire app and not just one component.
+// Additionally, this file can be also used as an entry point
+// to import other Sass files to be included in the output CSS.
+//
+// Shared Sass variables, which can be used to adjust Ionic's
+// default Sass variables, belong in "theme/variables.scss".
+//
+// To declare rules for a specific mode, create a child rule
+// for the .md, .ios, or .wp mode classes. The mode class is
+// automatically applied to the <body> element in the app.
+
+ion-content {
+  background-color: white;
+}
+
+.tags{
+ width: 100%;
+ margin-top: 8px;
+ margin-bottom: 4px;
+ font-size: 0.9em;
+ float: left;
+ padding-left: 4px;
+}
+
+.tag {
+ float: left;
+ background-color: #652C90;
+ border: 1px solid #652C90;
+ padding: 6px;
+ color: white;
+ border-radius: 4px;
+ margin: 2px;
+ transition: background 0.5s, color 0.5s;
+}
+
+.fundo_menu{
+  width:100%;
+  height:150px;
+  margin-bottom:16px;
+  background-position:center;
+  background-size:cover;
+  background-image:url('../assets/capa_default.png');
+}
+
+.header_menu{
+  width:100%;
+  height:150px;
+  background:linear-gradient(rgba(39,169,225,0.3),rgba(39,169,225,0.9));
+}
+
+.ft_menu{
+  float:left;
+  margin-left:16px;
+  margin-top:37px;
+  height:75px;
+  width:75px;
+  background-position:center;
+  background-size:cover;
+  background-image:url('../assets/logo.png');
+  border-radius:50%;
+}
+
+.name_menu{
+  float:left;
+  display:table;
+  margin-left:16px;
+  width:calc(100% - 123px);
+  height:100%;
+}
+
+.label_name{
+  display:table-cell;
+  vertical-align:middle;
+  font-family: Lato-Medium;
+  font-size:1.5em;
+  color:white;
+}
+
+@import "../theme/variables";
+
+@font-face {
+  font-family: 'icomoon';
+  src:  url('#{$icomoon-font-path}/icomoon.eot?mfwg9t');
+  src:  url('#{$icomoon-font-path}/icomoon.eot?mfwg9t#iefix') format('embedded-opentype'),
+    url('#{$icomoon-font-path}/icomoon.ttf?mfwg9t') format('truetype'),
+    url('#{$icomoon-font-path}/icomoon.woff?mfwg9t') format('woff'),
+    url('#{$icomoon-font-path}/icomoon.svg?mfwg9t#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Lato-Light';
+  src: url('#{$icomoon-font-path}/Lato-Light.ttf');
+}
+
+@font-face {
+  font-family: 'Lato-Medium';
+  src: url('#{$icomoon-font-path}/Lato-Medium.ttf');
+}
+
+@font-face {
+  font-family: 'Lato-Thin';
+  src: url('#{$icomoon-font-path}/Lato-Thin.ttf');
+}
+
+@font-face {
+  font-family: 'Lato-Black';
+  src: url('#{$icomoon-font-path}/Lato-Black.ttf');
+}
+
+[class^="icon-"],
+[class*=" icon-"],
+[class^="ion-ios-icon"],
+[class*="ion-ios-icon"],
+[class^="ion-md-icon"],
+[class*="ion-md-icon"]{
+  font-family: 'icomoon' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@mixin makeIcon($arg, $val) {
+  .ion-ios-#{$arg}:before ,
+  .ion-ios-#{$arg}-circle:before ,
+  .ion-ios-#{$arg}-circle-outline:before ,
+  .ion-ios-#{$arg}-outline:before ,
+  .ion-md-#{$arg}:before ,
+  .ion-md-#{$arg}-circle:before ,
+  .ion-md-#{$arg}-circle-outline:before ,
+  .ion-md-#{$arg}-outline:before  {
+    content: $val;
+  }
+}
+
+@mixin makeIconIos($arg, $val) {
+  .ion-ios-#{$arg}:before ,
+  .ion-ios-#{$arg}-circle:before ,
+  .ion-ios-#{$arg}-circle-outline:before ,
+  .ion-ios-#{$arg}-outline:before  {
+    content: $val;
+  }
+}
+
+@mixin makeIconMd($arg, $val) {
+  .ion-md-#{$arg}:before ,
+  .ion-md-#{$arg}-circle:before ,
+  .ion-md-#{$arg}-circle-outline:before ,
+  .ion-md-#{$arg}-outline:before  {
+    content: $val;
+  }
+}
+
+@include makeIcon(icon-vous, $icon-vous);
+@include makeIcon(icon-wifi, $icon-wifi);
+@include makeIcon(icon-fumante, $icon-fumante);
+@include makeIcon(icon-cartao, $icon-cartao);
+@include makeIcon(icon-comida, $icon-comida);
+@include makeIcon(icon-dinheiro, $icon-dinheiro);
+@include makeIcon(icon-bar, $icon-bar);
+@include makeIcon(icon-promo, $icon-promo);
+@include makeIcon(icon-new-event, $icon-new-event);
+@include makeIcon(icon-feed, $icon-feed);
+@include makeIcon(icon-message, $icon-message);
+@include makeIcon(icon-menu, $icon-menu);
+@include makeIcon(icon-page, $icon-page);
+@include makeIcon(icon-popup, $icon-popup);
+@include makeIcon(icon-adm, $icon-adm);
+@include makeIcon(icon-tag, $icon-tag);
+@include makeIcon(icon-desc, $icon-desc);
+@include makeIcon(icon-relac, $icon-relac);
+@include makeIcon(icon-genero, $icon-genero);
+@include makeIcon(icon-conv, $icon-conv);
+@include makeIcon(icon-seg-plus, $icon-seg-plus);
+@include makeIcon(icon-del, $icon-del);
+@include makeIcon(icon-send, $icon-send);
+@include makeIcon(icon-pin-g, $icon-pin-g);
+@include makeIcon(icon-pin-n, $icon-pin-n);
+@include makeIcon(icon-seg, $icon-seg-path1);
+@include makeIcon(icon-saida, $icon-saida);
+@include makeIcon(icon-entrada, $icon-entrada);
+@include makeIcon(icon-location, $icon-location);
+@include makeIcon(icon-check-off, $icon-check-off);
+@include makeIcon(icon-check-on, $icon-check-on);
+@include makeIcon(icon-video, $icon-video);
+@include makeIcon(icon-time-event, $icon-time-event);
+@include makeIcon(icon-one-check, $icon-one-check);
+@include makeIcon(icon-settings, $icon-settings);
+@include makeIcon(icon-see-password, $icon-see-password);
+@include makeIcon(icon-search, $icon-search);
+@include makeIcon(icon-publication, $icon-publication);
+@include makeIcon(icon-profile, $icon-profile);
+@include makeIcon(icon-notifications, $icon-notifications);
+@include makeIconIos(arrow-back, $icon-back);
+@include makeIcon(icon-like, $icon-like);
+@include makeIcon(icon-invites, $icon-invites);
+@include makeIcon(icon-home, $icon-home);
+@include makeIcon(icon-gallery, $icon-gallery);
+@include makeIcon(icon-filter, $icon-filter);
+@include makeIcon(icon-cancel, $icon-cancel);
+@include makeIcon(icon-events, $icon-events);
+@include makeIcon(icon-edit, $icon-edit);
+@include makeIcon(icon-date-event, $icon-date-event);
+@include makeIcon(icon-two-check, $icon-confirm);
+@include makeIcon(icon-comment, $icon-comment);
+@include makeIcon(icon-coin, $icon-coin);
+@include makeIcon(icon-camera, $icon-camera);
+@include makeIcon(icon-next, $icon-next);
+@include makeIconMd(arrow-back, $icon-back-page);
+@include makeIcon(icon-agenda, $icon-agenda);

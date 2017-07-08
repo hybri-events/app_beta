@@ -1,0 +1,33 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Pagamento via QRCode</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+  <div class="code">
+    <qr-code id="qrcode" [value]="this.data" [size]="290" [level]="'H'"></qr-code>
+    <img class="logo" src="assets/logo_qr.png">
+  </div>
+  <div class="info">
+    <ion-list no-lines>
+      <ion-item>
+        <span class="label">Nome:</span>
+        <span class="cont">{{nome}}</span>
+      </ion-item>
+      <ion-item>
+        <span class="label">Valor:</span>
+        <span class="cont">V$ {{vous}}</span>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <p style="margin:8px;color:white;">O QRCode é atualizado automaticamente de 30 em 30 segundos.</p>
+  </ion-toolbar>
+</ion-footer>
