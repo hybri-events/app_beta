@@ -48,13 +48,13 @@ export class CriarEventoPage {
   gatilho = 0;
   tsem = ["todo","toda","toda","toda","toda","toda","todo"];
   sem = ["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"];
-  cf = [["primeiro","segundo","terceiro","quarto","quinto"],
-        ["primeira","segunda","terceira","quarta","quinta"],
-        ["primeira","segunda","terceira","quarta","quinta"],
-        ["primeira","segunda","terceira","quarta","quinta"],
-        ["primeira","segunda","terceira","quarta","quinta"],
-        ["primeira","segunda","terceira","quarta","quinta"],
-        ["primeiro","segundo","terceiro","quarto","quinto"]];
+  cf = [["primeiro","segundo","terceiro","quarto","último"],
+        ["primeira","segunda","terceira","quarta","última"],
+        ["primeira","segunda","terceira","quarta","última"],
+        ["primeira","segunda","terceira","quarta","última"],
+        ["primeira","segunda","terceira","quarta","última"],
+        ["primeira","segunda","terceira","quarta","última"],
+        ["primeiro","segundo","terceiro","quarto","última"]];
   meses = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
   dia = this.data.getDate();
   mes = this.meses[this.data.getMonth()];
@@ -108,7 +108,7 @@ export class CriarEventoPage {
         buttons: ['OK']
       });
       alert.present();
-    } else if (new Date(this.dt_ini) <= new Date()){
+    } else if (new Date(this.dt_ini) <= new Date(Date.now() - this.tzoffset)){
       erro++;
       let alert = this.alertCtrl.create({
         title: 'Data e hora inválida!',

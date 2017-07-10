@@ -1,7 +1,8 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { Platform, NavController, NavParams, Content } from 'ionic-angular';
+import { Platform, NavController, NavParams, Content, AlertController } from 'ionic-angular';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import firebase from 'firebase';
+import { Geolocation } from '@ionic-native/geolocation';
 
 declare var google;
 
@@ -23,11 +24,24 @@ export class EventDetailPage {
   uid = firebase.auth().currentUser.uid;
   data;
 
-  constructor(public platform: Platform, public navCtrl: NavController, public navParams: NavParams, public db: AngularFireDatabase) {
+  numConf = 0;
+  numCheck = 0;
+  confirm;
+  ischeck = false;
+
+  periodoCheck = true;
+
+  eventoConf: FirebaseListObservable<any>;
+  userConf: FirebaseListObservable<any>;
+
+  constructor(public platform: Platform, public navCtrl: NavController, public navParams: NavParams, public db: AngularFireDatabase, public alertCtrl: AlertController, public geolocation: Geolocation) {
     this.id = navParams.data.id;
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     this.data = new Date(Date.now() - tzoffset).toISOString().slice(0,-1);
+
     this.event = db.list('/evento/'+this.id+'/');
+    this.eventoConf = db.list('/evento/'+this.id+'/confirmados/');
+    this.userConf = db.list('/usuario/'+this.uid+'/confirmados/');
     this.event.forEach( evento => {
       evento.forEach( eve => {
         if ( eve.$key == "tags" ){
@@ -35,12 +49,27 @@ export class EventDetailPage {
           eve.forEach(ev => {
             this.e[eve.$key].push(ev);
           });
+        } else if ( eve.$key == "confirmados" ){
+          this.eventoConf.forEach(j => {
+            j.forEach(i => {
+              if ( i.check ){
+                this.numCheck++;
+              }
+            });
+            this.numConf = j.length;
+          });
         } else {
+          if ( eve.$key == 'dti' ){
+            let dti = new Date(eve.$value);
+            dti.setHours(dti.getHours() + 12);
+            if ( this.data >= dti.toISOString().slice(0,-1) ){
+              this.periodoCheck = false;
+            }
+          }
           this.e[eve.$key] = eve.$value;
         }
       });
     });
-    console.log(this.e);
   }
 
   ngAfterViewInit() {
@@ -73,6 +102,7 @@ export class EventDetailPage {
       }
     });
     this.loadMap(this.e['lat'], this.e['lng']);
+    this.checkConf();
   }
 
   loadMap(lat, lng){
@@ -105,6 +135,78 @@ export class EventDetailPage {
     google.maps.event.addListener(marker, 'click', () => {
 
     });
+  }
+
+  checkConf(){
+    this.eventoConf.forEach(eve => {
+      eve.forEach(c => {
+        if ( c.uid == this.uid ){
+          this.ischeck = c.check;
+          this.confirm = true;
+        }
+      });
+    });
+  }
+
+  conf(){
+    if ( this.confirm ){
+      let ekey;
+      let ukey;
+      this.eventoConf.forEach(eve => {
+        eve.forEach(c => {
+          if ( c.uid == this.uid ){
+            ekey = c.$key;
+          }
+        });
+      });
+      this.eventoConf.remove(ekey);
+      this.userConf.forEach(eve => {
+        eve.forEach(c => {
+          if ( c.event == this.id ){
+            console.log('passou aqui');
+            ukey = c.$key;
+          }
+        });
+      });
+      this.userConf.remove(ukey);
+      this.confirm = false;
+    } else {
+      this.eventoConf.push({uid: this.uid, check: false});
+      this.userConf.push({event: this.id, check: false});
+      this.confirm = true;
+    }
+  }
+
+  check(){
+    if ( !this.ischeck ){
+      this.geolocation.getCurrentPosition().then((position) => {
+        let latitude = position.coords.latitude;
+        let longitude = position.coords.longitude;
+        let lat = this.e['lat'];
+        let lng = this.e['lng'];
+
+        console.log(latitude)
+        console.log(lat)
+        console.log(longitude)
+        console.log(lng)
+
+        if ( (latitude*-1) <= ((lat*-1)+0.0003) && (latitude*-1) >= ((lat*-1)-0.0003) && (longitude*-1) <= ((lng*-1)+0.0003) && (longitude*-1) >= ((lng*-1)-0.0003) ){
+          this.eventoConf.update({check: true});
+          this.userConf.update({check: true});
+        } else {
+          console.log('não');
+        }
+      }, (err) => {
+        console.log(err);
+      });
+    } else {
+      let alert = this.alertCtrl.create({
+        title: 'Check-in já realizado!',
+        subTitle: 'Você já fez check-in neste evento.',
+        buttons: ['OK']
+      });
+      alert.present();
+    }
   }
 
 }

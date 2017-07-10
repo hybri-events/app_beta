@@ -4,7 +4,7 @@
     <ion-title>Meus eventos</ion-title>
   </ion-navbar>
   <ion-toolbar class="tab_top" no-border-top style="padding:0px;">
-    <ion-segment [(ngModel)]="tabs">
+    <ion-segment [(ngModel)]="tabs" (ionChange)="changeTabs()">
       <ion-segment-button value="con">
         Confirmados
       </ion-segment-button>
@@ -21,83 +21,84 @@
   <div [ngSwitch]="tabs" class="card-background-page">
     <div *ngSwitchCase="'con'">
 
-      <ion-card style="background-image:url(assets/event_default.png)">
-        <div class="fundo_card">
-          <!--<div class="amigos_list"><img src="img/sets/selo.png"></div>-->
-          <div class="info_list">
-            <div class="icon_list"><ion-icon name="icon-date-event"></ion-icon><div>00/00/0000</div></div>
-            <div class="icon_list"><ion-icon name="icon-time-event"></ion-icon><div>00:00</div></div>
+      <div class="breve" padding *ngIf="(conf | async)?.length == 0"><div class="txt_breve">Você ainda não confirmou presença em nenhum evento.</div></div>
+      <div *ngFor="let e of events">
+        <ion-card [ngStyle]="{'background-image': 'url('+e.img+')' }" *ngIf="e.priv == '0'" (click)="openEvent(e.$key)">
+          <div class="fundo_card">
+            <div class="amigos_list" *ngIf="e.coin"><img src="assets/selo.png"></div>
+            <div class="info_list">
+              <div class="icon_list"><ion-icon name="icon-coin"></ion-icon><div>{{(e.faixa_ini==0?'Gratuito':'R$'+e.faixa_ini)}}{{(e.faixa_fim==0?'':(e.faixa_fim!=e.faixa_ini?' - R$'+e.faixa_fim:''))}}</div></div>
+              <div class="icon_list">
+                <ion-icon name="icon-fumante"></ion-icon>
+                <ion-icon name="icon-wifi"></ion-icon>
+                <ion-icon name="icon-comida"></ion-icon>
+                <ion-icon name="icon-bar"></ion-icon>
+              </div>
+              <div class="icon_list">
+                <ion-icon name="icon-cartao"></ion-icon>
+                <ion-icon name="icon-dinheiro"></ion-icon>
+                <ion-icon *ngIf="e.coin" name="icon-vous"></ion-icon>
+              </div>
+            </div>
+            <div class="bottom_list">
+              <div style="display:table-cell;vertical-align:bottom;width:80px;">
+                <div class="top"><div class="block"></div><div class="block"></div></div>
+                <div class="date_list">
+                  <div class="mes_list">{{e.mes}}</div>
+                  <div class="dia_list">{{('0'+e.dia).slice(-2)}}</div>
+                  <div class="hr_list">{{e.hr_ini}}</div>
+                </div>
+              </div>
+              <div class="present_list">
+                <div class="name_event">{{e.nome}}</div>
+                <div class="name_create" id="c">{{e.nomeCriador}}</div>
+                <div class="name_locale" id="l">{{e.cidade}}</div>
+              </div>
+            </div>
           </div>
-          <div class="present_list">
-            <div class="name_event">Nome da festa</div>
-            <div class="name_create" id="c">Nome de quem criou</div>
-            <div class="name_locale" id="l">Cidade da festa</div>
-          </div>
-        </div>
-      </ion-card>
-
-      <ion-card style="background-image:url(assets/event_default.png)">
-        <div class="fundo_card">
-          <!--<div class="amigos_list"><img src="img/sets/selo.png"></div>-->
-          <div class="info_list">
-            <div class="icon_list"><ion-icon name="icon-date-event"></ion-icon><div>00/00/0000</div></div>
-            <div class="icon_list"><ion-icon name="icon-time-event"></ion-icon><div>00:00</div></div>
-          </div>
-          <div class="present_list">
-            <div class="name_event">Nome da festa</div>
-            <div class="name_create" id="c">Nome de quem criou</div>
-            <div class="name_locale" id="l">Cidade da festa</div>
-          </div>
-        </div>
-      </ion-card>
-
-      <ion-card style="background-image:url(assets/event_default.png)">
-        <div class="fundo_card">
-          <!--<div class="amigos_list"><img src="img/sets/selo.png"></div>-->
-          <div class="info_list">
-            <div class="icon_list"><ion-icon name="icon-date-event"></ion-icon><div>00/00/0000</div></div>
-            <div class="icon_list"><ion-icon name="icon-time-event"></ion-icon><div>00:00</div></div>
-          </div>
-          <div class="present_list">
-            <div class="name_event">Nome da festa</div>
-            <div class="name_create" id="c">Nome de quem criou</div>
-            <div class="name_locale" id="l">Cidade da festa</div>
-          </div>
-        </div>
-      </ion-card>
+        </ion-card>
+      </div>
 
     </div>
     <div *ngSwitchCase="'cri'">
 
-      <ion-card style="background-image:url(assets/event_default.png)">
-        <div class="fundo_card">
-          <!--<div class="amigos_list"><img src="img/sets/selo.png"></div>-->
-          <div class="info_list">
-            <div class="icon_list"><ion-icon name="icon-date-event"></ion-icon><div>00/00/0000</div></div>
-            <div class="icon_list"><ion-icon name="icon-time-event"></ion-icon><div>00:00</div></div>
+      <div class="breve" padding *ngIf="cri.length == 0"><div class="txt_breve">Você ainda não confirmou presença em nenhum evento.</div></div>
+      <div *ngFor="let e of cri">
+        <ion-card [ngStyle]="{'background-image': 'url('+e.img+')' }" *ngIf="e.priv == '0'" (click)="openEvent(e.$key)">
+          <div class="fundo_card">
+            <div class="amigos_list" *ngIf="e.coin"><img src="assets/selo.png"></div>
+            <div class="info_list">
+              <div class="icon_list"><ion-icon name="icon-coin"></ion-icon><div>{{(e.faixa_ini==0?'Gratuito':'R$'+e.faixa_ini)}}{{(e.faixa_fim==0?'':(e.faixa_fim!=e.faixa_ini?' - R$'+e.faixa_fim:''))}}</div></div>
+              <div class="icon_list">
+                <ion-icon name="icon-fumante"></ion-icon>
+                <ion-icon name="icon-wifi"></ion-icon>
+                <ion-icon name="icon-comida"></ion-icon>
+                <ion-icon name="icon-bar"></ion-icon>
+              </div>
+              <div class="icon_list">
+                <ion-icon name="icon-cartao"></ion-icon>
+                <ion-icon name="icon-dinheiro"></ion-icon>
+                <ion-icon *ngIf="e.coin" name="icon-vous"></ion-icon>
+              </div>
+            </div>
+            <div class="bottom_list">
+              <div style="display:table-cell;vertical-align:bottom;width:80px;">
+                <div class="top"><div class="block"></div><div class="block"></div></div>
+                <div class="date_list">
+                  <div class="mes_list">{{e.mes}}</div>
+                  <div class="dia_list">{{('0'+e.dia).slice(-2)}}</div>
+                  <div class="hr_list">{{e.hr_ini}}</div>
+                </div>
+              </div>
+              <div class="present_list">
+                <div class="name_event">{{e.nome}}</div>
+                <div class="name_create" id="c">{{e.nomeCriador}}</div>
+                <div class="name_locale" id="l">{{e.cidade}}</div>
+              </div>
+            </div>
           </div>
-          <div class="present_list">
-            <div class="name_event">Nome da festa</div>
-            <div class="name_create" id="c">Nome de quem criou</div>
-            <div class="name_locale" id="l">Cidade da festa</div>
-          </div>
-        </div>
-      </ion-card>
-
-      <ion-card style="background-image:url(assets/event_default.png)">
-        <div class="fundo_card">
-          <!--<div class="amigos_list"><img src="img/sets/selo.png"></div>-->
-          <div class="info_list">
-            <div class="icon_list"><ion-icon name="icon-date-event"></ion-icon><div>00/00/0000</div></div>
-            <div class="icon_list"><ion-icon name="icon-time-event"></ion-icon><div>00:00</div></div>
-          </div>
-          <div class="present_list">
-            <div class="name_event">Nome da festa</div>
-            <div class="name_create" id="c">Nome de quem criou</div>
-            <div class="name_locale" id="l">Cidade da festa</div>
-          </div>
-        </div>
-      </ion-card>
+        </ion-card>
+      </div>
 
     </div>
   </div>

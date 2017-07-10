@@ -10,6 +10,7 @@ import { UserDataProvider } from '../providers/user-data/user-data';
 import { Storage } from '@ionic/storage';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import firebase from 'firebase/app';
+import { BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationResponse } from '@ionic-native/background-geolocation';
 
 import { TabsPage } from '../pages/tabs/tabs';
 
@@ -36,8 +37,9 @@ export class MyApp {
   date: string;
   tag: string;
   tags: FirebaseListObservable<any>;
+  teste: FirebaseListObservable<any>;
 
-  constructor(platform: Platform, statusBar: StatusBar, private storage: Storage, public db: AngularFireDatabase, public afDatabase: AngularFireDatabase, public splashScreen: SplashScreen, afAuth: AngularFireAuth, public authData: AuthProvider, public userData: UserDataProvider, public alertCtrl: AlertController, public err: ErrorProvider) {
+  constructor(private backgroundGeolocation: BackgroundGeolocation, platform: Platform, statusBar: StatusBar, private storage: Storage, public db: AngularFireDatabase, public afDatabase: AngularFireDatabase, public splashScreen: SplashScreen, afAuth: AngularFireAuth, public authData: AuthProvider, public userData: UserDataProvider, public alertCtrl: AlertController, public err: ErrorProvider) {
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     let fdata = new Date(Date.now() - tzoffset);
     fdata.setHours(-3);
@@ -86,10 +88,32 @@ export class MyApp {
       statusBar.styleDefault();
       splashScreen.hide();
     });
+
+    /*const config: BackgroundGeolocationConfig = {
+            desiredAccuracy: 10,
+            stationaryRadius: 20,
+            distanceFilter: 30,
+            debug: false, //  enable this hear sounds for background-geolocation life-cycle.
+            stopOnTerminate: false, // enable this to clear background location settings when the app terminates
+            notificationTitle: 'Vou',
+            notificationText: 'Verificação de check-in em eventos',
+            notificationIconColor: '#652C900',
+            notificationIconLarge: 'assets/logo_qr.png',
+            notificationIconSmall: 'assets/logo_qr.png'
+    };
+
+    this.backgroundGeolocation.configure(config).subscribe((location: BackgroundGeolocationResponse) => {
+      this.teste = this.db.list('/teste/');
+      setInterval(() => {
+        this.teste.push(location);
+      },5000);
+    });
+
+    this.backgroundGeolocation.start();*/
   }
 
   ionViewDidLoad() {
-    //this.splashScreen.hide();
+
   }
 
   openMenuPage(i) {
@@ -138,6 +162,8 @@ export class MyApp {
   resetarFiltro(){
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     let fdata = new Date(Date.now() - tzoffset);
+    fdata.setHours(-3);
+    fdata.setMinutes(0);
     this.date = fdata.toISOString().slice(0,-1);
 
     this.storage.set('dt_filtro', this.date);

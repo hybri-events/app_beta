@@ -40,19 +40,29 @@
   </div>
   <div class="tabs_event" id="tabs" *ngIf="data < e.dti">
     <div class="tab_event" style="width:100%;">
-      <p style="margin: 16px 0px 8px;font-family:Lato-Black">50 CONFIRMADOS</p>
-      <button ion-button icon-left clear full>
+      <p style="margin: 16px 0px 8px;font-family:Lato-Black">{{numConf}} {{(numConf == 1?'CONFIRMADO':'CONFIRMADOS')}}</p>
+      <button ion-button icon-left clear full (click)="conf()" *ngIf="!confirm">
         <ion-icon name="icon-one-check"></ion-icon>
-        Confirmar presença
+        CONFIRMAR PRESENÇA
+      </button>
+      <button ion-button icon-left clear full (click)="conf()" *ngIf="confirm">
+        <ion-icon name="icon-cancel"></ion-icon>
+        CANCELAR PRESENÇA
       </button>
     </div>
   </div>
   <div class="tabs_event" id="tabs" *ngIf="data >= e.dti">
     <div class="tab_event">
-      <p style="margin: 16px;font-family:Lato-Black">25<br>CHECK-INS</p>
+      <p style="margin: 16px;font-family:Lato-Black">{{numCheck}}<br>{{(numCheck == 1?'CHECK-IN':'CHECK-INS')}}</p>
     </div>
     <div class="tab_event">
-      <p style="margin: 16px;font-family:Lato-Black">50<br>CONFIRMADOS</p>
+      <p style="margin: 16px;font-family:Lato-Black">{{numConf}}<br>{{(numConf == 1?'CONFIRMADO':'CONFIRMADOS')}}</p>
+    </div>
+    <div class="tab_event" style="width:100%;" *ngIf="periodoCheck && confirm">
+      <button ion-button icon-left clear full (click)="check()">
+        <ion-icon name="icon-one-check"></ion-icon>
+        FAZER CHECK-IN
+      </button>
     </div>
   </div>
   <ion-list>
@@ -60,7 +70,7 @@
       <div class="lab"><ion-icon name="icon-desc" item-start></ion-icon>Descrição</div>
       <div class="cont">{{e.desc}}</div>
     </ion-item>
-    <ion-item *ngIf="e.desc != ''">
+    <ion-item [attr.id]="e.desc == '' ? 'list' : ''">
       <div class="lab"><ion-icon name="icon-events" item-start></ion-icon>Local</div>
       <div class="cont"><div #map id="map" style="width:100%;height:150px;"></div></div>
     </ion-item>

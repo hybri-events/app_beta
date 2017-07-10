@@ -10,6 +10,7 @@ import { QRCodeModule } from 'angular2-qrcode';
 import { SocialSharing } from '@ionic-native/social-sharing';
 import { Camera } from '@ionic-native/camera';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
+import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
 
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
@@ -147,7 +148,8 @@ const firebaseConfig = {
     SocialSharing,
     Camera,
     BarcodeScanner,
-    PromoProvider
+    PromoProvider,
+    BackgroundGeolocation
   ]
 })
 export class AppModule {}

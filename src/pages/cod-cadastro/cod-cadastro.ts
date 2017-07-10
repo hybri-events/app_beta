@@ -107,12 +107,12 @@ export class CodCadastroPage {
                       this.user.update(u[0].$key,{codcad: true});
                       this.storage.set('codcad', true);
                     });
-                    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Bônus pelo código de cadastro.", 10, 'Entrada', new Date().toISOString(), 'entrada','+');
+                    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Bônus pelo código de cadastro.", 25, 'Entrada', new Date().toISOString(), 'entrada','+');
                     this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
-                      this.contaData.altSaldo(1, s[0].id, s[0].saldo, 10, firebase.auth().currentUser.uid);
-                      this.contaData.cadTransacao(key, "Bônus pelo convite para cadastro.", 10, 'Entrada', new Date().toISOString(), 'entrada','+');
+                      this.contaData.altSaldo(1, s[0].id, s[0].saldo, 25, firebase.auth().currentUser.uid);
+                      this.contaData.cadTransacao(key, "Bônus pelo convite para cadastro.", 25, 'Entrada', new Date().toISOString(), 'entrada','+');
                       this.contaData.getSaldo(key).then(s => {
-                        this.contaData.altSaldo(1, s[0].id, s[0].saldo, 10, key);
+                        this.contaData.altSaldo(1, s[0].id, s[0].saldo, 25, key);
                         this.navCtrl.pop();
                         this.navCtrl.pop();
                       });
