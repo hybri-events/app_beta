@@ -62,7 +62,8 @@ export class CodCadastroPage {
                       this.user.update(u[0].$key,{codcad: true});
                       this.storage.set('codcad', true);
                     });
-                    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Bônus pelo seu cadastro prévio.", 50, 'Entrada', new Date().toISOString(), 'entrada','+');
+                    let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+                    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Bônus pelo seu cadastro prévio.", 50, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
                     this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
                       this.contaData.altSaldo(1, s[0].id, s[0].saldo, 50, firebase.auth().currentUser.uid);
                       this.navCtrl.pop();
@@ -107,10 +108,11 @@ export class CodCadastroPage {
                       this.user.update(u[0].$key,{codcad: true});
                       this.storage.set('codcad', true);
                     });
-                    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Bônus pelo código de cadastro.", 25, 'Entrada', new Date().toISOString(), 'entrada','+');
+                    let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+                    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Bônus pelo código de cadastro.", 25, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
                     this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
                       this.contaData.altSaldo(1, s[0].id, s[0].saldo, 25, firebase.auth().currentUser.uid);
-                      this.contaData.cadTransacao(key, "Bônus pelo convite para cadastro.", 25, 'Entrada', new Date().toISOString(), 'entrada','+');
+                      this.contaData.cadTransacao(key, "Bônus pelo convite para cadastro.", 25, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
                       this.contaData.getSaldo(key).then(s => {
                         this.contaData.altSaldo(1, s[0].id, s[0].saldo, 25, key);
                         this.navCtrl.pop();

@@ -2,6 +2,7 @@ import { Component, ViewChild, ElementRef } from '@angular/core';
 import { Platform, NavController, NavParams, Content, AlertController } from 'ionic-angular';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import firebase from 'firebase';
+import { ContaProvider } from '../../providers/conta/conta';
 import { Geolocation } from '@ionic-native/geolocation';
 
 declare var google;
@@ -34,7 +35,7 @@ export class EventDetailPage {
   eventoConf: FirebaseListObservable<any>;
   userConf: FirebaseListObservable<any>;
 
-  constructor(public platform: Platform, public navCtrl: NavController, public navParams: NavParams, public db: AngularFireDatabase, public alertCtrl: AlertController, public geolocation: Geolocation) {
+  constructor(public platform: Platform, public navCtrl: NavController, public navParams: NavParams, public db: AngularFireDatabase, public alertCtrl: AlertController, public geolocation: Geolocation, public contaData: ContaProvider) {
     this.id = navParams.data.id;
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     this.data = new Date(Date.now() - tzoffset).toISOString().slice(0,-1);
@@ -163,7 +164,6 @@ export class EventDetailPage {
       this.userConf.forEach(eve => {
         eve.forEach(c => {
           if ( c.event == this.id ){
-            console.log('passou aqui');
             ukey = c.$key;
           }
         });
@@ -191,8 +191,31 @@ export class EventDetailPage {
         console.log(lng)
 
         if ( (latitude*-1) <= ((lat*-1)+0.0003) && (latitude*-1) >= ((lat*-1)-0.0003) && (longitude*-1) <= ((lng*-1)+0.0003) && (longitude*-1) >= ((lng*-1)-0.0003) ){
-          this.eventoConf.update({check: true});
-          this.userConf.update({check: true});
+          let ekey;
+          let ukey;
+          this.eventoConf.forEach(eve => {
+            eve.forEach(c => {
+              if ( c.uid == this.uid ){
+                ekey = c.$key;
+              }
+            });
+          });
+          this.eventoConf.update(ekey,{check: true});
+          this.userConf.forEach(eve => {
+            eve.forEach(c => {
+              if ( c.event == this.id ){
+                ukey = c.$key;
+              }
+            });
+          });
+          this.userConf.update(ukey,{check: true});
+          if ( this.e['coin'] ){
+            let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+            this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Check-in no evento \""+this.e['nome']+"\".", 50, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
+            this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
+              this.contaData.altSaldo(1, s[0].id, s[0].saldo, 50, firebase.auth().currentUser.uid);
+            });
+          }
         } else {
           console.log('não');
         }

@@ -35,6 +35,7 @@ export class CoinPage {
 
   options: BarcodeScannerOptions;
   dataQRC = null;
+  nome;
   myname;
   equiv;
   vous;
@@ -70,7 +71,7 @@ export class CoinPage {
       if (this.authentic) {
         this.contaData.getSaldo(firebase.auth().currentUser.uid).then( eventListSnap => {
           this.saldoVS = eventListSnap[0].saldo;
-          this.saldoRS = eventListSnap[0].saldo * 0.05 / 1.2;
+          this.saldoRS = eventListSnap[0].saldo * 0.04;
           this.transacoes = this.db.list('conta/'+firebase.auth().currentUser.uid+'/transacao',{
             query: {
               orderByChild: 'dt_hr',
@@ -92,47 +93,7 @@ export class CoinPage {
         });
       }
     } else if (this.coins == "receive"){
-      this.options = {
-        showTorchButton : true,
-        prompt : "Posicione o QRCode na área marcada.",
-      }
-      this.barcodeScanner.scan(this.options).then((barcodeData) => {
-        let time = new Date().getTime();
-        if ( time > (JSON.parse(barcodeData.text)[0].time + 30000) ){
-          let alert = this.alertCtrl.create({
-            title: "QRCode expirado!",
-            message: "O QRCode da Vou se renova a cada 30 segundos. Leia-o novamente.",
-            buttons: [{
-              text: "Ok",
-              handler: data => {
-                this.coins = 'pay';
-              }
-            }]
-          });
-          alert.present();
-        } else {
-          this.coins = 'receive';
-          this.dataQRC = barcodeData;
-          this.vous = 'V$ '+this.dataQRC[0].valor;
-          this.equiv = 'R$ '+(this.dataQRC[0].valor * 0.05 / 1.2);
-          /*setTimeout(() => {
-            let alert = this.alertCtrl.create({
-              title: "Transferência expirada!",
-              message: "Você tem 1 minuto para confirmar a tranferência, caso o contrário, ela é expirada. Tente novamente.",
-              buttons: [{
-                text: "Ok",
-                handler: data => {
-                  this.coins = 'pay';
-                }
-              }]
-            });
-            alert.present();
-          },60000);*/
-        }
-      }, (err) => {
-        console.log("Error occured : " + err);
-        this.coins = 'pay';
-      });
+      this.coins = 'home';
     }
   }
 
@@ -141,7 +102,7 @@ export class CoinPage {
       if (this.authentic) {
         this.contaData.getSaldo(firebase.auth().currentUser.uid).then( eventListSnap => {
           this.saldoVS = eventListSnap[0].saldo;
-          this.saldoRS = eventListSnap[0].saldo * 0.05 / 1.2;
+          this.saldoRS = eventListSnap[0].saldo * 0.04;
           this.transacoes = this.db.list('conta/'+firebase.auth().currentUser.uid+'/transacao',{
             query: {
               orderByChild: 'dt_hr',
@@ -170,27 +131,54 @@ export class CoinPage {
       this.barcodeScanner.scan(this.options).then((barcodeData) => {
         let time = new Date().getTime();
         if ( time > (JSON.parse(barcodeData.text)[0].time + 30000) ){
-          let alert = this.alertCtrl.create({
+          let al = this.alertCtrl.create({
             title: "QRCode expirado!",
             message: "O QRCode da Vou se renova a cada 30 segundos. Leia-o novamente.",
             buttons: [{
               text: "Ok",
               handler: data => {
-                this.coins = 'pay';
+                this.changeTabs();
               }
             }]
           });
-          alert.present();
+          al.present();
         } else {
-          this.dataQRC = barcodeData;
-          this.vous = 'V$ '+this.dataQRC[0].valor;
-          this.equiv = 'R$ '+(this.dataQRC[0].valor * 0.05 / 1.2);
+          this.dataQRC = JSON.parse(barcodeData.text)[0];
+          this.nome = this.dataQRC.nome;
+          this.vous = 'V$ '+this.dataQRC.vous;
+          this.equiv = 'R$ '+(this.dataQRC.vous * 0.04).toFixed(2);
+          setTimeout(() => {
+            let alert = this.alertCtrl.create({
+              title: "Transferência expirada!",
+              message: "Você tem 1 minuto para confirmar a tranferência, caso o contrário, ela é expirada. Tente novamente.",
+              buttons: [{
+                text: "Ok",
+                handler: data => {
+                  this.changeTabs();
+                }
+              }]
+            });
+            alert.present();
+          },60000);
         }
       }, (err) => {
-        console.log("Error occured : " + err);
-        this.coins = 'pay';
+        alert("Error occured : " + err);
+        this.coins = "home";
       });
     }
+  }
+
+  trans(){
+    let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Recebimento efetuado por "+this.dataQRC.nome+".", (this.dataQRC.vous * 0.8), 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
+    this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
+      this.contaData.altSaldo(1, s[0].id, s[0].saldo, this.dataQRC.vous, firebase.auth().currentUser.uid);
+
+      this.contaData.cadTransacao(this.dataQRC.uid, "Pagamento efetuado para "+this.myname+".", this.dataQRC.vous, 'Saída', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'saida','-');
+      this.contaData.getSaldo(this.dataQRC.uid).then(s => {
+        this.contaData.altSaldo(0, s[0].id, s[0].saldo, this.dataQRC.vous, this.dataQRC.uid);
+      });
+    });
   }
 
   keyUpVS(evt){
@@ -200,7 +188,7 @@ export class CoinPage {
     } else {
       this.auxVS = this.txtVS;
     }
-    this.txtRS = parseFloat((this.txtVS * 0.05 / 1.2).toFixed(2));
+    this.txtRS = parseFloat((this.txtVS * 0.04).toFixed(2));
   }
 
   keyUpRS(evt){
@@ -221,7 +209,7 @@ export class CoinPage {
       this.txtRS = parseFloat((parseFloat(''+this.txtRS)).toFixed(2));
       this.auxRS = this.txtRS;
     }
-    this.txtVS = parseInt((this.txtRS / 0.05 * 1.2).toFixed(0));
+    this.txtVS = parseInt((this.txtRS / 0.04).toFixed(0));
   }
 
   openButtonPage(i) {

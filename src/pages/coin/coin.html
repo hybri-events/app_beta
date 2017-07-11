@@ -69,13 +69,13 @@
       <ion-list style="padding-bottom:16px;" class="pay">
         <ion-item>
           <ion-label>V$</ion-label>
-          <ion-input type="number" [(ngModel)]="this.txtVS" (click)="cleanVS()" (keyup)="keyUpVS($event)"></ion-input>
+          <ion-input type="number" [(ngModel)]="this.txtVS" (keyup)="keyUpVS($event)"></ion-input>
         </ion-item>
       </ion-list>
       <ion-list style="padding-bottom:32px;" class="pay">
         <ion-item>
           <ion-label>R$</ion-label>
-          <ion-input type="number" id="rs" [(ngModel)]="this.txtRS" (click)="cleanRS()" (keyup)="keyUpRS($event)"></ion-input>
+          <ion-input type="number" id="rs" [(ngModel)]="this.txtRS" (keyup)="keyUpRS($event)"></ion-input>
         </ion-item>
       </ion-list>
       <button ion-button block color="primary" (click)="genQRCode()">Gerar QRCode</button>
@@ -84,7 +84,7 @@
       <ion-list class="receive">
         <ion-item>
           <ion-label stacked>De</ion-label>
-          <ion-input type="text" [disabled]="true" [(ngModel)]="dataQRC[0].nome"></ion-input>
+          <ion-input type="text" [disabled]="true" [(ngModel)]="nome"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label stacked>Para</ion-label>
@@ -103,7 +103,7 @@
           <ion-input type="text" [disabled]="true" [(ngModel)]="data"></ion-input>
         </ion-item>
       </ion-list>
-      <button ion-button block>Confirmar transferência</button>
+      <button ion-button block (click)="trans()">Confirmar transferência</button>
     </div>
   </div>
   <div class="fundo" padding *ngIf="!this.authentic">
