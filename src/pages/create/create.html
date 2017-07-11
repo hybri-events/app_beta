@@ -1,12 +1,44 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>Criar uma página</ion-title>
+    <ion-title>Meus estabelecimentos</ion-title>
+    <ion-buttons end (click)="newEstab()">
+      <button ion-button icon-only color="primary" class="btn_search">
+        <ion-icon name="icon-cancel" style="transform:rotate(45deg)"></ion-icon>
+      </button>
+    </ion-buttons>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
-
+  <p style="font-size:1.1em;text-align:center">Esta área é destinada para empresários que queiram cadastrar seus estabelecimentos e usufruir das vantagens da Vou.</p>
+  <ion-list>
+    <button ion-item>
+      <span class="nome">Nome do estabelecimento</span><br>
+      <span class="cidade">Cidade</span>
+      <ion-icon name="icon-edit" item-end></ion-icon>
+    </button>
+    <button ion-item>
+      <span class="nome">Nome do estabelecimento</span><br>
+      <span class="cidade">Cidade</span>
+      <ion-icon name="icon-edit" item-end></ion-icon>
+    </button>
+    <button ion-item>
+      <span class="nome">Nome do estabelecimento</span><br>
+      <span class="cidade">Cidade</span>
+      <ion-icon name="icon-edit" item-end></ion-icon>
+    </button>
+    <button ion-item>
+      <span class="nome">Nome do estabelecimento</span><br>
+      <span class="cidade">Cidade</span>
+      <ion-icon name="icon-edit" item-end></ion-icon>
+    </button>
+    <button ion-item>
+      <span class="nome">Nome do estabelecimento</span><br>
+      <span class="cidade">Cidade</span>
+      <ion-icon name="icon-edit" item-end></ion-icon>
+    </button>
+  </ion-list>
 </ion-content>

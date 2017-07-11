@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
+import { NewEstabPage } from '../new-estab/new-estab'
 
 @Component({
   selector: 'page-create',
@@ -12,6 +13,10 @@ export class CreatePage {
 
   ionViewDidLoad() {
 
+  }
+
+  newEstab(){
+    this.navCtrl.push(NewEstabPage,null);
   }
 
 }

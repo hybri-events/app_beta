@@ -1,0 +1,36 @@
+page-new-estab {
+  .item-md, .item-ios, .item-wp {
+    margin-top: 16px;
+    padding-right: 16px;
+  }
+  .item-wp ion-select{
+    min-height: 34px;
+  }
+  .list-ios > .item-block:first-child, .list-ios > .item-block:last-child{
+    border: 0px;
+  }
+  .label_check{
+    margin-top: 8px;
+  }
+  .label_check .label{
+    white-space: normal;
+  }
+  .label_check .item-inner{
+    border-bottom: 0px !important;
+  }
+
+  .checkbox-md{
+   margin-right: 12px !important;
+  }
+
+  ion-item-divider{
+    margin-top: 32px !important;
+    color: #652C90 !important;
+  }
+  .hora_dias{
+    float: left;
+    width: 50%;
+    margin-top: -8px;
+    margin-bottom: 8px;
+  }
+}

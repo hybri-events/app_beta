@@ -1,0 +1,187 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Criar estabelecimento</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only color="primary" class="btn_search" (click)="continuar()"><ion-icon name="icon-one-check"></ion-icon></button>
+    </ion-buttons>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+  <ion-list padding>
+    <ion-item>
+      <ion-label floating>Nome do estabelecimento</ion-label>
+      <ion-input type="text" [(ngModel)]="nome"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label floating>E-mail empresarial</ion-label>
+      <ion-input type="email" [(ngModel)]="email"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label floating>Telefone para contato</ion-label>
+      <ion-input type="tel" [(ngModel)]="fone"></ion-input>
+    </ion-item>
+    <ion-item class="label_check" style="margin-top: 4px;">
+      <p>Entraremos em contato convosco através deste telefone para validar a criação do estabelecimento.</p>
+    </ion-item>
+
+    <ion-item>
+      <ion-label floating>Categoria</ion-label>
+      <ion-select [(ngModel)]="estilo">
+        <ion-option value="0">Apenas</ion-option>
+        <ion-option value="1">Semanalmente</ion-option>
+        <ion-option value="2">Mensalmente</ion-option>
+        <ion-option value="3">Mensalmente</ion-option>
+        <ion-option value="4">Anualmente</ion-option>
+        <ion-option value="5">Anualmente</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item-divider>
+        Dias de funcionamento
+    </ion-item-divider>
+
+    <ion-item class="label_check">
+      <ion-label>Domingo</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="dias.dom"></ion-checkbox>
+    </ion-item>
+    <ion-item class="label_check hora_dias" *ngIf="dias.dom">
+      <ion-label floating>De</ion-label>
+      <ion-datetime displayFormat="HH:mm" [(ngModel)]="hora.dom.ini"></ion-datetime>
+    </ion-item>
+    <ion-item class="label_check hora_dias" *ngIf="dias.dom">
+      <ion-label floating>Até</ion-label>
+      <ion-datetime displayFormat="HH:mm" [(ngModel)]="hora.dom.fim"></ion-datetime>
+    </ion-item>
+
+    <ion-item class="label_check">
+      <ion-label>Segunda-feira</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="dias.seg"></ion-checkbox>
+    </ion-item>
+    <ion-item class="label_check hora_dias" *ngIf="dias.seg">
+      <ion-label floating>De</ion-label>
+      <ion-datetime displayFormat="HH:mm" [(ngModel)]="hora.seg.ini"></ion-datetime>
+    </ion-item>
+    <ion-item class="label_check hora_dias" *ngIf="dias.seg">
+      <ion-label floating>Até</ion-label>
+      <ion-datetime displayFormat="HH:mm" [(ngModel)]="hora.seg.fim"></ion-datetime>
+    </ion-item>
+
+    <ion-item class="label_check">
+      <ion-label>Terça-feira</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="dias.ter"></ion-checkbox>
+    </ion-item>
+    <ion-item class="label_check hora_dias" *ngIf="dias.ter">
+      <ion-label floating>De</ion-label>
+      <ion-datetime displayFormat="HH:mm" [(ngModel)]="hora.ter.ini"></ion-datetime>
+    </ion-item>
+    <ion-item class="label_check hora_dias" *ngIf="dias.ter">
+      <ion-label floating>Até</ion-label>
+      <ion-datetime displayFormat="HH:mm" [(ngModel)]="hora.ter.fim"></ion-datetime>
+    </ion-item>
+
+    <ion-item class="label_check">
+      <ion-label>Quarta-feira</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="dias.qua"></ion-checkbox>
+    </ion-item>
+    <ion-item class="label_check hora_dias" *ngIf="dias.qua">
+      <ion-label floating>De</ion-label>
+      <ion-datetime displayFormat="HH:mm" [(ngModel)]="hora.qua.ini"></ion-datetime>
+    </ion-item>
+    <ion-item class="label_check hora_dias" *ngIf="dias.qua">
+      <ion-label floating>Até</ion-label>
+      <ion-datetime displayFormat="HH:mm" [(ngModel)]="hora.qua.fim"></ion-datetime>
+    </ion-item>
+
+    <ion-item class="label_check">
+      <ion-label>Quinta-feira</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="dias.qui"></ion-checkbox>
+    </ion-item>
+    <ion-item class="label_check hora_dias" *ngIf="dias.qui">
+      <ion-label floating>De</ion-label>
+      <ion-datetime displayFormat="HH:mm" [(ngModel)]="hora.qui.ini"></ion-datetime>
+    </ion-item>
+    <ion-item class="label_check hora_dias" *ngIf="dias.qui">
+      <ion-label floating>Até</ion-label>
+      <ion-datetime displayFormat="HH:mm" [(ngModel)]="hora.qui.fim"></ion-datetime>
+    </ion-item>
+
+    <ion-item class="label_check">
+      <ion-label>Sexta-feira</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="dias.sex"></ion-checkbox>
+    </ion-item>
+    <ion-item class="label_check hora_dias" *ngIf="dias.sex">
+      <ion-label floating>De</ion-label>
+      <ion-datetime displayFormat="HH:mm" [(ngModel)]="hora.sex.ini"></ion-datetime>
+    </ion-item>
+    <ion-item class="label_check hora_dias" *ngIf="dias.sex">
+      <ion-label floating>Até</ion-label>
+      <ion-datetime displayFormat="HH:mm" [(ngModel)]="hora.sex.fim"></ion-datetime>
+    </ion-item>
+
+    <ion-item class="label_check">
+      <ion-label>Sábado</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="dias.sab"></ion-checkbox>
+    </ion-item>
+    <ion-item class="label_check hora_dias" *ngIf="dias.sab">
+      <ion-label floating>De</ion-label>
+      <ion-datetime displayFormat="HH:mm" [(ngModel)]="hora.sab.ini"></ion-datetime>
+    </ion-item>
+    <ion-item class="label_check hora_dias" *ngIf="dias.sab">
+      <ion-label floating>Até</ion-label>
+      <ion-datetime displayFormat="HH:mm" [(ngModel)]="hora.sab.fim"></ion-datetime>
+    </ion-item>
+
+    <ion-item-divider>
+        Características do estabelecimento
+    </ion-item-divider>
+
+    <ion-item class="label_check">
+      <ion-label><ion-icon name="icon-bar"></ion-icon> Serviço de bar</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="bar"></ion-checkbox>
+    </ion-item>
+    <ion-item class="label_check">
+      <ion-label><ion-icon name="icon-comida"></ion-icon> Serviço de cozinha</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="cozinha"></ion-checkbox>
+    </ion-item>
+    <ion-item class="label_check">
+      <ion-label><ion-icon name="icon-fumante"></ion-icon> Área para fumantes</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="fum"></ion-checkbox>
+    </ion-item>
+    <ion-item class="label_check">
+      <ion-label><ion-icon name="icon-wifi"></ion-icon> Wi-fi</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="wifi"></ion-checkbox>
+    </ion-item>
+    <ion-item class="label_check">
+      <ion-label><ion-icon name="icon-estacionamento"></ion-icon> Estacionamento</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="estac"></ion-checkbox>
+    </ion-item>
+    <ion-item class="label_check">
+      <ion-label><ion-icon name="icon-acessibilidade"></ion-icon> Acessibilidade</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="acess"></ion-checkbox>
+    </ion-item>
+
+    <ion-item-divider>
+        Formas de pagamento
+    </ion-item-divider>
+
+    <ion-item class="label_check">
+      <ion-label><ion-icon name="icon-cartao"></ion-icon> Cartão de Crédito/Débito</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="cartao"></ion-checkbox>
+    </ion-item>
+    <ion-item class="label_check" style="margin-bottom: 24px;">
+      <ion-label><ion-icon name="icon-dinheiro"></ion-icon> Dinheiro</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="dinheiro"></ion-checkbox>
+    </ion-item>
+    <ion-item class="label_check">
+      <ion-label><ion-icon name="icon-vous"></ion-icon> Desejo adotar o sistema de Vous</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="coins"></ion-checkbox>
+    </ion-item>
+
+  </ion-list>
+</ion-content>

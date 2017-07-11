@@ -44,6 +44,9 @@ import { InviteFriendsPage } from '../pages/invite-friends/invite-friends';
 import { CreatePage } from '../pages/create/create';
 import { SettingsPage } from '../pages/settings/settings';
 
+import { NewEstabPage } from '../pages/new-estab/new-estab';
+import { SetLocationCasaPage } from '../pages/set-location-casa/set-location-casa';
+
 import { CadastroPage } from '../pages/cadastro/cadastro';
 import { CodCadastroPage } from '../pages/cod-cadastro/cod-cadastro';
 import { LoginPage } from '../pages/login/login';
@@ -94,7 +97,9 @@ const firebaseConfig = {
     AddOrganizadorPage,
     InvitePage,
     PromocaoPage,
-    EventDetailPage
+    EventDetailPage,
+    NewEstabPage,
+    SetLocationCasaPage
   ],
   imports: [
     BrowserModule,
@@ -132,7 +137,9 @@ const firebaseConfig = {
     AddOrganizadorPage,
     InvitePage,
     PromocaoPage,
-    EventDetailPage
+    EventDetailPage,
+    NewEstabPage,
+    SetLocationCasaPage
   ],
   providers: [
     StatusBar,
