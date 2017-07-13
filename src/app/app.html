@@ -1,22 +1,23 @@
 <ion-menu [content]="mycontent">
   <ion-content>
-    <div class="fundo_menu" id="fundo_menu">
+    <div class="fundo_menu" [ngStyle]="{'background-image': 'url('+capaUser+')' }">
       <div class="header_menu">
-        <div class="ft_menu" id="ft_menu"></div>
+        <div class="ft_menu" [ngStyle]="{'background-image': 'url('+perfilPrin+')' }"></div>
         <div class="name_menu">
           <div class="label_name" *ngIf="!this.authentic">
             <button ion-button full menuToggle (click)="openButtonPage(0)">Cadastrar</button>
             <button ion-button full menuToggle (click)="openButtonPage(1)">Entrar</button>
           </div>
-          <div class="label_name" *ngIf="this.authentic" id="label_name"></div>
+          <div class="label_name" *ngIf="this.authentic" id="label_name">{{nomeUser}}</div>
         </div>
+        <div class="ft_perfil_casa" [ngStyle]="{'background-image': 'url('+perfilUser+')' }" *ngIf="isCasa" (click)="returnProfile()"></div>
       </div>
     </div>
     <ion-list no-lines>
       <!--<button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(0)"><ion-icon item-left name="icon-profile"></ion-icon>Perfil</button>-->
       <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(1)"><ion-icon item-left name="icon-events"></ion-icon>Meus eventos</button>
-      <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(2)"><ion-icon item-left name="icon-agenda"></ion-icon>Agenda</button>
-      <!--<button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(3)"><ion-icon item-left name="icon-invites"></ion-icon>Convites</button>-->
+      <!--<button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(2)"><ion-icon item-left name="icon-agenda"></ion-icon>Agenda</button>
+      <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(3)"><ion-icon item-left name="icon-invites"></ion-icon>Convites</button>-->
       <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(7)"><ion-icon item-left name="icon-promo"></ion-icon>Códigos promocionais</button>
       <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(4)"><ion-icon item-left name="icon-conv"></ion-icon>Convidar amigos</button>
       <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(5)"><ion-icon item-left name="icon-page"></ion-icon>Meus estabelecimentos</button>

@@ -2,6 +2,9 @@ import { Component, ViewChild } from '@angular/core';
 import { NavController, NavParams, AlertController } from 'ionic-angular';
 import { SetLocationEventPage } from '../set-location-event/set-location-event';
 import { Camera, CameraOptions } from '@ionic-native/camera';
+import { Storage } from '@ionic/storage';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import firebase from 'firebase';
 
 @Component({
   selector: 'page-criar-evento',
@@ -61,13 +64,31 @@ export class CriarEventoPage {
   semana = this.tsem[this.data.getDay()] +" "+ this.sem[this.data.getDay()];
   csem;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private camera: Camera, public alertCtrl: AlertController) {
+  coin = false;
+
+  casa: FirebaseListObservable<any>;
+  coinsCasa = false;
+
+  constructor(public navCtrl: NavController, public navParams: NavParams, private camera: Camera, public alertCtrl: AlertController, private storage: Storage, public db: AngularFireDatabase) {
     let mod = this.dia % 7;
     let div = parseInt((this.dia / 7)+"");
     if ( mod > 0 ){
       div++;
     }
     this.csem = this.tsem[this.data.getDay()] +" "+ this.cf[this.data.getDay()][div-1] +" "+ this.sem[this.data.getDay()];
+
+    this.storage.get('casa').then((val) => {
+      if ( val != null ){
+        this.casa = this.db.list("casas/"+firebase.auth().currentUser.uid+"/"+val+"/");
+        this.casa.forEach(ca => {
+          ca.forEach(c => {
+            if ( c.$key == 'coins' ){
+              this.coinsCasa = c.$value;
+            }
+          });
+        });
+      }
+    });
   }
 
   updateDt(){
@@ -111,8 +132,8 @@ export class CriarEventoPage {
     } else if (new Date(this.dt_ini) <= new Date(Date.now() - this.tzoffset)){
       erro++;
       let alert = this.alertCtrl.create({
-        title: 'Data e hora inválida!',
-        subTitle: 'Determine a data e hora de ínicio futura.',
+        title: 'Data e hora inválidas!',
+        subTitle: 'Determine uma data e hora de início válidas.',
         buttons: ['OK']
       });
       alert.present();
@@ -149,7 +170,7 @@ export class CriarEventoPage {
                 if (this.faixa.lower > this.faixa.upper){
                   erro++;
                   let alert = this.alertCtrl.create({
-                    title: 'Faixa de preço',
+                    title: 'Faixa de preço inválida!',
                     subTitle: 'O início da faixa de preço é maior que o fim.',
                     buttons: ['Ok']
                   });
@@ -219,7 +240,7 @@ export class CriarEventoPage {
                     priv: this.priv,
                     pub: this.pub,
                     gat: this.gatilho,
-                    coin: false,
+                    coin: this.coin,
                     img: this.img}];
     this.navCtrl.push(SetLocationEventPage, params);
   }

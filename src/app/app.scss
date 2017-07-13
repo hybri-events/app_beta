@@ -82,6 +82,17 @@ ion-content {
   color:white;
 }
 
+.ft_perfil_casa{
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-position:center;
+  background-size:cover;
+}
+
 @import "../theme/variables";
 
 @font-face {

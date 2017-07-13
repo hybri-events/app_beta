@@ -95,6 +95,11 @@
       <ion-input type="number" [(ngModel)]="faixa.upper"></ion-input>
     </ion-item>
 
+    <ion-item class="label_check" *ngIf="coinsCasa">
+      <ion-label>Distribuir Vous neste evento</ion-label>
+      <ion-checkbox color="primary" [(ngModel)]="coin"></ion-checkbox>
+    </ion-item>
+
     <!--<ion-item class="label_check">
       <ion-label>Permitir publicações de outras pessoas no evento</ion-label>
       <ion-checkbox color="primary" [(ngModel)]="pub"></ion-checkbox>

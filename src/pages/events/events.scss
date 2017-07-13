@@ -27,6 +27,7 @@
 .card-background-page-map {
   float: left;
   width: 232px;
+  display: inline-block;
 
   .card {float:left;width:100%;background-size:cover;background-position:center;color:white;font-size:0.9em;}
 
@@ -115,7 +116,15 @@
         height: calc(100% - 68.8px);
       }
 
+      .gm-style-iw {
+        top: 0px !important;
+        left: 0px !important;
+        width: 232px !important;
+      }
 
+      .prim {
+        width: 232px !important;
+      }
 
     }
 

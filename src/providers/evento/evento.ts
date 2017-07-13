@@ -9,7 +9,7 @@ export class EventoProvider {
 
   constructor(public http: Http) {}
 
-  cadEvento(params): firebase.Promise<any> {
+  cadEvento(params,uid): firebase.Promise<any> {
     for ( let i=0;i<params[0].tags.length;i++ ){
       this.cadTags(params[0].tags[i].nome);
     }
@@ -21,7 +21,7 @@ export class EventoProvider {
     let mes = meses[datai.getMonth()];
     return firebase.database().ref(`evento/`).push({
       nome: params[0].nome,
-      criador: firebase.auth().currentUser.uid,
+      criador: uid,
       nomeCriador: params[2].nomeCriador,
       dt_ini: ('0'+datai.getDate()).slice(-2)+'/'+('0'+(datai.getMonth()+1)).slice(-2)+'/'+datai.getFullYear(),
       hr_ini: ('0'+datai.getHours()).slice(-2)+':'+('0'+datai.getMinutes()).slice(-2),

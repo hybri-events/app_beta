@@ -8,6 +8,8 @@ import { ErrorProvider } from '../../providers/error/error';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 import firebase from 'firebase';
+import { Storage } from '@ionic/storage';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 
 declare var google;
 
@@ -26,7 +28,14 @@ export class SetLocationEventPage {
   param: any;
   public loading:Loading;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public geolocation: Geolocation, private modalCtrl: ModalController, public http: Http, public event: EventoProvider, public err: ErrorProvider, public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
+  isCasa = false;
+  casa: FirebaseListObservable<any>;
+  nomeCasa;
+  keyCasa;
+  latCasa;
+  lngCasa;
+
+  constructor(public navCtrl: NavController, public navParams: NavParams, public geolocation: Geolocation, private modalCtrl: ModalController, public http: Http, public event: EventoProvider, public err: ErrorProvider, public alertCtrl: AlertController, public loadingCtrl: LoadingController, private storage: Storage, public db: AngularFireDatabase) {
     this.address = {
       place: ''
     };
@@ -41,9 +50,9 @@ export class SetLocationEventPage {
       if ( this.param[0].priv == "1" ){
         this.navCtrl.push(InvitePage, this.param);
       } else {
-        this.event.getNomeCriador(firebase.auth().currentUser.uid).then(n => {
-          this.param.push({nomeCriador: n[0].nome})
-          this.event.cadEvento(this.param).then((e) => {
+        if ( this.isCasa ){
+          this.param.push({nomeCriador: this.nomeCasa});
+          this.event.cadEvento(this.param, this.keyCasa).then((e) => {
             if ( this.param[0].img != 'assets/event_default.png' ){
               this.event.saveImg(e.key,this.param[0].img);
             }
@@ -62,7 +71,30 @@ export class SetLocationEventPage {
               alert.present();
             });
           });
-        });
+        } else {
+          this.event.getNomeCriador(firebase.auth().currentUser.uid).then(n => {
+            this.param.push({nomeCriador: n[0].nome})
+            this.event.cadEvento(this.param, firebase.auth().currentUser.uid).then((e) => {
+              if ( this.param[0].img != 'assets/event_default.png' ){
+                this.event.saveImg(e.key,this.param[0].img);
+              }
+              this.navCtrl.pop();
+              this.navCtrl.pop();
+            }, (error) => {
+              this.loading.dismiss().then( () => {
+                let alert = this.alertCtrl.create({
+                  title: "Ocorreu um erro!",
+                  message: this.err.messageError(error["code"]),
+                  buttons: [{
+                    text: "Ok",
+                    role: 'cancel'
+                  }]
+                });
+                alert.present();
+              });
+            });
+          });
+        }
       }
     });
   }
@@ -83,19 +115,44 @@ export class SetLocationEventPage {
   }
 
   ionViewDidLoad(){
-    this.geolocation.getCurrentPosition().then((position) => {
+    this.storage.get('casa').then((val) => {
+      if ( val != null ){
+        this.keyCasa = val;
+        this.casa = this.db.list("casas/"+firebase.auth().currentUser.uid+"/"+val+"/");
+        this.casa.forEach(ca => {
+          ca.forEach(c => {
+            if ( c.$key == 'nome' ){
+              this.nomeCasa = c.$value;
+            } else if ( c.$key == 'lat' ){
+              this.latCasa = c.$value;
+            } else if ( c.$key == 'lng' ){
+              this.lngCasa = c.$value;
+            }
+          });
+        });
+        this.isCasa = true;
+        this.lat = this.latCasa;
+        this.lng = this.lngCasa;
+        this.loadMap();
+      } else {
+        this.geolocation.getCurrentPosition().then((position) => {
 
-      this.lat = position.coords.latitude;
-      this.lng = position.coords.longitude;
+          this.lat = position.coords.latitude;
+          this.lng = position.coords.longitude;
 
-      this.loadMap();
+          this.loadMap();
 
-    }, (err) => {
-      console.log(err);
+        }, (err) => {
+          console.log(err);
+        });
+      }
     });
   }
 
   loadMap(){
+
+    console.log(this.lat)
+    console.log(this.lng)
 
     let latLng = new google.maps.LatLng(this.lat, this.lng);
 

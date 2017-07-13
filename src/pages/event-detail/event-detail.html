@@ -2,9 +2,14 @@
 
   <ion-navbar>
     <ion-title id="title">{{e.nome}}</ion-title>
-    <ion-buttons end *ngIf="uid == e.criador">
+    <ion-buttons end *ngIf="uid == e.criador || keyCasa == e.criador">
       <button ion-button icon-only color="primary" class="btn_search">
         <ion-icon name="icon-edit"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-buttons end *ngIf="uid == e.criador || keyCasa == e.criador">
+      <button ion-button icon-only color="primary" class="btn_search">
+        <ion-icon name="icon-del"></ion-icon>
       </button>
     </ion-buttons>
   </ion-navbar>
@@ -41,11 +46,11 @@
   <div class="tabs_event" id="tabs" *ngIf="data < e.dti">
     <div class="tab_event" style="width:100%;">
       <p style="margin: 16px 0px 8px;font-family:Lato-Black">{{numConf}} {{(numConf == 1?'CONFIRMADO':'CONFIRMADOS')}}</p>
-      <button ion-button icon-left clear full (click)="conf()" *ngIf="!confirm">
+      <button ion-button icon-left clear full (click)="conf()" *ngIf="!confirm && !isCasa">
         <ion-icon name="icon-one-check"></ion-icon>
         CONFIRMAR PRESENÇA
       </button>
-      <button ion-button icon-left clear full (click)="conf()" *ngIf="confirm">
+      <button ion-button icon-left clear full (click)="conf()" *ngIf="confirm && !isCasa">
         <ion-icon name="icon-cancel"></ion-icon>
         CANCELAR PRESENÇA
       </button>
@@ -58,7 +63,7 @@
     <div class="tab_event">
       <p style="margin: 16px;font-family:Lato-Black">{{numConf}}<br>{{(numConf == 1?'CONFIRMADO':'CONFIRMADOS')}}</p>
     </div>
-    <div class="tab_event" style="width:100%;" *ngIf="periodoCheck && confirm">
+    <div class="tab_event" style="width:100%;" *ngIf="periodoCheck && confirm && !isCasa">
       <button ion-button icon-left clear full (click)="check()">
         <ion-icon name="icon-one-check"></ion-icon>
         FAZER CHECK-IN
@@ -74,20 +79,22 @@
       <div class="lab"><ion-icon name="icon-events" item-start></ion-icon>Local</div>
       <div class="cont"><div #map id="map" style="width:100%;height:150px;"></div></div>
     </ion-item>
-    <ion-item>
+    <ion-item *ngIf="e.criador[0] == '-'">
       <div class="lab"><ion-icon name="icon-home" item-start></ion-icon>Características do local</div>
       <div class="cont">
-        <ion-icon name="icon-fumante" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Área para fumantes<br>
-        <ion-icon name="icon-wifi" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Wi-fi<br>
-        <ion-icon name="icon-comida" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Comidas<br>
-        <ion-icon name="icon-bar" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Bebidas
+        <div *ngIf="e.casa.bar"><ion-icon name="icon-bar" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Bebidas</div>
+        <div *ngIf="e.casa.cozinha"><ion-icon name="icon-comida" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Comidas</div>
+        <div *ngIf="e.casa.wifi"><ion-icon name="icon-wifi" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Wi-Fi</div>
+        <div *ngIf="e.casa.fum"><ion-icon name="icon-fumante" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Área para fumantes</div>
+        <div *ngIf="e.casa.estac"><ion-icon name="icon-estacionamento" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Estacionamento</div>
+        <div *ngIf="e.casa.acess"><ion-icon name="icon-acessibilidade" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Acessibilidade</div>
       </div>
     </ion-item>
-    <ion-item>
+    <ion-item *ngIf="e.criador[0] == '-'">
       <div class="lab"><ion-icon name="icon-coin" item-start></ion-icon>Formas de pagamento</div>
       <div class="cont">
-        <ion-icon name="icon-cartao" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Cartão<br>
-        <ion-icon name="icon-dinheiro" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Dinheiro<br>
+        <div *ngIf="e.casa.cartao"><ion-icon name="icon-cartao" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Cartão</div>
+        <div *ngIf="e.casa.dinheiro"><ion-icon name="icon-dinheiro" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Dinheiro</div>
         <div *ngIf="e.coin"><ion-icon name="icon-vous" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Vous</div>
       </div>
     </ion-item>

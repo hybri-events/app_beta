@@ -30,8 +30,8 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content padding [attr.class]="!this.authentic ? 'scroll-coin' : ''">
-  <div [ngSwitch]="coins" [attr.class]="!this.authentic ? 'cont' : ''">
+<ion-content padding [attr.class]="!this.authentic || (isCasa && !coinCasa) ? 'scroll-coin' : ''">
+  <div [ngSwitch]="coins" [attr.class]="!this.authentic || (isCasa && !coinCasa) ? 'cont' : ''">
     <div *ngSwitchCase="'home'" class="home">
       <div class="saldo">
         <div class="lbl_saldo">Saldo</div>
@@ -51,7 +51,7 @@
           <div class="info_ex">
             <div class="tipo_ex {{transacao.classe}}"><ion-icon name="icon-{{transacao.classe}}"></ion-icon>{{transacao.tipo}}</div>
             <div class="desc_ex">{{transacao.descricao}}</div>
-            <div class="date_ex">{{transacao.dt_hr}}</div>
+            <div class="date_ex">{{('0'+transacao.dia).slice(-2)}}/{{('0'+transacao.mes).slice(-2)}}/{{transacao.ano}} {{('0'+transacao.hora).slice(-2)}}:{{('0'+transacao.min).slice(-2)}}</div>
           </div>
           <div class="value_ex {{transacao.classe}}">
             {{transacao.operador}} V${{transacao.valor}}
@@ -109,9 +109,17 @@
   <div class="fundo" padding *ngIf="!this.authentic">
     <div class="breve">
       <div class="txt_breve" style="font-family:Lato-Medium">
-        Você precisa entrar em uma conta para usar essa funcionalidade.<br><br>
+        Você precisa estar logado para ter acesso à essa área.<br><br>
         <button ion-button full (click)="openButtonPage(0)">Cadastrar</button>
         <button ion-button full (click)="openButtonPage(1)">Entrar</button>
+      </div>
+    </div>
+  </div>
+  <div class="fundo" padding *ngIf="isCasa && !coinCasa">
+    <div class="breve">
+      <div class="txt_breve" style="font-family:Lato-Medium">
+        Você ainda não tem nosso serviço de distribuição de Vous? Não fique para trás e solicite abaixo.<br><br>
+        <button ion-button full (click)="solicitarCoins()">Solicitar distribuição de Vous</button>
       </div>
     </div>
   </div>

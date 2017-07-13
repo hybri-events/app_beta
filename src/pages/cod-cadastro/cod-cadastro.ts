@@ -38,7 +38,7 @@ export class CodCadastroPage {
             if ( item[0].usado ){
               let alert = this.alertCtrl.create({
                 title: "Esse código já está em uso!",
-                message: "Esse código promocional já está em uso. Caso esse código seja seu, contate-nos pelo e-mail 'gustavo@usevou.com' relatando o problema.",
+                message: "Esse código promocional já está em uso. Caso esse código seja seu, contate-nos pelo e-mail 'contato@usevou.com' relatando o problema.",
                 buttons: [{
                   text: "Ok",
                   role: 'cancel'
@@ -51,7 +51,7 @@ export class CodCadastroPage {
             } else {
               let alert = this.alertCtrl.create({
                 title: "Código correto!",
-                message: "Parabéns você acabou de ganhar V$50.",
+                message: "Parabéns, você  ganhou V$50!",
                 buttons: [{
                   text: "Ok",
                   handler: data => {
@@ -63,7 +63,7 @@ export class CodCadastroPage {
                       this.storage.set('codcad', true);
                     });
                     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
-                    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Bônus pelo seu cadastro prévio.", 50, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
+                    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Bônus de pré-cadastro.", 50, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
                     this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
                       this.contaData.altSaldo(1, s[0].id, s[0].saldo, 50, firebase.auth().currentUser.uid);
                       this.navCtrl.pop();
@@ -85,7 +85,7 @@ export class CodCadastroPage {
             if ( key == firebase.auth().currentUser.uid ){
               let alert = this.alertCtrl.create({
                 title: "Esse código é seu!",
-                message: "Você não pode cadastrar seu próprio código de convite.",
+                message: "Você não pode cadastrar seu próprio código promocional.",
                 buttons: [{
                   text: "Ok",
                   role: 'cancel'
@@ -98,7 +98,7 @@ export class CodCadastroPage {
             } else if ( item[this.codigo] != undefined ){
               let alert = this.alertCtrl.create({
                 title: "Código correto!",
-                message: "Parabéns você acabou de ganhar V$10.",
+                message: "Parabéns, você ganhou V$25.",
                 buttons: [{
                   text: "Ok",
                   handler: data => {
@@ -109,10 +109,10 @@ export class CodCadastroPage {
                       this.storage.set('codcad', true);
                     });
                     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
-                    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Bônus pelo código de cadastro.", 25, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
+                    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Bônus de convite utilizado.", 25, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
                     this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
                       this.contaData.altSaldo(1, s[0].id, s[0].saldo, 25, firebase.auth().currentUser.uid);
-                      this.contaData.cadTransacao(key, "Bônus pelo convite para cadastro.", 25, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
+                      this.contaData.cadTransacao(key, "Bônus convite recebido.", 25, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
                       this.contaData.getSaldo(key).then(s => {
                         this.contaData.altSaldo(1, s[0].id, s[0].saldo, 25, key);
                         this.navCtrl.pop();

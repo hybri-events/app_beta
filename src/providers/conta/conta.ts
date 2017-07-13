@@ -22,7 +22,7 @@ export class ContaProvider {
 
   cadTransacao(uid, descricao, valor, tipo, dt_hr, classe, operador): firebase.Promise<any> {
     return firebase.database().ref('conta/'+uid+'/transacao').push({
-      descricao, valor, tipo, dt_hr, classe, operador
+      descricao, valor, tipo, dt_hr, classe, operador, dia: new Date(dt_hr).getDate(), mes: new Date(dt_hr).getMonth()+1, ano: new Date(dt_hr).getFullYear(), hora: new Date(dt_hr).getHours(), min: new Date(dt_hr).getMinutes() 
     });
   }
 

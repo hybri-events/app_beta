@@ -10,7 +10,6 @@ import { UserDataProvider } from '../providers/user-data/user-data';
 import { Storage } from '@ionic/storage';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import firebase from 'firebase/app';
-import { BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationResponse } from '@ionic-native/background-geolocation';
 
 import { TabsPage } from '../pages/tabs/tabs';
 
@@ -39,7 +38,15 @@ export class MyApp {
   tags: FirebaseListObservable<any>;
   teste: FirebaseListObservable<any>;
 
-  constructor(private backgroundGeolocation: BackgroundGeolocation, platform: Platform, statusBar: StatusBar, private storage: Storage, public db: AngularFireDatabase, public afDatabase: AngularFireDatabase, public splashScreen: SplashScreen, afAuth: AngularFireAuth, public authData: AuthProvider, public userData: UserDataProvider, public alertCtrl: AlertController, public err: ErrorProvider) {
+  nomeUser;
+  perfilUser;
+  capaUser;
+  perfilPrin;
+
+  isCasa = false;
+  casa: FirebaseListObservable<any>;
+
+  constructor(platform: Platform, statusBar: StatusBar, private storage: Storage, public db: AngularFireDatabase, public afDatabase: AngularFireDatabase, public splashScreen: SplashScreen, afAuth: AngularFireAuth, public authData: AuthProvider, public userData: UserDataProvider, public alertCtrl: AlertController, public err: ErrorProvider) {
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     let fdata = new Date(Date.now() - tzoffset);
     fdata.setHours(-3);
@@ -56,11 +63,27 @@ export class MyApp {
         if ( !user.isAnonymous ){
           this.authentic = true;
           this.userData.getUser().then( eventListSnap => {
-            document.getElementById("label_name").innerHTML = eventListSnap[0].nome;
-            document.getElementById("ft_menu").style.backgroundImage = "url("+eventListSnap[0].ft_perfil+")";
-            document.getElementById("fundo_menu").style.backgroundImage = "url("+eventListSnap[0].ft_capa+")";
-            this.storage.set('nomeUsu', eventListSnap[0].nome);
+            this.nomeUser = eventListSnap[0].nome;
+            this.perfilUser = eventListSnap[0].ft_perfil;
+            this.perfilPrin = this.perfilUser;
+            this.capaUser = eventListSnap[0].ft_capa;
+
+            this.storage.set('nomeUsu', this.nomeUser);
             this.storage.set('codcad', eventListSnap[0].codcad);
+            this.storage.get('casa').then((val) => {
+              if ( val != null ){
+                this.casa = this.db.list("casas/"+firebase.auth().currentUser.uid+"/"+val+"/");
+                this.casa.forEach(ca => {
+                  ca.forEach(c => {
+                    if ( c.$key == 'nome' ){
+                      this.nomeUser = c.$value;
+                    }
+                  });
+                });
+                this.isCasa = true;
+                this.perfilPrin = 'assets/estab_default.png';
+              }
+            });
           }).catch((error) => {
             console.log('Ok');
             console.log(error);
@@ -88,32 +111,12 @@ export class MyApp {
       statusBar.styleDefault();
       splashScreen.hide();
     });
-
-    /*const config: BackgroundGeolocationConfig = {
-            desiredAccuracy: 10,
-            stationaryRadius: 20,
-            distanceFilter: 30,
-            debug: false, //  enable this hear sounds for background-geolocation life-cycle.
-            stopOnTerminate: false, // enable this to clear background location settings when the app terminates
-            notificationTitle: 'Vou',
-            notificationText: 'Verificação de check-in em eventos',
-            notificationIconColor: '#652C900',
-            notificationIconLarge: 'assets/logo_qr.png',
-            notificationIconSmall: 'assets/logo_qr.png'
-    };
-
-    this.backgroundGeolocation.configure(config).subscribe((location: BackgroundGeolocationResponse) => {
-      this.teste = this.db.list('/teste/');
-      setInterval(() => {
-        this.teste.push(location);
-      },5000);
-    });
-
-    this.backgroundGeolocation.start();*/
   }
 
-  ionViewDidLoad() {
-
+  returnProfile() {
+    this.storage.remove('casa');
+    this.splashScreen.show();
+    window.location.reload();
   }
 
   openMenuPage(i) {

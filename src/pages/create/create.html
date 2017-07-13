@@ -13,31 +13,16 @@
 
 
 <ion-content padding>
-  <p style="font-size:1.1em;text-align:center">Esta área é destinada para empresários que queiram cadastrar seus estabelecimentos e usufruir das vantagens da Vou.</p>
+  <p style="font-size:1.1em;text-align:center">Empresário, cadastre aqui seus estabelecimentos para aproveitar todas as vantagens que oferecemos.</p>
   <ion-list>
-    <button ion-item>
-      <span class="nome">Nome do estabelecimento</span><br>
-      <span class="cidade">Cidade</span>
-      <ion-icon name="icon-edit" item-end></ion-icon>
-    </button>
-    <button ion-item>
-      <span class="nome">Nome do estabelecimento</span><br>
-      <span class="cidade">Cidade</span>
-      <ion-icon name="icon-edit" item-end></ion-icon>
-    </button>
-    <button ion-item>
-      <span class="nome">Nome do estabelecimento</span><br>
-      <span class="cidade">Cidade</span>
-      <ion-icon name="icon-edit" item-end></ion-icon>
-    </button>
-    <button ion-item>
-      <span class="nome">Nome do estabelecimento</span><br>
-      <span class="cidade">Cidade</span>
-      <ion-icon name="icon-edit" item-end></ion-icon>
-    </button>
-    <button ion-item>
-      <span class="nome">Nome do estabelecimento</span><br>
-      <span class="cidade">Cidade</span>
+    <ion-item style="white-space:normal" *ngIf="(list | async)?.length == 0">
+      <p>Não há nenhum estabelecimento vínculado à essa conta.</p>
+    </ion-item>
+    <button *ngFor="let l of list | async" ion-item [disabled]="!l.valid" (click)="changeProfile(l.$key)">
+      <span class="nome">{{l.nome}}</span><br>
+      <span class="cidade">{{l.cidade}}</span><br>
+      <i class="cidade" style="color:#652C90" *ngIf="!l.valid">Em processo de validação</i>
+      <ion-icon name="icon-del" item-end style="margin-right:8px;"></ion-icon>
       <ion-icon name="icon-edit" item-end></ion-icon>
     </button>
   </ion-list>

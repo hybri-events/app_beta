@@ -102,6 +102,8 @@ export class NewEstabPage {
                   cozinha: this.cozinha,
                   fum: this.fum,
                   wifi: this.wifi,
+                  estac: this.estac,
+                  acess: this.acess,
                   cartao: this.cartao,
                   dinheiro: this.dinheiro,
                   coins: this.coins,

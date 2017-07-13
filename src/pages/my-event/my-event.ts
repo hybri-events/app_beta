@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { EventDetailPage } from '../event-detail/event-detail';
+import { Storage } from '@ionic/storage';
 import firebase from 'firebase';
 
 @Component({
@@ -15,20 +16,44 @@ export class MyEventPage {
   eve: FirebaseListObservable<any>;
   conf: FirebaseListObservable<any>;
 
-  constructor(public navCtrl: NavController, public db: AngularFireDatabase, public navParams: NavParams) {
-    this.conf = db.list("/usuario/"+firebase.auth().currentUser.uid+"/confirmados/");
+  isCasa = false;
+  casa = [];
+
+  constructor(public navCtrl: NavController, public db: AngularFireDatabase, public navParams: NavParams, private storage: Storage) {
     this.eve = db.list("/evento/");
-    this.conf.forEach(co => {
-      this.events = [];
-      co.forEach(c => {
+    this.conf = db.list("/usuario/"+firebase.auth().currentUser.uid+"/confirmados/");
+    db.list('/casas/').subscribe(list => this.casa = list );
+    this.storage.get('casa').then((val) => {
+      if ( val != null ){
         this.eve.forEach(ev => {
+          this.cri = [];
           ev.forEach(e => {
-            if ( c.event == e.$key ){
-              this.events.unshift(e);
+            if ( e.criador == val ){
+              this.casa.forEach(ca => {
+                if( ca[e.criador] != null ){
+                  e['casa'] = ca[e.criador];
+                  this.cri.unshift(e);
+                }
+              });
             }
-          });
+          })
+        })
+        this.isCasa = true;
+        this.tabs = "cri";
+      } else {
+        this.conf.forEach(co => {
+          this.events = [];
+          co.forEach(c => {
+            this.eve.forEach(ev => {
+              ev.forEach(e => {
+                if ( c.event == e.$key ){
+                  this.events.unshift(e);
+                }
+              });
+            });
+          })
         });
-      })
+      }
     });
   }
 

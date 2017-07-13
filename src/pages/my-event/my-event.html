@@ -3,7 +3,7 @@
   <ion-navbar>
     <ion-title>Meus eventos</ion-title>
   </ion-navbar>
-  <ion-toolbar class="tab_top" no-border-top style="padding:0px;">
+  <ion-toolbar class="tab_top" no-border-top style="padding:0px;" *ngIf="!isCasa">
     <ion-segment [(ngModel)]="tabs" (ionChange)="changeTabs()">
       <ion-segment-button value="con">
         Confirmados
@@ -28,15 +28,17 @@
             <div class="amigos_list" *ngIf="e.coin"><img src="assets/selo.png"></div>
             <div class="info_list">
               <div class="icon_list"><ion-icon name="icon-coin"></ion-icon><div>{{(e.faixa_ini==0?'Gratuito':'R$'+e.faixa_ini)}}{{(e.faixa_fim==0?'':(e.faixa_fim!=e.faixa_ini?' - R$'+e.faixa_fim:''))}}</div></div>
-              <div class="icon_list">
-                <ion-icon name="icon-fumante"></ion-icon>
-                <ion-icon name="icon-wifi"></ion-icon>
-                <ion-icon name="icon-comida"></ion-icon>
-                <ion-icon name="icon-bar"></ion-icon>
+              <div class="icon_list" *ngIf="e.criador[0] == '-'">
+                <ion-icon name="icon-estacionamento" *ngIf="e.casa.estac"></ion-icon>
+                <ion-icon name="icon-acessibilidade" *ngIf="e.casa.acess"></ion-icon>
+                <ion-icon name="icon-fumante" *ngIf="e.casa.fum"></ion-icon>
+                <ion-icon name="icon-wifi" *ngIf="e.casa.wifi"></ion-icon>
+                <ion-icon name="icon-comida" *ngIf="e.casa.cozinha"></ion-icon>
+                <ion-icon name="icon-bar" *ngIf="e.casa.bar"></ion-icon>
               </div>
-              <div class="icon_list">
-                <ion-icon name="icon-cartao"></ion-icon>
-                <ion-icon name="icon-dinheiro"></ion-icon>
+              <div class="icon_list" *ngIf="e.criador[0] == '-'">
+                <ion-icon name="icon-cartao" *ngIf="e.casa.cartao"></ion-icon>
+                <ion-icon name="icon-dinheiro" *ngIf="e.casa.dinheiro"></ion-icon>
                 <ion-icon *ngIf="e.coin" name="icon-vous"></ion-icon>
               </div>
             </div>
@@ -62,7 +64,7 @@
     </div>
     <div *ngSwitchCase="'cri'">
 
-      <div class="breve" padding *ngIf="cri.length == 0"><div class="txt_breve">Você ainda não confirmou presença em nenhum evento.</div></div>
+      <div class="breve" padding *ngIf="cri.length == 0"><div class="txt_breve">Você ainda não criou nenhum evento.</div></div>
       <div *ngFor="let e of cri">
         <ion-card [ngStyle]="{'background-image': 'url('+e.img+')' }" *ngIf="e.priv == '0'" (click)="openEvent(e.$key)">
           <div class="fundo_card">

@@ -23,28 +23,40 @@
     </ion-item>
 
     <ion-item>
-      <ion-label floating>Telefone para contato</ion-label>
+      <ion-label floating>Telefone do responsável</ion-label>
       <ion-input type="tel" [(ngModel)]="fone"></ion-input>
     </ion-item>
     <ion-item class="label_check" style="margin-top: 4px;">
-      <p>Entraremos em contato convosco através deste telefone para validar a criação do estabelecimento.</p>
+      <p>Entraremos em contato através deste telefone para validar o cadastro do estabelecimento.</p>
     </ion-item>
 
     <ion-item>
       <ion-label floating>Categoria</ion-label>
       <ion-select [(ngModel)]="estilo">
-        <ion-option value="0">Apenas</ion-option>
-        <ion-option value="1">Semanalmente</ion-option>
-        <ion-option value="2">Mensalmente</ion-option>
-        <ion-option value="3">Mensalmente</ion-option>
-        <ion-option value="4">Anualmente</ion-option>
-        <ion-option value="5">Anualmente</ion-option>
+        <ion-option value="casa_noturna">Casa noturna</ion-option>
+        <ion-option value="casa_noturna_lgbts">Casa noturna LGBTS</ion-option>
+        <ion-option value="beach_club">Beach Club</ion-option>
+        <ion-option value="bar">Bar</ion-option>
+        <ion-option value="bar_lgbts">Bar LGBTS</ion-option>
+        <ion-option value="pub">Pub</ion-option>
+        <ion-option value="lounge_narguile">Lounge de narguilé</ion-option>
+        <ion-option value="restaurante">Restaurante (com música ao vivo)</ion-option>
+        <ion-option value="espaco_shows">Espaço para shows e eventos</ion-option>
+        <ion-option value="produtora">Produtora de eventos</ion-option>
+        <ion-option value="teatro">Teatro</ion-option>
+        <ion-option value="festa_anual">Festa típica anual</ion-option>
+        <ion-option value="salao_baile">Salão de baile</ion-option>
+        <ion-option value="outro">Outro</ion-option>
       </ion-select>
     </ion-item>
 
     <ion-item-divider>
         Dias de funcionamento
     </ion-item-divider>
+
+    <ion-item class="label_check">
+      <p>Os eventos do seu estabelecimento serão criados automaticamente de acordo com o seu horário de funcionamento, definido abaixo:</p>
+    </ion-item>
 
     <ion-item class="label_check">
       <ion-label>Domingo</ion-label>
@@ -154,7 +166,7 @@
       <ion-checkbox color="primary" [(ngModel)]="fum"></ion-checkbox>
     </ion-item>
     <ion-item class="label_check">
-      <ion-label><ion-icon name="icon-wifi"></ion-icon> Wi-fi</ion-label>
+      <ion-label><ion-icon name="icon-wifi"></ion-icon> Wi-Fi</ion-label>
       <ion-checkbox color="primary" [(ngModel)]="wifi"></ion-checkbox>
     </ion-item>
     <ion-item class="label_check">
@@ -181,6 +193,9 @@
     <ion-item class="label_check">
       <ion-label><ion-icon name="icon-vous"></ion-icon> Desejo adotar o sistema de Vous</ion-label>
       <ion-checkbox color="primary" [(ngModel)]="coins"></ion-checkbox>
+    </ion-item>
+    <ion-item class="label_check" style="margin-top:0px;margin-left:32px;">
+      <p>Atraia e fidelize clientes através da distribuição de Vous. <a href="http://empresario.usevou.com/">Saiba mais</a>.</p>
     </ion-item>
 
   </ion-list>

@@ -42,6 +42,11 @@ export class CoinPage {
   dt = new Date();
   data = ('0'+this.dt.getDate()).slice(-2)+'/'+('0'+(this.dt.getMonth()+1)).slice(-2)+'/'+this.dt.getFullYear()+' às '+('0'+this.dt.getHours()).slice(-2)+':'+('0'+this.dt.getMinutes()).slice(-2);
 
+  isCasa = false;
+  coinCasa = false;
+  casa: FirebaseListObservable<any>;
+  keyCasa;
+
   constructor(platform: Platform, public db: AngularFireDatabase, private storage: Storage, public navCtrl: NavController, afAuth: AngularFireAuth, public contaData: ContaProvider, public alertCtrl: AlertController, public err: ErrorProvider, private barcodeScanner: BarcodeScanner) {
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     this.plat = platform;
@@ -64,6 +69,35 @@ export class CoinPage {
     storage.get('nomeUsu').then((val) => {
       this.myname = val;
     });
+
+    this.storage.get('casa').then((val) => {
+      if ( val != null ){
+        this.keyCasa = val;
+        this.casa = this.db.list("casas/"+firebase.auth().currentUser.uid+"/"+val+"/");
+        this.casa.forEach(ca => {
+          ca.forEach(c => {
+            if ( c.$key == 'coins' ){
+              this.coinCasa = c.$value;
+            }
+          });
+        });
+        this.isCasa = true;
+      }
+    });
+  }
+
+  solicitarCoins(){
+    let sol = this.db.list("/solicitCoins/");
+    sol.push({idCasa: this.keyCasa});
+    let alert = this.alertCtrl.create({
+      title: "Solicitação enviada!",
+      message: "Sua solicitação foi enviada, aguarde que entraremos em contato. Muito obrigado!",
+      buttons: [{
+        text: "Ok",
+        role: 'cancel'
+      }]
+    });
+    alert.present();
   }
 
   ionViewDidEnter(){
@@ -133,7 +167,7 @@ export class CoinPage {
         if ( time > (JSON.parse(barcodeData.text)[0].time + 30000) ){
           let al = this.alertCtrl.create({
             title: "QRCode expirado!",
-            message: "O QRCode da Vou se renova a cada 30 segundos. Leia-o novamente.",
+            message: "Um novo QRCode é gerado a cada 30 segundos. Por favor, tente novamente.",
             buttons: [{
               text: "Ok",
               handler: data => {
@@ -150,7 +184,7 @@ export class CoinPage {
           setTimeout(() => {
             let alert = this.alertCtrl.create({
               title: "Transferência expirada!",
-              message: "Você tem 1 minuto para confirmar a tranferência, caso o contrário, ela é expirada. Tente novamente.",
+              message: "Você tem 1 minuto para confirmar a transferência, caso contrário, a operação é cancelada. Tente novamente.",
               buttons: [{
                 text: "Ok",
                 handler: data => {
@@ -170,7 +204,7 @@ export class CoinPage {
 
   trans(){
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
-    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Recebimento efetuado por "+this.dataQRC.nome+".", (this.dataQRC.vous * 0.8), 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
+    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Pagamento recebido de "+this.dataQRC.nome+".", (this.dataQRC.vous * 0.8), 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
     this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
       this.contaData.altSaldo(1, s[0].id, s[0].saldo, this.dataQRC.vous, firebase.auth().currentUser.uid);
 

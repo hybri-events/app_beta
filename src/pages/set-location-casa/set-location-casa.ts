@@ -43,7 +43,6 @@ export class SetLocationCasaPage {
       this.param['lat'] = this.lat;
       this.param['lng'] = this.lng;
       this.param['cidade'] = cidade;
-      console.log(this.param);
       this.casa.push(this.param);
       this.navCtrl.pop();
       this.navCtrl.pop();
