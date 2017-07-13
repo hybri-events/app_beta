@@ -28,7 +28,7 @@
 </ion-header>
 
 <ion-content>
-  <button ion-button block clear style="width:calc(100% - 24px);margin:12px;" (click)="openNewEvent()">Criar um evento</button>
+  <button ion-button block clear style="width:calc(100% - 24px);margin:12px;" (click)="openNewEvent()" *ngIf="isCasa">Criar um evento</button>
   <div [ngSwitch]="maps" class="map">
     <div *ngSwitchCase="'map'" style="width:100%;height:100%;">
       <div #map id="map"></div>

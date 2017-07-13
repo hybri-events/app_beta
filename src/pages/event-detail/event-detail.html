@@ -7,7 +7,7 @@
         <ion-icon name="icon-edit"></ion-icon>
       </button>
     </ion-buttons>
-    <ion-buttons end *ngIf="uid == e.criador || keyCasa == e.criador">
+    <ion-buttons end *ngIf="uid == e.criador || keyCasa == e.criador" (click)="removeEvent()">
       <button ion-button icon-only color="primary" class="btn_search">
         <ion-icon name="icon-del"></ion-icon>
       </button>

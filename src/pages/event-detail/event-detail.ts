@@ -288,4 +288,17 @@ export class EventDetailPage {
     }
   }
 
+  removeEvent(){
+    let alert = this.alertCtrl.create({
+      title: 'Excluir evento',
+      subTitle: 'Tem certeza que você deseja excluir este evento?',
+      buttons: [{text: 'Não', handler: () => {}},{text: 'Sim', handler: () => {
+        let list = this.db.list('/evento/');
+        list.remove(this.id);
+        this.navCtrl.pop();
+      }}]
+    });
+    alert.present();
+  }
+
 }

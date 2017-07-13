@@ -47,6 +47,8 @@ export class CoinPage {
   casa: FirebaseListObservable<any>;
   keyCasa;
 
+  timeout;
+
   constructor(platform: Platform, public db: AngularFireDatabase, private storage: Storage, public navCtrl: NavController, afAuth: AngularFireAuth, public contaData: ContaProvider, public alertCtrl: AlertController, public err: ErrorProvider, private barcodeScanner: BarcodeScanner) {
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     this.plat = platform;
@@ -78,6 +80,8 @@ export class CoinPage {
           ca.forEach(c => {
             if ( c.$key == 'coins' ){
               this.coinCasa = c.$value;
+            } else if ( c.$key == 'nome' ){
+              this.myname = c.$value;
             }
           });
         });
@@ -103,28 +107,53 @@ export class CoinPage {
   ionViewDidEnter(){
     if ( this.coins == "home" ){
       if (this.authentic) {
-        this.contaData.getSaldo(firebase.auth().currentUser.uid).then( eventListSnap => {
-          this.saldoVS = eventListSnap[0].saldo;
-          this.saldoRS = eventListSnap[0].saldo * 0.04;
-          this.transacoes = this.db.list('conta/'+firebase.auth().currentUser.uid+'/transacao',{
-            query: {
-              orderByChild: 'dt_hr',
-              startAt: this.date2,
-              endAt: this.date1
-            }
+        if ( this.isCasa ){
+          this.contaData.getSaldo(this.keyCasa).then( eventListSnap => {
+            this.saldoVS = eventListSnap[0].saldo;
+            this.saldoRS = eventListSnap[0].saldo * 0.04;
+            this.transacoes = this.db.list('conta/'+this.keyCasa+'/transacao',{
+              query: {
+                orderByChild: 'dt_hr',
+                startAt: this.date2,
+                endAt: this.date1
+              }
+            });
+          }).catch((error) => {
+            console.log(error);
+            let alert = this.alertCtrl.create({
+              title: "Ocorreu um erro!",
+              message: this.err.messageError(error["code"]),
+              buttons: [{
+                text: "Ok",
+                role: 'cancel'
+              }]
+            });
+            alert.present();
           });
-        }).catch((error) => {
-          console.log(error);
-          let alert = this.alertCtrl.create({
-            title: "Ocorreu um erro!",
-            message: this.err.messageError(error["code"]),
-            buttons: [{
-              text: "Ok",
-              role: 'cancel'
-            }]
+        } else {
+          this.contaData.getSaldo(firebase.auth().currentUser.uid).then( eventListSnap => {
+            this.saldoVS = eventListSnap[0].saldo;
+            this.saldoRS = eventListSnap[0].saldo * 0.04;
+            this.transacoes = this.db.list('conta/'+firebase.auth().currentUser.uid+'/transacao',{
+              query: {
+                orderByChild: 'dt_hr',
+                startAt: this.date2,
+                endAt: this.date1
+              }
+            });
+          }).catch((error) => {
+            console.log(error);
+            let alert = this.alertCtrl.create({
+              title: "Ocorreu um erro!",
+              message: this.err.messageError(error["code"]),
+              buttons: [{
+                text: "Ok",
+                role: 'cancel'
+              }]
+            });
+            alert.present();
           });
-          alert.present();
-        });
+        }
       }
     } else if (this.coins == "receive"){
       this.coins = 'home';
@@ -134,40 +163,99 @@ export class CoinPage {
   changeTabs(){
     if ( this.coins == "home" ){
       if (this.authentic) {
-        this.contaData.getSaldo(firebase.auth().currentUser.uid).then( eventListSnap => {
-          this.saldoVS = eventListSnap[0].saldo;
-          this.saldoRS = eventListSnap[0].saldo * 0.04;
-          this.transacoes = this.db.list('conta/'+firebase.auth().currentUser.uid+'/transacao',{
-            query: {
-              orderByChild: 'dt_hr',
-              startAt: this.date2,
-              endAt: this.date1
-            }
+        if ( this.isCasa ){
+          this.contaData.getSaldo(this.keyCasa).then( eventListSnap => {
+            this.saldoVS = eventListSnap[0].saldo;
+            this.saldoRS = eventListSnap[0].saldo * 0.04;
+            this.transacoes = this.db.list('conta/'+this.keyCasa+'/transacao',{
+              query: {
+                orderByChild: 'dt_hr',
+                startAt: this.date2,
+                endAt: this.date1
+              }
+            });
+          }).catch((error) => {
+            console.log(error);
+            let alert = this.alertCtrl.create({
+              title: "Ocorreu um erro!",
+              message: this.err.messageError(error["code"]),
+              buttons: [{
+                text: "Ok",
+                role: 'cancel'
+              }]
+            });
+            alert.present();
           });
-        }).catch((error) => {
-          console.log(error);
-          let alert = this.alertCtrl.create({
-            title: "Ocorreu um erro!",
-            message: this.err.messageError(error["code"]),
-            buttons: [{
-              text: "Ok",
-              role: 'cancel'
-            }]
+        } else {
+          this.contaData.getSaldo(firebase.auth().currentUser.uid).then( eventListSnap => {
+            this.saldoVS = eventListSnap[0].saldo;
+            this.saldoRS = eventListSnap[0].saldo * 0.04;
+            this.transacoes = this.db.list('conta/'+firebase.auth().currentUser.uid+'/transacao',{
+              query: {
+                orderByChild: 'dt_hr',
+                startAt: this.date2,
+                endAt: this.date1
+              }
+            });
+          }).catch((error) => {
+            console.log(error);
+            let alert = this.alertCtrl.create({
+              title: "Ocorreu um erro!",
+              message: this.err.messageError(error["code"]),
+              buttons: [{
+                text: "Ok",
+                role: 'cancel'
+              }]
+            });
+            alert.present();
           });
-          alert.present();
-        });
+        }
       }
     } else if (this.coins == "receive"){
-      this.options = {
-        showTorchButton : true,
-        prompt : "Posicione o QRCode na área marcada.",
+      if ( !this.isCasa ){
+        let alert = this.alertCtrl.create({
+          title: "Tranferência de V$!",
+          message: "Para esta operação cobraremos uma taxa de transação no valor de 20%. Deseja prosseguir?",
+          buttons: [{text: 'Não', handler: () => {this.coins = 'home'}},{text: 'Sim', handler: () => {this.lerQR()} }]
+        });
+        alert.present();
+      } else {
+        this.lerQR();
       }
-      this.barcodeScanner.scan(this.options).then((barcodeData) => {
-        let time = new Date().getTime();
-        if ( time > (JSON.parse(barcodeData.text)[0].time + 30000) ){
-          let al = this.alertCtrl.create({
-            title: "QRCode expirado!",
-            message: "Um novo QRCode é gerado a cada 30 segundos. Por favor, tente novamente.",
+    }
+  }
+
+  lerQR(){
+    this.options = {
+      showTorchButton : true,
+      prompt : "Posicione o QRCode na área marcada.",
+    }
+    this.barcodeScanner.scan(this.options).then((barcodeData) => {
+      if (barcodeData.cancelled){
+        this.coins = "home";
+      }
+      let time = new Date().getTime();
+      if ( time > (JSON.parse(barcodeData.text)[0].time + 30000) ){
+        let al = this.alertCtrl.create({
+          title: "QRCode expirado!",
+          message: "Um novo QRCode é gerado a cada 30 segundos. Por favor, tente novamente.",
+          buttons: [{
+            text: "Ok",
+            handler: data => {
+              this.changeTabs();
+            }
+          }]
+        });
+        al.present();
+      } else {
+        this.dataQRC = JSON.parse(barcodeData.text)[0];
+        this.nome = this.dataQRC.nome;
+        this.vous = 'V$ '+this.dataQRC.vous;
+        this.equiv = 'R$ '+(this.dataQRC.vous * 0.04).toFixed(2);
+        this.timeout = setTimeout(() => {
+          let alert = this.alertCtrl.create({
+            title: "Transferência expirada!",
+            message: "Você tem 1 minuto para confirmar a transferência, caso contrário, a operação é cancelada. Tente novamente.",
             buttons: [{
               text: "Ok",
               handler: data => {
@@ -175,44 +263,66 @@ export class CoinPage {
               }
             }]
           });
-          al.present();
-        } else {
-          this.dataQRC = JSON.parse(barcodeData.text)[0];
-          this.nome = this.dataQRC.nome;
-          this.vous = 'V$ '+this.dataQRC.vous;
-          this.equiv = 'R$ '+(this.dataQRC.vous * 0.04).toFixed(2);
-          setTimeout(() => {
-            let alert = this.alertCtrl.create({
-              title: "Transferência expirada!",
-              message: "Você tem 1 minuto para confirmar a transferência, caso contrário, a operação é cancelada. Tente novamente.",
-              buttons: [{
-                text: "Ok",
-                handler: data => {
-                  this.changeTabs();
-                }
-              }]
-            });
-            alert.present();
-          },60000);
-        }
-      }, (err) => {
-        alert("Error occured : " + err);
-        this.coins = "home";
-      });
-    }
+          alert.present();
+        },60000);
+      }
+    }, (err) => {
+      alert("Error occured : " + err);
+      this.coins = "home";
+    });
   }
 
   trans(){
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
-    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Pagamento recebido de "+this.dataQRC.nome+".", (this.dataQRC.vous * 0.8), 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
-    this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
-      this.contaData.altSaldo(1, s[0].id, s[0].saldo, this.dataQRC.vous, firebase.auth().currentUser.uid);
+    if ( this.isCasa ){
+      this.contaData.cadTransacao(this.keyCasa, "Pagamento recebido de "+this.dataQRC.nome+".", (this.dataQRC.vous * 0.8), 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
+      this.contaData.getSaldo(this.keyCasa).then(s => {
+        this.contaData.altSaldo(1, s[0].id, s[0].saldo, (this.dataQRC.vous * 0.8), this.keyCasa);
 
-      this.contaData.cadTransacao(this.dataQRC.uid, "Pagamento efetuado para "+this.myname+".", this.dataQRC.vous, 'Saída', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'saida','-');
-      this.contaData.getSaldo(this.dataQRC.uid).then(s => {
-        this.contaData.altSaldo(0, s[0].id, s[0].saldo, this.dataQRC.vous, this.dataQRC.uid);
+        this.contaData.cadTransacao(this.dataQRC.uid, "Pagamento efetuado para "+this.myname+".", this.dataQRC.vous, 'Saída', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'saida','-');
+        this.contaData.getSaldo(this.dataQRC.uid).then(s => {
+          this.contaData.altSaldo(0, s[0].id, s[0].saldo, this.dataQRC.vous, this.dataQRC.uid);
+
+          let alert = this.alertCtrl.create({
+            title: "Tranferência executada com sucesso!",
+            message: "Sua transferência foi executada com sucesso. Muito obrigado!",
+            buttons: [{
+              text: "Ok",
+              handler: data => {
+                this.coins = 'home';
+                this.changeTabs();
+                clearTimeout(this.timeout);
+              }
+            }]
+          });
+          alert.present();
+        });
       });
-    });
+    } else {
+      this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Pagamento recebido de "+this.dataQRC.nome+".", (this.dataQRC.vous * 0.8), 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
+      this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
+        this.contaData.altSaldo(1, s[0].id, s[0].saldo, (this.dataQRC.vous * 0.8), firebase.auth().currentUser.uid);
+
+        this.contaData.cadTransacao(this.dataQRC.uid, "Pagamento efetuado para "+this.myname+".", this.dataQRC.vous, 'Saída', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'saida','-');
+        this.contaData.getSaldo(this.dataQRC.uid).then(s => {
+          this.contaData.altSaldo(0, s[0].id, s[0].saldo, this.dataQRC.vous, this.dataQRC.uid);
+
+          let alert = this.alertCtrl.create({
+            title: "Tranferência executada com sucesso!",
+            message: "Sua transferência foi executada com sucesso. Muito obrigado!",
+            buttons: [{
+              text: "Ok",
+              handler: data => {
+                this.coins = 'home';
+                this.changeTabs();
+                clearTimeout(this.timeout);
+              }
+            }]
+          });
+          alert.present();
+        });
+      });
+    }
   }
 
   keyUpVS(evt){

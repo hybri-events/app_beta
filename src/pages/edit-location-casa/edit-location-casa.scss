@@ -1,0 +1,25 @@
+page-edit-location-casa {
+  .content-md #map {
+    width: 100%;
+    height: calc(100% - 58px);
+  }
+  .content-ios #map {
+    width: 100%;
+    height: calc(100% - 44px);
+  }
+  .content-wp #map {
+    width: 100%;
+    height: calc(100% - 54px);
+  }
+  #latlng {
+    width:100%;
+    padding: 16px;
+    background-color: #652C90;
+    position: absolute;
+    bottom: 0px;
+    color: white;
+  }
+  #latlng span {
+    font-family: Lato-Medium;
+  }
+}

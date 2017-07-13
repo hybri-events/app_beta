@@ -47,12 +47,22 @@ export class MyEventPage {
             this.eve.forEach(ev => {
               ev.forEach(e => {
                 if ( c.event == e.$key ){
+                  if ( e.criador[0] == "-" ){
+                    this.casa.forEach(ca => {
+                      if( ca[e.criador] != null ){
+                        e['casa'] = ca[e.criador];
+                      }
+                    });
+                  } else {
+                    e['casa'] = {estac: false, bar: false, cozinha: false, acess: false, wifi: false, fum: false};
+                  }
                   this.events.unshift(e);
                 }
               });
             });
           })
         });
+        console.log(this.events);
       }
     });
   }
@@ -73,6 +83,15 @@ export class MyEventPage {
           this.eve.forEach(ev => {
             ev.forEach(e => {
               if ( c.event == e.$key ){
+                if ( e.criador[0] == "-" ){
+                  this.casa.forEach(ca => {
+                    if( ca[e.criador] != null ){
+                      e['casa'] = ca[e.criador];
+                    }
+                  });
+                } else {
+                  e['casa'] = {estac: false, bar: false, cozinha: false, acess: false, wifi: false, fum: false};
+                }
                 this.events.unshift(e);
               }
             });
@@ -84,6 +103,7 @@ export class MyEventPage {
         this.cri = [];
         ev.forEach(e => {
           if ( e.criador == firebase.auth().currentUser.uid ){
+            e['casa'] = {estac: false, bar: false, cozinha: false, acess: false, wifi: false, fum: false};
             this.cri.unshift(e);
           }
         })

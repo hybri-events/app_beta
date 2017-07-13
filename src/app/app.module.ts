@@ -46,6 +46,9 @@ import { SettingsPage } from '../pages/settings/settings';
 
 import { NewEstabPage } from '../pages/new-estab/new-estab';
 import { SetLocationCasaPage } from '../pages/set-location-casa/set-location-casa';
+import { EditCasaPage } from '../pages/edit-casa/edit-casa';
+import { EditLocationCasaPage } from '../pages/edit-location-casa/edit-location-casa';
+import { EditLocationEventPage } from '../pages/edit-location-event/edit-location-event';
 
 import { CadastroPage } from '../pages/cadastro/cadastro';
 import { CodCadastroPage } from '../pages/cod-cadastro/cod-cadastro';
@@ -99,7 +102,10 @@ const firebaseConfig = {
     PromocaoPage,
     EventDetailPage,
     NewEstabPage,
-    SetLocationCasaPage
+    SetLocationCasaPage,
+    EditCasaPage,
+    EditLocationCasaPage,
+    EditLocationEventPage
   ],
   imports: [
     BrowserModule,
@@ -139,7 +145,10 @@ const firebaseConfig = {
     PromocaoPage,
     EventDetailPage,
     NewEstabPage,
-    SetLocationCasaPage
+    SetLocationCasaPage,
+    EditCasaPage,
+    EditLocationCasaPage,
+    EditLocationEventPage
   ],
   providers: [
     StatusBar,
