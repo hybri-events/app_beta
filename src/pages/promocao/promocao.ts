@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
-import { CodCadastroPage } from '../cod-cadastro/cod-cadastro';
+import { ListPromoPage } from '../list-promo/list-promo';
 import { Storage } from '@ionic/storage';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import firebase from 'firebase/app';
 
 @Component({
   selector: 'page-promocao',
@@ -10,14 +12,17 @@ import { Storage } from '@ionic/storage';
 export class PromocaoPage {
   codcad = false;
 
-  constructor(private storage: Storage, public navCtrl: NavController) {
+  codigos: FirebaseListObservable<any>;
+
+  constructor(private storage: Storage, public navCtrl: NavController, public db: AngularFireDatabase) {
     storage.get('codcad').then((val) => {
       this.codcad = val;
     });
+    this.codigos = db.list('/usuario/'+firebase.auth().currentUser.uid+'/codigos/');
   }
 
-  openCodCadastro(){
-    this.navCtrl.push(CodCadastroPage,null)
+  openAddPromo(){
+    this.navCtrl.push(ListPromoPage,null)
   }
 
 }

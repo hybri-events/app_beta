@@ -1,0 +1,19 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Promoções ativas</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-list>
+    <ion-item *ngIf="show.length == 0">
+      <p style="white-space:normal">Nenhuma promoção ativa encontrada.</p>
+    </ion-item>
+    <button ion-item *ngFor="let p of show" (click)="openCod(p.id)">
+      <p style="white-space:normal">{{p.nome}}</p>
+    </button>
+  </ion-list>
+</ion-content>

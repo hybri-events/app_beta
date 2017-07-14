@@ -7,24 +7,25 @@
 </ion-header>
 
 
-<ion-content>
-  <ion-card style="margin-top:32px;">
-    <button *ngIf="!codcad" ion-button clear block style="height:64px;white-space:normal;" (click)="openCodCadastro()">Inserir código promocional de cadastro</button>
-    <ion-list *ngIf="codcad">
-      <ion-item>
-        <ion-icon name="icon-one-check" style="color:green" item-start></ion-icon>
-        <span style="color:green">Código de cadastro validado</span>
-      </ion-item>
-    </ion-list>
-  </ion-card>
-  <ion-list style="margin-top:32px;">
+<ion-content padding>
+  <ion-list>
+    <ion-item>
+      <p style="white-space:normal">Aqui você pode cadastrar todas os seus códigos promocionais.</p>
+    </ion-item>
     <ion-list-header>Lista de promoções</ion-list-header>
-    <ion-item style="white-space:normal;">Aqui você pode cadastrar todas as suas promoções.</ion-item>
+    <ion-item *ngIf="(codigos | async)?.length == 0">
+      <p style="white-space:normal">Nenhum código promocional encontrado.</p>
+    </ion-item>
+    <ion-item *ngFor="let c of codigos | async">
+      <h1>{{c.codigo}}</h1>
+      <p>{{c.nome}}</p>
+      <div>V$ {{c.valor}}</div>
+    </ion-item>
   </ion-list>
 </ion-content>
 
 <ion-footer>
   <ion-toolbar>
-    <button ion-button full clear style="color:white;">Adicionar código promocional</button>
+    <button ion-button full clear style="color:white;" (click)="openAddPromo()">Adicionar código promocional</button>
   </ion-toolbar>
 </ion-footer>

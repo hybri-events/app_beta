@@ -84,6 +84,22 @@ export class EditEventPage {
 
     this.id = navParams.data.id;
     this.evento = db.list('/evento/'+this.id);
+
+    this.storage.get('casa').then((val) => {
+      if ( val != null ){
+        this.casa = this.db.list("casas/"+firebase.auth().currentUser.uid+"/"+val+"/");
+        this.casa.forEach(ca => {
+          ca.forEach(c => {
+            if ( c.$key == 'coins' ){
+              this.coinsCasa = c.$value;
+            }
+          });
+        });
+      }
+    });
+  }
+
+  ionViewDidLoad(){
     this.evento.forEach(ev => {
       ev.forEach(e => {
         if ( e.$key == 'nome' ){
@@ -93,7 +109,7 @@ export class EditEventPage {
           this.dt_ini = e.$value;
         }
         if ( e.$key == 'dtf' ){
-          if ( e.$value != 'null' ){
+          if ( e.$value != '' ){
             this.termino = true;
             this.dt_fim = e.$value;
           }
@@ -112,6 +128,10 @@ export class EditEventPage {
         }
         if ( e.$key == 'img' ){
           this.img = e.$value;
+          if ( this.img[0] == 'h' ){
+            document.getElementById("foto_evento").style.backgroundImage = "url("+this.img+")";
+            document.getElementById("button").innerHTML = "Trocar imagem";
+          }
         }
         if ( e.$key == 'gat' ){
           this.gatilho = e.$value;
@@ -126,19 +146,6 @@ export class EditEventPage {
           this.coin = e.$value;
         }
       });
-    });
-
-    this.storage.get('casa').then((val) => {
-      if ( val != null ){
-        this.casa = this.db.list("casas/"+firebase.auth().currentUser.uid+"/"+val+"/");
-        this.casa.forEach(ca => {
-          ca.forEach(c => {
-            if ( c.$key == 'coins' ){
-              this.coinsCasa = c.$value;
-            }
-          });
-        });
-      }
     });
   }
 

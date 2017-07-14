@@ -46,7 +46,8 @@ export class EditLocationEventPage {
       this.param['lng'] = this.lng;
       this.param['cidade'] = cidade;
       this.evento.update(this.param.id,this.param);
-      if ( this.param.img != 'assets/event_default.png' ){
+
+      if ( this.param.img != 'assets/event_default.png' && this.param.img[0] != 'h' ){
         this.event.saveImg(this.param.id,this.param.img);
       }
       this.navCtrl.pop();

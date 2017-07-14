@@ -21,6 +21,8 @@ import { MyApp } from './app.component';
 import { CoinPage } from '../pages/coin/coin';
 import { QrCodePage } from '../pages/qr-code/qr-code';
 
+import { TutorialPage } from '../pages/tutorial/tutorial';
+
 import { EventsPage } from '../pages/events/events';
 import { EventDetailPage } from '../pages/event-detail/event-detail';
 import { CriarEventoPage } from '../pages/criar-evento/criar-evento';
@@ -41,7 +43,10 @@ import { PerfilPage } from '../pages/perfil/perfil';
 import { MyEventPage } from '../pages/my-event/my-event';
 import { AgendaPage } from '../pages/agenda/agenda';
 import { InvitesPage } from '../pages/invites/invites';
+
 import { PromocaoPage } from '../pages/promocao/promocao';
+import { ListPromoPage } from '../pages/list-promo/list-promo';
+
 import { InviteFriendsPage } from '../pages/invite-friends/invite-friends';
 import { CreatePage } from '../pages/create/create';
 import { SettingsPage } from '../pages/settings/settings';
@@ -107,7 +112,9 @@ const firebaseConfig = {
     EditCasaPage,
     EditEventPage,
     EditLocationCasaPage,
-    EditLocationEventPage
+    EditLocationEventPage,
+    ListPromoPage,
+    TutorialPage
   ],
   imports: [
     BrowserModule,
@@ -151,7 +158,9 @@ const firebaseConfig = {
     EditCasaPage,
     EditEventPage,
     EditLocationCasaPage,
-    EditLocationEventPage
+    EditLocationEventPage,
+    ListPromoPage,
+    TutorialPage
   ],
   providers: [
     StatusBar,

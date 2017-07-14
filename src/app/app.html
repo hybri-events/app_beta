@@ -18,7 +18,7 @@
       <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(1)"><ion-icon item-left name="icon-events"></ion-icon>Meus eventos</button>
       <!--<button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(2)"><ion-icon item-left name="icon-agenda"></ion-icon>Agenda</button>
       <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(3)"><ion-icon item-left name="icon-invites"></ion-icon>Convites</button>-->
-      <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(7)"><ion-icon item-left name="icon-promo"></ion-icon>Códigos promocionais</button>
+      <button ion-item [disabled]="!this.authentic" menuToggle *ngIf="!isCasa" (click)="openMenuPage(7)"><ion-icon item-left name="icon-promo"></ion-icon>Códigos promocionais</button>
       <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(4)"><ion-icon item-left name="icon-conv"></ion-icon>Convidar amigos</button>
       <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(5)"><ion-icon item-left name="icon-page"></ion-icon>Meus estabelecimentos</button>
       <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(6)"><ion-icon item-left name="icon-settings"></ion-icon>Configurações</button>

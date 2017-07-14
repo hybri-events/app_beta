@@ -14,17 +14,30 @@ export class CodCadastroPage {
   validation:any = false;
 
   promo: FirebaseListObservable<any>;
-  con: FirebaseListObservable<any>;
+  info: FirebaseListObservable<any>;
   user: FirebaseListObservable<any>;
+
+  valor;
+  nome;
+
   p = [];
-  c = [];
+  u = [];
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, public alertCtrl: AlertController, public db: AngularFireDatabase, public contaData: ContaProvider) {
-    this.promo = this.db.list('/promocoes/cadastro/promo/');
-    this.con = this.db.list('/promocoes/cadastro/convite/');
-    this.user = this.db.list('/usuario/'+firebase.auth().currentUser.uid+'/');
+    this.promo = this.db.list('/promocoes/'+navParams.data.id+'/');
+    this.info = this.db.list('/promocoes/ativas/');
+    this.user = this.db.list('/usuario/'+firebase.auth().currentUser.uid+'/codigos/');
     this.promo.subscribe(list => this.p = list);
-    this.con.subscribe(list => this.c = list);
+    this.user.subscribe(list => this.u = list);
+
+    this.info.forEach(inf => {
+      inf.forEach(i => {
+        if ( i.id == navParams.data.id ){
+          this.valor = i.valor;
+          this.nome = i.nome;
+        }
+      });
+    });
   }
 
   num(numero){
@@ -33,39 +46,62 @@ export class CodCadastroPage {
       document.getElementById(this.codigo.length+"").style.background = "#652C90";
       if ( this.codigo.length == 6 ){
         let error = 0;
-        this.p.forEach(item => {
-          if ( item.$key == this.codigo ){
-            if ( item[0].usado ){
-              let alert = this.alertCtrl.create({
-                title: "Esse código já está em uso!",
-                message: "Esse código promocional já está em uso. Caso esse código seja seu, contate-nos pelo e-mail 'contato@usevou.com' relatando o problema.",
-                buttons: [{
-                  text: "Ok",
-                  role: 'cancel'
-                }]
-              });
-              alert.present();
-              for ( let i=0;i<6;i++ ){
-                this.apagar();
+        this.p.forEach(i => {
+          if ( i.cod == this.codigo ){ 
+            if ( this.navParams.data.id == 'convite' ){
+              if ( i.uid == firebase.auth().currentUser.uid ){
+                let alert = this.alertCtrl.create({
+                  title: "Esse código é seu!",
+                  message: "Você não pode cadastrar seu próprio código promocional.",
+                  buttons: [{
+                    text: "Ok",
+                    role: 'cancel'
+                  }]
+                });
+                alert.present();
+                for ( let i=0;i<6;i++ ){
+                  this.apagar();
+                }
+              } else {
+                let alert = this.alertCtrl.create({
+                  title: "Código correto!",
+                  message: "Parabéns, você  ganhou V$"+this.valor+"!",
+                  buttons: [{
+                    text: "Ok",
+                    handler: data => {
+                      let p = this.db.list('/promocoes/'+this.navParams.data.id+'/'+this.codigo);
+                      p.push({[firebase.auth().currentUser.uid]: "ok"});
+                      this.user.push({id: this.navParams.data.id, codigo: this.codigo, nome: this.nome, valor: this.valor});
+                      let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+                      this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Código promocional de "+this.nome+" confirmado.", this.valor, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
+                      this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
+                        this.contaData.altSaldo(1, s[0].id, s[0].saldo, this.valor, firebase.auth().currentUser.uid);
+                        this.contaData.cadTransacao(i.uid, "Código promocional de "+this.nome+" utilizado.", this.valor, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
+                        this.contaData.getSaldo(i.uid).then(s => {
+                          this.contaData.altSaldo(1, s[0].id, s[0].saldo, this.valor, i.uid);
+                          this.navCtrl.pop();
+                          this.navCtrl.pop();
+                        });
+                      });
+                    }
+                  }]
+                });
+                alert.present();
               }
             } else {
               let alert = this.alertCtrl.create({
                 title: "Código correto!",
-                message: "Parabéns, você  ganhou V$50!",
+                message: "Parabéns, você  ganhou V$"+this.valor+"!",
                 buttons: [{
                   text: "Ok",
                   handler: data => {
-                    this.promo.update(this.codigo,{0:{usado: true}});
-                    let pu = this.db.list('/promocoes/cadastro/promo/'+this.codigo+'/0/');
-                    pu.push({uid: firebase.auth().currentUser.uid});
-                    this.user.forEach(u => {
-                      this.user.update(u[0].$key,{codcad: true});
-                      this.storage.set('codcad', true);
-                    });
+                    let p = this.db.list('/promocoes/'+this.navParams.data.id+'/'+this.codigo);
+                    p.push({[firebase.auth().currentUser.uid]: "ok"});
+                    this.user.push({id: this.navParams.data.id, codigo: this.codigo, nome: this.nome, valor: this.valor});
                     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
-                    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Bônus de pré-cadastro.", 50, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
+                    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Código promocional de "+this.nome+".", this.valor, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
                     this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
-                      this.contaData.altSaldo(1, s[0].id, s[0].saldo, 50, firebase.auth().currentUser.uid);
+                      this.contaData.altSaldo(1, s[0].id, s[0].saldo, this.valor, firebase.auth().currentUser.uid);
                       this.navCtrl.pop();
                       this.navCtrl.pop();
                     });
@@ -75,59 +111,6 @@ export class CodCadastroPage {
               alert.present();
             }
           } else {
-            error++;
-          }
-        });
-        if ( error == this.p.length ){
-          error = 0;
-          this.c.forEach(item => {
-            let key = item.$key;
-            if ( key == firebase.auth().currentUser.uid ){
-              let alert = this.alertCtrl.create({
-                title: "Esse código é seu!",
-                message: "Você não pode cadastrar seu próprio código promocional.",
-                buttons: [{
-                  text: "Ok",
-                  role: 'cancel'
-                }]
-              });
-              alert.present();
-              for ( let i=0;i<6;i++ ){
-                this.apagar();
-              }
-            } else if ( item[this.codigo] != undefined ){
-              let alert = this.alertCtrl.create({
-                title: "Código correto!",
-                message: "Parabéns, você ganhou V$25.",
-                buttons: [{
-                  text: "Ok",
-                  handler: data => {
-                    let uid = firebase.auth().currentUser.uid;
-                    this.con.update(key,{[this.codigo]:{[uid]: 'ok'}});
-                    this.user.forEach(u => {
-                      this.user.update(u[0].$key,{codcad: true});
-                      this.storage.set('codcad', true);
-                    });
-                    let tzoffset = (new Date()).getTimezoneOffset() * 60000;
-                    this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Bônus de convite utilizado.", 25, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
-                    this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
-                      this.contaData.altSaldo(1, s[0].id, s[0].saldo, 25, firebase.auth().currentUser.uid);
-                      this.contaData.cadTransacao(key, "Bônus convite recebido.", 25, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
-                      this.contaData.getSaldo(key).then(s => {
-                        this.contaData.altSaldo(1, s[0].id, s[0].saldo, 25, key);
-                        this.navCtrl.pop();
-                        this.navCtrl.pop();
-                      });
-                    });
-                  }
-                }]
-              });
-              alert.present();
-            } else {
-              error++;
-            }
-          });
-          if ( error == this.c.length ){
             let alert = this.alertCtrl.create({
               title: "Esse código não existe!",
               message: "Verifique se você está preenchendo o código corretamente.",
@@ -141,7 +124,7 @@ export class CodCadastroPage {
               this.apagar();
             }
           }
-        }
+        });
       }
     }
   }

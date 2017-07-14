@@ -1,0 +1,28 @@
+page-tutorial {
+  .slides{
+    background: #1b98c5;
+    background: -moz-linear-gradient(45deg, #1b98c5 0%, #652c90 100%);
+    background: -webkit-gradient(left bottom, right top, color-stop(0%, #1b98c5), color-stop(100%, #652c90));
+    background: -webkit-linear-gradient(45deg, #1b98c5 0%, #652c90 100%);
+    background: -o-linear-gradient(45deg, #1b98c5 0%, #652c90 100%);
+    background: -ms-linear-gradient(45deg, #1b98c5 0%, #652c90 100%);
+    background: linear-gradient(45deg, #1b98c5 0%, #652c90 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1b98c5', endColorstr='#652c90', GradientType=1 );
+  }
+  .swiper-pagination-bullet-active{
+    background: white;
+  }
+  ion-slide h1{
+    color: white;
+    font-family: Lato-Black;
+    padding-bottom: 16px;
+  }
+  ion-slide div{
+    color: white;
+    padding-top: 16px;
+  }
+  ion-slide img{
+    width: 60% !important;
+    margin: 0 auto;
+  }
+}

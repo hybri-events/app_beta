@@ -10,6 +10,7 @@ import { NameValidator } from '../../validators/name';
 import { Facebook } from '@ionic-native/facebook';
 import firebase from 'firebase';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 
 @Component({
   selector: 'page-cadastro',
@@ -19,7 +20,7 @@ export class CadastroPage {
   public signupForm:FormGroup;
   public loading:Loading;
 
-  constructor(public navCtrl: NavController, public err: ErrorProvider, public splashScreen: SplashScreen, private facebook: Facebook, public authData: AuthProvider, public userData: UserDataProvider, public contaData: ContaProvider, public formBuilder: FormBuilder, public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
+  constructor(public navCtrl: NavController, public err: ErrorProvider, public splashScreen: SplashScreen, public db: AngularFireDatabase, private facebook: Facebook, public authData: AuthProvider, public userData: UserDataProvider, public contaData: ContaProvider, public formBuilder: FormBuilder, public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
     this.signupForm = formBuilder.group({
       nome: ['', Validators.compose([Validators.required, NameValidator.isValid])],
       nasc: ['', Validators.compose([Validators.required])],

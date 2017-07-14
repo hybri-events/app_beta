@@ -12,6 +12,7 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 import firebase from 'firebase/app';
 
 import { TabsPage } from '../pages/tabs/tabs';
+import { TutorialPage } from '../pages/tutorial/tutorial';
 
 import { CadastroPage } from '../pages/cadastro/cadastro';
 import { LoginPage } from '../pages/login/login';
@@ -61,6 +62,12 @@ export class MyApp {
     const authObserver = afAuth.authState.subscribe( user => {
       if (user) {
         if ( !user.isAnonymous ){
+          this.storage.get('first').then((val) => {
+            if ( val == null ){
+              this.nav.push(TutorialPage,null);
+              this.storage.set('first',true);
+            }
+          });
           this.authentic = true;
           this.userData.getUser().then( eventListSnap => {
             this.nomeUser = eventListSnap[0].nome;
