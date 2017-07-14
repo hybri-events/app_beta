@@ -35,6 +35,7 @@ export class EventsPage {
   eve = [];
 
   casa = [];
+  isCasa = false;
 
   constructor(platform: Platform, public db: AngularFireDatabase, private storage: Storage, public navCtrl: NavController, afAuth: AngularFireAuth, public geolocation: Geolocation, public evento: EventoProvider, public alertCtrl: AlertController, public err: ErrorProvider) {
     this.plat = platform;
@@ -47,6 +48,11 @@ export class EventsPage {
       } else {
         this.authentic = false;
         authObserver.unsubscribe();
+      }
+    });
+    this.storage.get('casa').then((val) => {
+      if ( val != null ){
+        this.isCasa = true;
       }
     });
     this.db.list('/casas/').subscribe(cas => this.casa = cas);

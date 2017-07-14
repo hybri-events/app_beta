@@ -16,7 +16,7 @@ export class EventoProvider {
     let dti = new Date(params[0].dt_ini);
     let datai = new Date(dti.getTime() + this.offset);
     let dtf = new Date(params[0].dt_fim);
-    let dataf = new Date(dtf.getTime() - this.offset);
+    let dataf = new Date(dtf.getTime() + this.offset);
     let meses = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
     let mes = meses[datai.getMonth()];
     return firebase.database().ref(`evento/`).push({
@@ -30,6 +30,7 @@ export class EventoProvider {
       mes: mes,
       dia: datai.getDate(),
       dti: params[0].dt_ini,
+      dtf: params[0].dt_fim,
       desc: params[0].desc,
       faixa_ini: params[0].faixa.lower,
       faixa_fim: params[0].faixa.upper,

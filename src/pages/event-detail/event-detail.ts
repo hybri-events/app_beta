@@ -5,6 +5,7 @@ import firebase from 'firebase';
 import { ContaProvider } from '../../providers/conta/conta';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Storage } from '@ionic/storage';
+import { EditEventPage } from '../edit-event/edit-event';
 
 declare var google;
 
@@ -286,6 +287,10 @@ export class EventDetailPage {
       });
       alert.present();
     }
+  }
+
+  editEvent(){
+    this.navCtrl.push(EditEventPage,{id: this.id});
   }
 
   removeEvent(){
