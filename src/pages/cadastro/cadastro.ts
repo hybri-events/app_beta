@@ -10,7 +10,7 @@ import { NameValidator } from '../../validators/name';
 import { Facebook } from '@ionic-native/facebook';
 import firebase from 'firebase';
 import { SplashScreen } from '@ionic-native/splash-screen';
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFireDatabase } from 'angularfire2/database';
 
 @Component({
   selector: 'page-cadastro',
@@ -19,6 +19,7 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 export class CadastroPage {
   public signupForm:FormGroup;
   public loading:Loading;
+  cont = 0;
 
   constructor(public navCtrl: NavController, public err: ErrorProvider, public splashScreen: SplashScreen, public db: AngularFireDatabase, private facebook: Facebook, public authData: AuthProvider, public userData: UserDataProvider, public contaData: ContaProvider, public formBuilder: FormBuilder, public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
     this.signupForm = formBuilder.group({
@@ -38,8 +39,6 @@ export class CadastroPage {
       user.delete().then(function() {
         me.authData.signupUser(me.signupForm.value.email, me.signupForm.value.password).then((success) => {
           me.userData.cadUser(me.signupForm.value.nome, me.signupForm.value.nasc, me.signupForm.value.email, 'http://usevou.com/profile/ft_perfil/padrao.png').then(() => {
-            me.contaData.cadConta(0);
-            me.authData.sendEmailVerification();
             me.splashScreen.show();
             window.location.reload();
           }, (error) => {
@@ -99,24 +98,28 @@ export class CadastroPage {
         const facebookCredential = firebase.auth.FacebookAuthProvider.credential(response.authResponse.accessToken);
 
         firebase.auth().signInWithCredential(facebookCredential).then((success) => {
-            me.userData.cadUser(success['displayName'], null, success['email'], success['photoURL']).then(() => {
-              me.contaData.cadConta(0);
-              me.authData.sendEmailVerification();
-              me.splashScreen.show();
-              window.location.reload();
-            }).catch((error) => {
-              me.loading.dismiss().then( () => {
-                let alert = me.alertCtrl.create({
-                  title: "Ocorreu um erro!",
-                  message: me.err.messageError(error["code"]),
-                  buttons: [{
-                    text: "Ok",
-                    role: 'cancel'
-                  }]
-                });
-                alert.present();
-              });
-            });
+          let uid = success.uid;
+          let user = me.db.list('/usuario/');
+          let create = true;
+          user.forEach(us => {
+            if ( me.cont == 0 ){
+              for ( let i=0;i<us.length;i++ ){
+                if (us[i].$key == uid){
+                  create = false;
+                }
+              }
+              if ( create ){
+                me.userData.cadUser(success['displayName'], null, success['email'], success['photoURL']);
+                me.cont++;
+                me.splashScreen.show();
+                window.location.reload();
+              } else {
+                me.cont++;
+                me.splashScreen.show();
+                window.location.reload();
+              }
+            }
+          });
         }).catch((error) => {
           me.loading.dismiss().then( () => {
             let alert = me.alertCtrl.create({

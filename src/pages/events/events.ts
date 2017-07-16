@@ -8,6 +8,10 @@ import { EventoProvider } from '../../providers/evento/evento';
 import { ErrorProvider } from '../../providers/error/error';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { Storage } from '@ionic/storage';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/operator/mergeMap';
 
 declare var google;
 
@@ -56,7 +60,8 @@ export class EventsPage {
       }
     });
     this.db.list('/casas/').subscribe(cas => this.casa = cas);
-    storage.get('dt_filtro').then((val) => {
+    Observable.fromPromise(this.storage.get('dt_filtro').then((val) => {
+      console.log(val);
       this.stDtini = val;
       let date = new Date(val);
       date.setDate(date.getDate()+1);
@@ -98,10 +103,11 @@ export class EventsPage {
           });
         });
       });
-    });
+    }));
   }
 
   changeTab(){
+    this.eve = [];
     this.storage.get('dt_filtro').then((val) => {
       this.stDtini = val;
       let date = new Date(val);
@@ -246,6 +252,22 @@ export class EventsPage {
             let gw = document.getElementsByClassName('gm-style-iw');
             for ( let i=0; i<gw.length; i++ ){
               gw[i].parentElement.setAttribute('class','prim');
+              let lp = gw[i].parentElement.style.left;
+              let lpi = parseInt(lp.substr(0,lp.length-2));
+              gw[i].parentElement.style.left = lpi + 26 +'px';
+
+              let ls = gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[0].style.left;
+              let lsi = parseInt(ls.substr(0,ls.length-2));
+              gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[0].style.left = lsi - 26 +'px';
+
+              let lt = gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[3].style.left;
+              let lti = parseInt(lt.substr(0,lt.length-2));
+              gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[3].style.left = lti - 26 +'px';
+
+              let lq = gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[5].style.left;
+              let lqi = parseInt(lq.substr(0,lq.length-2));
+              gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[5].style.left = lqi - 26 +'px';
+
               gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[1].setAttribute('class','prim');
               gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[7].setAttribute('class','prim');
             }

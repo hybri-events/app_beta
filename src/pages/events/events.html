@@ -9,11 +9,11 @@
     <div class="logo_main" *ngIf="this.plat.is('android')">
       <img src="assets/logo_main.png">
     </div>
-    <ion-buttons (click)="this.search = true" end>
+    <!--<ion-buttons (click)="this.search = true" end>
       <button ion-button icon-only color="primary" class="btn_search">
         <ion-icon name="icon-search"></ion-icon>
       </button>
-    </ion-buttons>
+    </ion-buttons>-->
   </ion-navbar>
   <ion-toolbar class="tab_top" no-border-top style="padding:0px;">
     <ion-segment [(ngModel)]="maps" (ionChange)="changeTab()">

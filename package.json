@@ -41,7 +41,7 @@
         "cordova-plugin-camera": "^2.4.1",
         "cordova-plugin-compat": "^1.1.0",
         "cordova-plugin-device": "^1.1.4",
-        "cordova-plugin-facebook4": "^1.9.0",
+        "cordova-plugin-facebook4": "^1.9.1",
         "cordova-plugin-geolocation": "^2.4.3",
         "cordova-plugin-googlemaps": "^1.4.0",
         "cordova-plugin-mauron85-background-geolocation": "^2.2.5",
@@ -77,10 +77,6 @@
             "cordova-plugin-geolocation": {
                 "GEOLOCATION_USAGE_DESCRIPTION": " "
             },
-            "cordova-plugin-facebook4": {
-                "APP_ID": "380223525703372",
-                "APP_NAME": "Vou"
-            },
             "cordova-plugin-x-socialsharing": {},
             "cordova-plugin-compat": {},
             "cordova-plugin-camera": {
@@ -93,13 +89,14 @@
             },
             "cordova-plugin-background-mode": {},
             "cordova-plugin-mauron85-background-geolocation": {
-                "ACCOUNT_TYPE": "$PACKAGE_NAME.account",
-                "CONTENT_AUTHORITY": "$PACKAGE_NAME",
                 "ALWAYS_USAGE_DESCRIPTION": "This app requires background location tracking"
-            }
+            },
+            "cordova-plugin-facebook4": {
+                "APP_ID": "380223525703372",
+                "APP_NAME": "Vou"
+            },
+            "es6-promise-plugin": {}
         },
-        "platforms": [
-            "ios"
-        ]
+        "platforms": []
     }
 }
