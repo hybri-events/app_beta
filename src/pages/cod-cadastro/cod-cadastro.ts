@@ -24,7 +24,7 @@ export class CodCadastroPage {
   u = [];
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, public alertCtrl: AlertController, public db: AngularFireDatabase, public contaData: ContaProvider) {
-    this.promo = this.db.list('/promocoes/'+navParams.data.id+'/');
+    this.promo = this.db.list('/promocoes/'+navParams.data.id+'/0');
     this.info = this.db.list('/promocoes/ativas/');
     this.user = this.db.list('/usuario/'+firebase.auth().currentUser.uid+'/codigos/');
     this.promo.subscribe(list => this.p = list);
@@ -47,7 +47,8 @@ export class CodCadastroPage {
       if ( this.codigo.length == 6 ){
         let error = 0;
         this.p.forEach(i => {
-          if ( i.cod == this.codigo ){ 
+          console.log(i);
+          if ( i.$value == this.codigo ){
             if ( this.navParams.data.id == 'convite' ){
               if ( i.uid == firebase.auth().currentUser.uid ){
                 let alert = this.alertCtrl.create({

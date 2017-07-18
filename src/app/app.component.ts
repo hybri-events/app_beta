@@ -10,6 +10,7 @@ import { UserDataProvider } from '../providers/user-data/user-data';
 import { Storage } from '@ionic/storage';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import firebase from 'firebase/app';
+import { Events } from 'ionic-angular';
 
 import { TabsPage } from '../pages/tabs/tabs';
 import { TutorialPage } from '../pages/tutorial/tutorial';
@@ -47,7 +48,9 @@ export class MyApp {
   isCasa = false;
   casa: FirebaseListObservable<any>;
 
-  constructor(platform: Platform, statusBar: StatusBar, private storage: Storage, public db: AngularFireDatabase, public afDatabase: AngularFireDatabase, public splashScreen: SplashScreen, afAuth: AngularFireAuth, public authData: AuthProvider, public userData: UserDataProvider, public alertCtrl: AlertController, public err: ErrorProvider) {
+  faixa = {lower: 0, upper: 200}
+
+  constructor(platform: Platform, public events: Events, statusBar: StatusBar, private storage: Storage, public db: AngularFireDatabase, public afDatabase: AngularFireDatabase, public splashScreen: SplashScreen, afAuth: AngularFireAuth, public authData: AuthProvider, public userData: UserDataProvider, public alertCtrl: AlertController, public err: ErrorProvider) {
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     let fdata = new Date(Date.now() - tzoffset);
     fdata.setHours(-3);
@@ -56,6 +59,7 @@ export class MyApp {
     console.log(this.date);
 
     this.storage.set('dt_filtro', this.date);
+    this.storage.set('faixa', this.faixa);
 
     this.tags = db.list('/tags');
 
@@ -165,8 +169,13 @@ export class MyApp {
   }
 
   aplicarFiltro(){
-    this.storage.set('dt_filtro', this.date);
-    this.storage.set('tag', this.tag);
+    this.storage.set('dt_filtro', this.date.slice(0,-1)).then(() => {
+      this.storage.set('tag', this.tag).then(() => {
+        this.storage.set('faixa', this.faixa).then(() => {
+          this.events.publish('filtro:change', null);
+        });
+      });
+    });
   }
 
   resetarFiltro(){
@@ -176,8 +185,16 @@ export class MyApp {
     fdata.setMinutes(0);
     this.date = fdata.toISOString().slice(0,-1);
 
-    this.storage.set('dt_filtro', this.date);
-    this.storage.set('tag', this.tag);
+    this.tag = null;
+    this.faixa = {lower: 0, upper: 1000};
+
+    this.storage.set('dt_filtro', this.date).then(() => {
+      this.storage.set('tag', this.tag).then(() => {
+        this.storage.set('faixa', this.faixa).then(() => {
+          this.events.publish('filtro:change', null);
+        });
+      });
+    });
 
     this.tags.forEach((tag) => {
       tag.forEach((t) => {

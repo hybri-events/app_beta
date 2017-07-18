@@ -43,7 +43,7 @@
         "cordova-plugin-device": "^1.1.4",
         "cordova-plugin-facebook4": "^1.9.1",
         "cordova-plugin-geolocation": "^2.4.3",
-        "cordova-plugin-googlemaps": "^1.4.0",
+        "cordova-plugin-googlemaps": "~1.4.0",
         "cordova-plugin-mauron85-background-geolocation": "^2.2.5",
         "cordova-plugin-splashscreen": "^4.0.3",
         "cordova-plugin-statusbar": "^2.2.2",
@@ -74,9 +74,7 @@
             "cordova-plugin-statusbar": {},
             "cordova-plugin-whitelist": {},
             "ionic-plugin-keyboard": {},
-            "cordova-plugin-geolocation": {
-                "GEOLOCATION_USAGE_DESCRIPTION": " "
-            },
+            "cordova-plugin-geolocation": {},
             "cordova-plugin-x-socialsharing": {},
             "cordova-plugin-compat": {},
             "cordova-plugin-camera": {
@@ -95,7 +93,11 @@
                 "APP_ID": "380223525703372",
                 "APP_NAME": "Vou"
             },
-            "es6-promise-plugin": {}
+            "es6-promise-plugin": {},
+            "cordova-plugin-googlemaps": {
+                "API_KEY_FOR_ANDROID": "AIzaSyCDS1iQAUYcxOPKpEFEvQG3vb0L2IcnQSI",
+                "API_KEY_FOR_IOS": "AIzaSyCDS1iQAUYcxOPKpEFEvQG3vb0L2IcnQSI"
+            }
         },
         "platforms": []
     }

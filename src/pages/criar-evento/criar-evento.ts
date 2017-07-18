@@ -160,28 +160,18 @@ export class CriarEventoPage {
         subTitle: 'Deseja adicionar algumas tags ao seu evento para facilitar a localização do mesmo?',
         buttons: [{text: 'Não', handler: () => {
           erro--;
-          if (this.faixa.lower == 330 && this.faixa.upper == 660){
+          if (parseInt(""+this.faixa.lower) == 330 && parseInt(""+this.faixa.upper) == 660){
             erro++;
             let alert = this.alertCtrl.create({
               title: 'Faixa de preço',
               subTitle: 'Tem certeza que a faixa de preço dos ingressos é de R$330,00 à R$660,00?',
               buttons: [{text: 'Não', handler: () => {}},{text: 'Sim', handler: () => {
                 erro--;
-                if (this.faixa.lower > this.faixa.upper){
-                  erro++;
-                  let alert = this.alertCtrl.create({
-                    title: 'Faixa de preço inválida!',
-                    subTitle: 'O início da faixa de preço é maior que o fim.',
-                    buttons: ['Ok']
-                  });
-                  alert.present();
-                } else {
-                  this.nextPage();
-                }
+                this.nextPage();
               }}]
             });
             alert.present();
-          } else if (this.faixa.lower > this.faixa.upper){
+          } else if (parseInt(""+this.faixa.lower) > parseInt(""+this.faixa.upper)){
             erro++;
             let alert = this.alertCtrl.create({
               title: 'Faixa de preço',
@@ -195,28 +185,18 @@ export class CriarEventoPage {
         }},{text: 'Sim', handler: () => {}}]
       });
       alert.present();
-    } else if (this.priv == "0" && this.faixa.lower == 330 && this.faixa.upper == 660){
+    } else if (this.priv == "0" && parseInt(""+this.faixa.lower) == 330 && parseInt(""+this.faixa.upper) == 660){
       erro++;
       let alert = this.alertCtrl.create({
         title: 'Faixa de preço',
         subTitle: 'Tem certeza que a faixa de preço dos ingressos é de R$330,00 à R$660,00?',
         buttons: [{text: 'Não', handler: () => {}},{text: 'Sim', handler: () => {
           erro--;
-          if (this.faixa.lower > this.faixa.upper){
-            erro++;
-            let alert = this.alertCtrl.create({
-              title: 'Faixa de preço',
-              subTitle: 'O início da faixa de preço é maior que o fim.',
-              buttons: ['Ok']
-            });
-            alert.present();
-          } else {
-            this.nextPage();
-          }
+          this.nextPage();
         }}]
       });
       alert.present();
-    } else if (this.priv == "0" && this.faixa.lower > this.faixa.upper){
+    } else if (this.priv == "0" && parseInt(""+this.faixa.lower) > parseInt(""+this.faixa.upper)){
       erro++;
       let alert = this.alertCtrl.create({
         title: 'Faixa de preço',

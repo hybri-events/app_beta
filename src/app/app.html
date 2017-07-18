@@ -29,10 +29,21 @@
 
 <ion-menu [content]="mycontent" side="right">
   <ion-content padding>
-    <ion-list>
+    <ion-list style="height:calc(100% - 84px);overflow-y:auto;">
       <ion-item>
         <ion-label stacked>Filtro por data</ion-label>
         <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="date"></ion-datetime>
+      </ion-item>
+      <ion-item style="margin-top:16px;">
+        <ion-label stacked>
+          Faixa de preço dos ingressos<br>
+          De: <ion-badge item-end>{{faixa.lower}}</ion-badge>
+          Até: <ion-badge item-end>{{faixa.upper}}</ion-badge>
+        </ion-label>
+        <ion-range dualKnobs="true" pin="true" [(ngModel)]="faixa" min="0" max="200" step="5">
+          <ion-label range-left>Grátis</ion-label>
+          <ion-label range-right>+200</ion-label>
+        </ion-range>
       </ion-item>
       <ion-item style="padding: 0px;">
         <div class="tags">
@@ -40,8 +51,10 @@
         </div>
       </ion-item>
     </ion-list>
-    <button ion-button menuToggle="right" (click)="aplicarFiltro()" block>Aplicar</button>
-    <button ion-button menuToggle="right" (click)="resetarFiltro()" color="secondary" block>Resetar filtros</button>
+    <div style="position:absolute;width:calc(100% - 32px);bottom:8px;background:white;">
+      <button ion-button menuToggle="right" (click)="aplicarFiltro()" block>Aplicar</button>
+      <button ion-button menuToggle="right" (click)="resetarFiltro()" color="secondary" block>Resetar filtros</button>
+    </div>
   </ion-content>
 </ion-menu>
 

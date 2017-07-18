@@ -20,7 +20,7 @@
       <ion-segment-button value="list">
         Lista
       </ion-segment-button>
-      <ion-segment-button value="map" (click)="loadMap()">
+      <ion-segment-button value="map">
         Mapa
       </ion-segment-button>
     </ion-segment>
@@ -34,7 +34,12 @@
       <div #map id="map"></div>
     </div>
     <div *ngSwitchCase="'list'" class="card-background-page">
-      <div class="breve" padding *ngIf="(events | async)?.length == 0"><div class="txt_breve">Infelizmente não foi encontrado nenhum evento.</div></div>
+      <div class="breve" *ngIf="carregando" style="width:100%;">
+        <div class="txt_breve" style="width:100%;"><img src="assets/loading.gif" style="width:200px;margin:0px auto;"></div>
+      </div>
+      <div class="breve" padding *ngIf="(events | async)?.length == 0 || (eve.length == 0 && (stTag != null || stFaixa.lower != 0))">
+        <div class="txt_breve">Infelizmente não foi encontrado nenhum evento.</div>
+      </div>
       <div *ngFor="let e of eve">
         <ion-card [ngStyle]="{'background-image': 'url('+e.img+')' }" *ngIf="e.priv == '0'" (click)="openEvent(e.$key)">
           <div class="fundo_card">

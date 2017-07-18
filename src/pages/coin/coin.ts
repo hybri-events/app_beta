@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController, AlertController, Platform } from 'ionic-angular';
 import { AngularFireAuth } from 'angularfire2/auth';
-import { CodCadastroPage } from '../cod-cadastro/cod-cadastro';
+import { CadastroPage } from '../cadastro/cadastro';
 import { ContaProvider } from '../../providers/conta/conta';
 import { ErrorProvider } from '../../providers/error/error';
 import { LoginPage } from '../login/login';
@@ -358,7 +358,7 @@ export class CoinPage {
 
   openButtonPage(i) {
     if ( i == 0 ){
-      this.navCtrl.push(CodCadastroPage, null);
+      this.navCtrl.push(CadastroPage, null);
     } else if ( i == 1 ){
       this.navCtrl.push(LoginPage, null);
     }
