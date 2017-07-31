@@ -7,10 +7,8 @@ import { IonicStorageModule } from '@ionic/storage';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Facebook } from '@ionic-native/facebook';
 import { QRCodeModule } from 'angular2-qrcode';
-import { SocialSharing } from '@ionic-native/social-sharing';
 import { Camera } from '@ionic-native/camera';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
-import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
 
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
@@ -173,11 +171,9 @@ const firebaseConfig = {
     ErrorProvider,
     ContaProvider,
     EventoProvider,
-    SocialSharing,
     Camera,
     BarcodeScanner,
-    PromoProvider,
-    BackgroundGeolocation
+    PromoProvider
   ]
 })
 export class AppModule {}

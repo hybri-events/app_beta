@@ -18,14 +18,6 @@
     </ion-item>
 
     <ion-item>
-      <ion-label floating>Data de nascimento</ion-label>
-      <ion-datetime #nasc displayFormat="DD/MM/YYYY" formControlName="nasc" [class.invalid]="!signupForm.controls.nasc.valid && signupForm.controls.nasc.dirty"></ion-datetime>
-    </ion-item>
-    <ion-item class="error-message" *ngIf="!signupForm.controls.nasc.valid  && signupForm.controls.nasc.dirty">
-      <p>Selecione sua data de nascimento.</p>
-    </ion-item>
-
-    <ion-item>
       <ion-label floating>E-mail</ion-label>
       <ion-input #email formControlName="email" type="email" [class.invalid]="!signupForm.controls.email.valid && signupForm.controls.email.dirty"></ion-input>
     </ion-item>

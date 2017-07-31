@@ -63,7 +63,7 @@
     <div class="tab_event">
       <p style="margin: 16px;font-family:Lato-Black">{{numConf}}<br>{{(numConf == 1?'CONFIRMADO':'CONFIRMADOS')}}</p>
     </div>
-    <div class="tab_event" style="width:100%;" *ngIf="periodoCheck && confirm && !isCasa">
+    <div class="tab_event" style="width:100%;" *ngIf="periodoCheck && !isCasa">
       <button ion-button icon-left clear full (click)="check()">
         <ion-icon name="icon-one-check"></ion-icon>
         FAZER CHECK-IN
@@ -73,7 +73,7 @@
   <ion-list>
     <ion-item id="list" *ngIf="e.desc != ''" style="padding-top:8px;">
       <div class="lab"><ion-icon name="icon-desc" item-start></ion-icon>Descrição</div>
-      <div class="cont">{{e.desc}}</div>
+      <pre class="cont" style="white-space:pre-line;font-family:Lato-Light;">{{e.desc}}</pre>
     </ion-item>
     <ion-item [attr.id]="e.desc == '' ? 'list' : ''">
       <div class="lab"><ion-icon name="icon-events" item-start></ion-icon>Local</div>

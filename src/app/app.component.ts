@@ -11,6 +11,7 @@ import { Storage } from '@ionic/storage';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import firebase from 'firebase/app';
 import { Events } from 'ionic-angular';
+import { Geolocation } from '@ionic-native/geolocation';
 
 import { TabsPage } from '../pages/tabs/tabs';
 import { TutorialPage } from '../pages/tutorial/tutorial';
@@ -26,6 +27,8 @@ import { PromocaoPage } from '../pages/promocao/promocao';
 import { InviteFriendsPage } from '../pages/invite-friends/invite-friends';
 import { CreatePage } from '../pages/create/create';
 import { SettingsPage } from '../pages/settings/settings';
+import { Http } from '@angular/http';
+import 'rxjs/add/operator/map';
 
 @Component({
   templateUrl: 'app.html'
@@ -40,6 +43,9 @@ export class MyApp {
   tags: FirebaseListObservable<any>;
   teste: FirebaseListObservable<any>;
 
+  cidades: FirebaseListObservable<any>;
+  city = null;
+
   nomeUser;
   perfilUser;
   capaUser;
@@ -50,7 +56,22 @@ export class MyApp {
 
   faixa = {lower: 0, upper: 200}
 
-  constructor(platform: Platform, public events: Events, statusBar: StatusBar, private storage: Storage, public db: AngularFireDatabase, public afDatabase: AngularFireDatabase, public splashScreen: SplashScreen, afAuth: AngularFireAuth, public authData: AuthProvider, public userData: UserDataProvider, public alertCtrl: AlertController, public err: ErrorProvider) {
+  constructor(
+    platform: Platform,
+    public events: Events,
+    statusBar: StatusBar,
+    private storage: Storage,
+    public db: AngularFireDatabase,
+    public afDatabase: AngularFireDatabase,
+    public splashScreen: SplashScreen,
+    afAuth: AngularFireAuth,
+    public authData: AuthProvider,
+    public userData: UserDataProvider,
+    public alertCtrl: AlertController,
+    public err: ErrorProvider,
+    public geolocation: Geolocation,
+    public http: Http
+  ) {
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     let fdata = new Date(Date.now() - tzoffset);
     fdata.setHours(-3);
@@ -60,6 +81,32 @@ export class MyApp {
 
     this.storage.set('dt_filtro', this.date);
     this.storage.set('faixa', this.faixa);
+
+    this.geolocation.getCurrentPosition().then((position) => {
+
+      let lat = position.coords.latitude;
+      let lng = position.coords.longitude;
+      var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng;
+      this.http.get(url).map(res => res.json()).subscribe(data => {
+        for ( let j=0;j<data.results[0].address_components.length;j++ ){
+          for ( let k=0;k<data.results[0].address_components[j].types.length;k++ ){
+            if ( data.results[0].address_components[j].types[k] == 'locality' ){
+              this.city = data.results[0].address_components[j].long_name;
+              this.storage.set('cidade', this.city);
+              break;
+            }
+          }
+          if ( this.city != null ){
+            break;
+          }
+        }
+      });
+
+    }, (err) => {
+      console.log(err);
+    });
+
+    this.cidades = db.list('/evento');
 
     this.tags = db.list('/tags');
 
@@ -172,7 +219,9 @@ export class MyApp {
     this.storage.set('dt_filtro', this.date.slice(0,-1)).then(() => {
       this.storage.set('tag', this.tag).then(() => {
         this.storage.set('faixa', this.faixa).then(() => {
-          this.events.publish('filtro:change', null);
+          this.storage.set('cidade', this.city).then(() => {
+            this.events.publish('filtro:change', null);
+          });
         });
       });
     });

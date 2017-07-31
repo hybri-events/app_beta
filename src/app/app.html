@@ -15,23 +15,29 @@
     </div>
     <ion-list no-lines>
       <!--<button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(0)"><ion-icon item-left name="icon-profile"></ion-icon>Perfil</button>-->
-      <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(1)"><ion-icon item-left name="icon-events"></ion-icon>Meus eventos</button>
+      <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(1)"><ion-icon item-left name="icon-my_events"></ion-icon>Meus eventos</button>
       <!--<button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(2)"><ion-icon item-left name="icon-agenda"></ion-icon>Agenda</button>
       <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(3)"><ion-icon item-left name="icon-invites"></ion-icon>Convites</button>-->
       <button ion-item [disabled]="!this.authentic" menuToggle *ngIf="!isCasa" (click)="openMenuPage(7)"><ion-icon item-left name="icon-promo"></ion-icon>Códigos promocionais</button>
       <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(4)"><ion-icon item-left name="icon-conv"></ion-icon>Convidar amigos</button>
       <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(5)"><ion-icon item-left name="icon-page"></ion-icon>Meus estabelecimentos</button>
-      <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(6)"><ion-icon item-left name="icon-settings"></ion-icon>Configurações</button>
+      <!--<button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(6)"><ion-icon item-left name="icon-settings"></ion-icon>Configurações</button>-->
       <button ion-item menuToggle (click)="exit()" *ngIf="this.authentic"><ion-icon item-left name="icon-cancel"></ion-icon>Sair</button>
     </ion-list>
   </ion-content>
 </ion-menu>
 
-<ion-menu [content]="mycontent" side="right">
+<ion-menu [content]="mycontent" side="right" [swipeEnabled]="false">
   <ion-content padding>
     <ion-list style="height:calc(100% - 84px);overflow-y:auto;">
       <ion-item>
-        <ion-label stacked>Filtro por data</ion-label>
+        <ion-label stacked>Cidade</ion-label>
+        <ion-select interface="popover" [(ngModel)]="city">
+          <div *ngFor="let c of cidades | async"><ion-option value="{{c.$key}}" *ngIf="c.$key[0] != '-'">{{c.$key}}</ion-option></div>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label stacked>Data</ion-label>
         <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="date"></ion-datetime>
       </ion-item>
       <ion-item style="margin-top:16px;">

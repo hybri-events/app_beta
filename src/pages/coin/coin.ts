@@ -1,15 +1,18 @@
 import { Component } from '@angular/core';
-import { NavController, AlertController, Platform } from 'ionic-angular';
+import { NavController, AlertController, Platform, LoadingController, Loading } from 'ionic-angular';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { CadastroPage } from '../cadastro/cadastro';
 import { ContaProvider } from '../../providers/conta/conta';
 import { ErrorProvider } from '../../providers/error/error';
 import { LoginPage } from '../login/login';
 import { QrCodePage } from '../qr-code/qr-code';
-import { BarcodeScanner ,BarcodeScannerOptions } from '@ionic-native/barcode-scanner';
+import { BarcodeScanner, BarcodeScannerOptions } from '@ionic-native/barcode-scanner';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import firebase from 'firebase';
 import { Storage } from '@ionic/storage';
+
+declare var navigator: any;
+declare var Connection: any;
 
 @Component({
   selector: 'page-coin',
@@ -49,7 +52,20 @@ export class CoinPage {
 
   timeout;
 
-  constructor(platform: Platform, public db: AngularFireDatabase, private storage: Storage, public navCtrl: NavController, afAuth: AngularFireAuth, public contaData: ContaProvider, public alertCtrl: AlertController, public err: ErrorProvider, private barcodeScanner: BarcodeScanner) {
+  loading: Loading;
+
+  constructor(
+    public platform: Platform,
+    public db: AngularFireDatabase,
+    private storage: Storage,
+    public navCtrl: NavController,
+    afAuth: AngularFireAuth,
+    public contaData: ContaProvider,
+    public alertCtrl: AlertController,
+    public err: ErrorProvider,
+    private barcodeScanner: BarcodeScanner,
+    public loadingCtrl: LoadingController
+  ) {
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     this.plat = platform;
     let fdata = new Date(Date.now() - tzoffset);
@@ -106,55 +122,7 @@ export class CoinPage {
 
   ionViewDidEnter(){
     if ( this.coins == "home" ){
-      if (this.authentic) {
-        if ( this.isCasa ){
-          this.contaData.getSaldo(this.keyCasa).then( eventListSnap => {
-            this.saldoVS = eventListSnap[0].saldo;
-            this.saldoRS = eventListSnap[0].saldo * 0.04;
-            this.transacoes = this.db.list('conta/'+this.keyCasa+'/transacao',{
-              query: {
-                orderByChild: 'dt_hr',
-                startAt: this.date2,
-                endAt: this.date1
-              }
-            });
-          }).catch((error) => {
-            console.log(error);
-            let alert = this.alertCtrl.create({
-              title: "Ocorreu um erro!",
-              message: this.err.messageError(error["code"]),
-              buttons: [{
-                text: "Ok",
-                role: 'cancel'
-              }]
-            });
-            alert.present();
-          });
-        } else {
-          this.contaData.getSaldo(firebase.auth().currentUser.uid).then( eventListSnap => {
-            this.saldoVS = eventListSnap[0].saldo;
-            this.saldoRS = eventListSnap[0].saldo * 0.04;
-            this.transacoes = this.db.list('conta/'+firebase.auth().currentUser.uid+'/transacao',{
-              query: {
-                orderByChild: 'dt_hr',
-                startAt: this.date2,
-                endAt: this.date1
-              }
-            });
-          }).catch((error) => {
-            console.log(error);
-            let alert = this.alertCtrl.create({
-              title: "Ocorreu um erro!",
-              message: this.err.messageError(error["code"]),
-              buttons: [{
-                text: "Ok",
-                role: 'cancel'
-              }]
-            });
-            alert.present();
-          });
-        }
-      }
+      this.changeTabs();
     } else if (this.coins == "receive"){
       this.coins = 'home';
     }
@@ -212,15 +180,17 @@ export class CoinPage {
         }
       }
     } else if (this.coins == "receive"){
-      if ( !this.isCasa ){
-        let alert = this.alertCtrl.create({
-          title: "Tranferência de V$!",
-          message: "Para esta operação cobraremos uma taxa de transação no valor de 20%. Deseja prosseguir?",
-          buttons: [{text: 'Não', handler: () => {this.coins = 'home'}},{text: 'Sim', handler: () => {this.lerQR()} }]
-        });
-        alert.present();
-      } else {
-        this.lerQR();
+      if ( this.authentic ){
+        if ( !this.isCasa ){
+          let alert = this.alertCtrl.create({
+            title: "Tranferência de V$!",
+            message: "Para esta operação cobraremos uma taxa de transação no valor de 20%. Deseja prosseguir?",
+            buttons: [{text: 'Não', handler: () => {this.coins = 'home'}},{text: 'Sim', handler: () => {this.lerQR()} }]
+          });
+          alert.present();
+        } else {
+          this.lerQR();
+        }
       }
     }
   }
@@ -274,55 +244,133 @@ export class CoinPage {
 
   trans(){
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+    let data = new Date(Date.now() - tzoffset);
+    let transA: FirebaseListObservable<any>;
+    let transB: FirebaseListObservable<any>;
+    let uidSaldo;
     if ( this.isCasa ){
-      this.contaData.cadTransacao(this.keyCasa, "Pagamento recebido de "+this.dataQRC.nome+".", (this.dataQRC.vous * 0.8), 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
-      this.contaData.getSaldo(this.keyCasa).then(s => {
-        this.contaData.altSaldo(1, s[0].id, s[0].saldo, (this.dataQRC.vous * 0.8), this.keyCasa);
-
-        this.contaData.cadTransacao(this.dataQRC.uid, "Pagamento efetuado para "+this.myname+".", this.dataQRC.vous, 'Saída', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'saida','-');
-        this.contaData.getSaldo(this.dataQRC.uid).then(s => {
-          this.contaData.altSaldo(0, s[0].id, s[0].saldo, this.dataQRC.vous, this.dataQRC.uid);
-
-          let alert = this.alertCtrl.create({
-            title: "Tranferência executada com sucesso!",
-            message: "Sua transferência foi executada com sucesso. Muito obrigado!",
-            buttons: [{
-              text: "Ok",
-              handler: data => {
-                this.coins = 'home';
-                this.changeTabs();
-                clearTimeout(this.timeout);
-              }
-            }]
-          });
-          alert.present();
-        });
-      });
+      transA = this.db.list('conta/'+this.keyCasa+'/transacao');
+      transB = this.db.list('conta/'+this.dataQRC.uid+'/transacao');
+      uidSaldo = this.keyCasa;
     } else {
-      this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Pagamento recebido de "+this.dataQRC.nome+".", (this.dataQRC.vous * 0.8), 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
-      this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
-        this.contaData.altSaldo(1, s[0].id, s[0].saldo, (this.dataQRC.vous * 0.8), firebase.auth().currentUser.uid);
-
-        this.contaData.cadTransacao(this.dataQRC.uid, "Pagamento efetuado para "+this.myname+".", this.dataQRC.vous, 'Saída', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'saida','-');
-        this.contaData.getSaldo(this.dataQRC.uid).then(s => {
-          this.contaData.altSaldo(0, s[0].id, s[0].saldo, this.dataQRC.vous, this.dataQRC.uid);
-
-          let alert = this.alertCtrl.create({
-            title: "Tranferência executada com sucesso!",
-            message: "Sua transferência foi executada com sucesso. Muito obrigado!",
-            buttons: [{
-              text: "Ok",
-              handler: data => {
-                this.coins = 'home';
-                this.changeTabs();
-                clearTimeout(this.timeout);
-              }
-            }]
-          });
-          alert.present();
-        });
-      });
+      transA = this.db.list('conta/'+firebase.auth().currentUser.uid+'/transacao');
+      transB = this.db.list('conta/'+this.dataQRC.uid+'/transacao');
+      uidSaldo = firebase.auth().currentUser.uid;
     }
+    this.loading = this.loadingCtrl.create({
+      content: "Realizando transação. Aguarde...",
+    });
+    this.loading.present();
+    clearTimeout(this.timeout);
+    this.timeout = setTimeout(() => {
+      this.loading.dismiss();
+      let al = this.alertCtrl.create({
+        title: "Problemas de conexão!",
+        message: "Verifique sua conexão com a internet e tente novamente.",
+        buttons: [{
+          text: "Ok",
+          handler: d => {
+            clearTimeout(this.timeout);
+            this.timeout = null;
+            /*transA.forEach(tr => {
+              tr.forEach(t => {
+                if ( t.dt_hr == data.toISOString().slice(0,-1) ){
+                  transA.remove(t.$key);
+                }
+              });
+            });
+            transB.forEach(tr => {
+              tr.forEach(t => {
+                if ( t.dt_hr == data.toISOString().slice(0,-1) ){
+                  transB.remove(t.$key);
+                }
+              });
+            });
+            this.contaData.getSaldo(uidSaldo).then(s => {
+              this.contaData.altSaldo(0, s[0].id, s[0].saldo, (this.dataQRC.vous * 0.8), uidSaldo);
+            });*/
+            this.coins = 'home';
+            this.changeTabs();
+          }
+        }]
+      });
+      al.present();
+    },7000);
+    this.contaData.getSaldo(this.dataQRC.uid).then(s => {
+      if ( s[0].saldo >= this.dataQRC.vous ){
+        if ( this.timeout != null ){
+          this.contaData.altSaldo(0, s[0].id, s[0].saldo, this.dataQRC.vous, this.dataQRC.uid).then(() => {
+            if ( this.timeout != null ){
+              this.contaData.getSaldo(uidSaldo).then(s => {
+                if ( this.timeout != null ){
+                  this.contaData.altSaldo(1, s[0].id, s[0].saldo, (this.dataQRC.vous * 0.8), uidSaldo).then(() => {
+                    if ( this.timeout != null ){
+                      this.loading.dismiss();
+                      transA.push({
+                        ano: data.getFullYear(),
+                        classe: "entrada",
+                        descricao: "Pagamento recebido de "+this.dataQRC.nome+".",
+                        dia: data.getDate(),
+                        dt_hr: data.toISOString().slice(0,-1),
+                        hora: data.getHours(),
+                        mes: data.getMonth()+1,
+                        min: data.getMinutes(),
+                        operador: "+",
+                        tipo: "Entrada",
+                        valor: (this.dataQRC.vous * 0.8)
+                      });
+                      transB.push({
+                        ano: data.getFullYear(),
+                        classe: "saida",
+                        descricao: "Pagamento efetuado para "+this.myname+".",
+                        dia: data.getDate(),
+                        dt_hr: data.toISOString().slice(0,-1),
+                        hora: data.getHours(),
+                        mes: data.getMonth()+1,
+                        min: data.getMinutes(),
+                        operador: "-",
+                        tipo: "Saída",
+                        valor: this.dataQRC.vous
+                      });
+                      let al = this.alertCtrl.create({
+                        title: "Tranferência executada com sucesso!",
+                        message: "Sua transferência foi executada com sucesso. Muito obrigado!",
+                        buttons: [{
+                          text: "Ok",
+                          handler: data => {
+                            clearTimeout(this.timeout);
+                            this.timeout = null;
+                            this.coins = 'home';
+                            this.changeTabs();
+                          }
+                        }]
+                      });
+                      al.present();
+                    }
+                  });
+                }
+              });
+            }
+          });
+        }
+      } else {
+        this.loading.dismiss();
+        let al = this.alertCtrl.create({
+          title: "Saldo insuficiente!",
+          message: this.dataQRC.nome+" não tem saldo suficiente para completar a tranferência.",
+          buttons: [{
+            text: "Ok",
+            handler: data => {
+              clearTimeout(this.timeout);
+              this.timeout = null;
+              this.coins = 'home';
+              this.changeTabs();
+            }
+          }]
+        });
+        al.present();
+      }
+    });
   }
 
   keyUpVS(evt){

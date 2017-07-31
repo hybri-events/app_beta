@@ -43,7 +43,7 @@ export class CodCadastroPage {
   num(numero){
     if ( this.codigo.length < 6 ){
       this.codigo += numero + "";
-      document.getElementById(this.codigo.length+"").style.background = "#652C90";
+      document.getElementById("p"+this.codigo.length+"").style.backgroundColor = "#652C90";
       if ( this.codigo.length == 6 ){
         let error = 0;
         this.p.forEach(i => {

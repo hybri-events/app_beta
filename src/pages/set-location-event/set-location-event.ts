@@ -45,7 +45,12 @@ export class SetLocationEventPage {
   continuar(){
     var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + this.lat + "," + this.lng;
     this.http.get(url).map(res => res.json()).subscribe(data => {
-      let cidade = data.results[0].address_components[3].short_name;
+      let cidade;
+      for ( let j=0;j<data.results[0].address_components.length;j++ ){
+        if ( data.results[0].address_components[j].types[0] == 'locality' ){
+          cidade = data.results[0].address_components[j].long_name;
+        }
+      }
       this.param.push({lat: this.lat, lng: this.lng, cidade: cidade});
       if ( this.param[0].priv == "1" ){
         this.navCtrl.push(InvitePage, this.param);

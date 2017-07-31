@@ -35,13 +35,18 @@ export class EditLocationEventPage {
       place: ''
     };
     this.param = navParams.data;
-    this.evento = db.list('/evento/');
   }
 
   continuar(){
     var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + this.lat + "," + this.lng;
     this.http.get(url).map(res => res.json()).subscribe(data => {
-      let cidade = data.results[0].address_components[3].short_name;
+      let cidade;
+      for ( let j=0;j<data.results[0].address_components.length;j++ ){
+        if ( data.results[0].address_components[j].types[0] == 'locality' ){
+          cidade = data.results[0].address_components[j].long_name;
+        }
+      }
+      this.evento = this.db.list('/evento/'+cidade);
       this.param['lat'] = this.lat;
       this.param['lng'] = this.lng;
       this.param['cidade'] = cidade;

@@ -33,6 +33,7 @@ export class EventsPage {
   stDtfim;
   stTag;
   stFaixa = {lower: 0, upper: 1000};
+  stCity;
 
   eve = [];
 
@@ -65,142 +66,91 @@ export class EventsPage {
         this.isCasa = true;
       }
     });
-    this.db.list('/casas/').subscribe(cas => this.casa = cas);
-    this.storage.get('dt_filtro').then((val) => {
-      console.log(val);
-      this.stDtini = val;
-      let date = new Date(val);
-      date.setDate(date.getDate()+1);
-      date.setHours(20);
-      date.setMinutes(59);
-      date.setDate(new Date(this.stDtini).getDate());
-      this.stDtfim = date.toISOString().slice(0,-1);
-      console.log(this.stDtini)
-      console.log(this.stDtfim)
-      this.storage.get('tag').then((val) => {
-        this.stTag = val;
-        this.storage.get('faixa').then((val) => {
-          this.stFaixa = val;
-          this.events = this.db.list('/evento', {
-            query: {
-              orderByChild: 'dti',
-              startAt: this.stDtini,
-              endAt: this.stDtfim
-            }
-          });
-          this.events.forEach(ev => {
-            let t = [];
-            ev.forEach(e => {
-              let ok = false;
-              if ( e.faixa_ini >= parseInt(""+this.stFaixa.lower) && (e.faixa_fim <= parseInt(""+this.stFaixa.upper) || parseInt(""+this.stFaixa.upper) == 200) ){
-                if ( this.stTag != null ){
-                  if ( e.tags != undefined ){
-                    for ( let j=0;j<e.tags.length;j++ ){
-                      if ( e.tags[j].nome == this.stTag ){
-                        ok = true;
-                      }
-                    }
-                  }
-                } else {
-                  ok = true;
-                }
-              }
-              this.carregando = false;
-              if ( ok ){
-                if ( e.criador[0] == "-" ){
-                  this.casa.forEach(ca => {
-                    if( ca[e.criador] != null ){
-                      e['casa'] = ca[e.criador];
-                      if ( e.coin ){
-                        t.unshift(e);
-                      } else {
-                        t.push(e);
-                      }
-                    }
-                  });
-                } else {
-                  e['casa'] = {bar: false, cozinha: false, fum: false, estac: false, wifi: false, acess: false};
-                  if ( e.coin ){
-                    t.unshift(e);
-                  } else {
-                    t.push(e);
-                  }
-                }
-                this.eve = t;
-              }
-            });
-          });
-        });
-      });
+  }
+
+  ionViewDidLoad(){
+    this.db.list('/casas/').subscribe(cas => {
+      this.casa = cas;
+      this.changeTab();
     });
   }
 
   changeTab(){
     this.eve = [];
     this.carregando = true;
-    this.storage.get('dt_filtro').then((val) => {
-      this.stDtini = val;
-      let date = new Date(val);
-      date.setDate(date.getDate()+1);
-      date.setHours(20);
-      date.setMinutes(59);
-      date.setDate(new Date(this.stDtini).getDate());
-      this.stDtfim = date.toISOString().slice(0,-1);
-      this.storage.get('tag').then((val) => {
-        this.stTag = val;
-        this.storage.get('faixa').then((val) => {
-          this.stFaixa = val;
-          this.events = this.db.list('/evento', {
-            query: {
-              orderByChild: 'dti',
-              startAt: this.stDtini,
-              endAt: this.stDtfim
-            }
-          });
-          this.events.forEach(ev => {
-            let t = [];
-            ev.forEach(e => {
-              let ok = false;
-              if ( e.faixa_ini >= parseInt(""+this.stFaixa.lower) && e.faixa_fim <= parseInt(""+this.stFaixa.upper) ){
-                if ( this.stTag != null ){
-                  if ( e.tags != undefined ){
-                    for ( let j=0;j<e.tags.length;j++ ){
-                      if ( e.tags[j].nome == this.stTag ){
-                        ok = true;
-                      }
-                    }
-                  }
-                } else {
-                  ok = true;
-                }
-              }
-              this.carregando = false;
-              if ( ok ){
-                if ( e.criador[0] == "-" ){
-                  this.casa.forEach(ca => {
-                    if( ca[e.criador] != null ){
-                      e['casa'] = ca[e.criador];
-                      if ( e.coin ){
-                        t.unshift(e);
-                      } else {
-                        t.push(e);
-                      }
-                    }
-                  });
-                } else {
-                  e['casa'] = {bar: false, cozinha: false, fum: false, estac: false, wifi: false, acess: false};
-                  if ( e.coin ){
-                    t.unshift(e);
-                  } else {
-                    t.push(e);
-                  }
-                }
-                this.eve = t;
-              }
-              if ( this.maps == "map" ){
-                this.loadMap();
+    this.storage.get('cidade').then((val) => {
+      this.stCity = val;
+      this.storage.get('dt_filtro').then((val) => {
+        this.stDtini = val;
+        let date = new Date(val);
+        date.setDate(date.getDate()+1);
+        date.setHours(20);
+        date.setMinutes(59);
+    	  if ( this.plat.is('android') ){
+    		  date.setDate(new Date(this.stDtini).getDate());
+    	  }
+        this.stDtfim = date.toISOString().slice(0,-1);
+        this.storage.get('tag').then((val) => {
+          this.stTag = val;
+          this.storage.get('faixa').then((val) => {
+            this.stFaixa = val;
+            this.events = this.db.list('/evento/'+this.stCity, {
+              query: {
+                orderByChild: 'dti',
+                startAt: this.stDtini,
+                endAt: this.stDtfim
               }
             });
+            let h = 0;
+            this.events.forEach(ev => {
+              let t = [];
+              h++;
+              ev.forEach(e => {
+                let ok = false;
+                if ( e.faixa_ini >= parseInt(""+this.stFaixa.lower) && e.faixa_fim <= parseInt(""+this.stFaixa.upper) ){
+                  if ( this.stTag != null ){
+                    if ( e.tags != undefined ){
+                      for ( let j=0;j<e.tags.length;j++ ){
+                        if ( e.tags[j].nome == this.stTag ){
+                          ok = true;
+                        }
+                      }
+                    }
+                  } else {
+                    ok = true;
+                  }
+                }
+                this.carregando = false;
+                if ( ok ){
+                  if ( e.criador[0] == "-" ){
+                    this.casa.forEach(ca => {
+                      if( ca[e.criador] != null ){
+                        e['casa'] = ca[e.criador];
+                        if ( e.coin ){
+                          t.unshift(e);
+                        } else {
+                          t.push(e);
+                        }
+                      }
+                    });
+                  } else {
+                    e['casa'] = {bar: false, cozinha: false, fum: false, estac: false, wifi: false, acess: false};
+                    if ( e.coin ){
+                      t.unshift(e);
+                    } else {
+                      t.push(e);
+                    }
+                  }
+                  this.eve = t;
+                }
+                if ( this.maps == "map" ){
+                  this.loadMap();
+                }
+              });
+            });
+            if ( h == 0 ){
+              this.carregando = false;
+            }
           });
         });
       });

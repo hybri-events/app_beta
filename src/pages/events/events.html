@@ -14,6 +14,11 @@
         <ion-icon name="icon-search"></ion-icon>
       </button>
     </ion-buttons>-->
+    <ion-buttons *ngIf="!this.plat.is('android')" menuToggle="right" end>
+      <button ion-button icon-only color="primary" class="btn_search">
+        <ion-icon name="icon-filter"></ion-icon>
+      </button>
+    </ion-buttons>
   </ion-navbar>
   <ion-toolbar class="tab_top" no-border-top style="padding:0px;">
     <ion-segment [(ngModel)]="maps" (ionChange)="changeTab()">
@@ -23,6 +28,7 @@
       <ion-segment-button value="map">
         Mapa
       </ion-segment-button>
+      <button *ngIf="this.plat.is('android')" menuToggle="right" ion-button clear style="color:white"><ion-icon name="icon-filter"></ion-icon></button>
     </ion-segment>
   </ion-toolbar>
 </ion-header>
@@ -80,8 +86,4 @@
       </div>
     </div>
   </div>
-
-  <ion-fab right bottom menuToggle="right">
-    <button ion-fab color="primary"><ion-icon name="icon-filter"></ion-icon></button>
-  </ion-fab>
 </ion-content>

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import firebase from 'firebase';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
+import Querybase from 'querybase';
 
 @Injectable()
 export class EventoProvider {
@@ -19,7 +20,7 @@ export class EventoProvider {
     let dataf = new Date(dtf.getTime() + this.offset);
     let meses = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
     let mes = meses[datai.getMonth()];
-    return firebase.database().ref(`evento/`).push({
+    return firebase.database().ref('evento/'+params[1].cidade).push({
       nome: params[0].nome,
       criador: uid,
       nomeCriador: params[2].nomeCriador,
@@ -54,33 +55,6 @@ export class EventoProvider {
 
   cadTags(nome){
     return firebase.database().ref(`tags/`).push({nome});
-  }
-
-  getEventos(): firebase.Promise<any> {
-    return new Promise( (resolve, reject) => {
-      firebase.database().ref(`evento/`).orderByChild('priv').equalTo('0').on('value', snapshot => {
-        let rawList = [];
-        snapshot.forEach( snap => {
-          console.log(Date.now());
-          console.log(new Date(snap.val().dt_ini));
-          rawList.push({
-            id: snap.key,
-            nome: snap.val().nome,
-            criador: snap.val().criador,
-            dt_ini: new Date(new Date(snap.val().dt_ini).getTime() + this.offset),
-            dt_fim: (snap.val().dt_fim != 'null'? new Date(new Date(snap.val().dt_fim).getTime() + this.offset):'null'),
-            faixa_ini: snap.val().faixa_ini,
-            faixa_fim: snap.val().faixa_fim,
-            lat: snap.val().lat,
-            lng: snap.val().lng,
-            cidade: snap.val().cidade,
-            coin: snap.val().coin
-          });
-        return false;
-        });
-        resolve(rawList);
-      });
-    });
   }
 
   getNomeCriador(uid): firebase.Promise<any>{

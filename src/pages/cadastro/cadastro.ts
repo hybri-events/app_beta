@@ -24,7 +24,6 @@ export class CadastroPage {
   constructor(public navCtrl: NavController, public err: ErrorProvider, public splashScreen: SplashScreen, public db: AngularFireDatabase, private facebook: Facebook, public authData: AuthProvider, public userData: UserDataProvider, public contaData: ContaProvider, public formBuilder: FormBuilder, public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
     this.signupForm = formBuilder.group({
       nome: ['', Validators.compose([Validators.required, NameValidator.isValid])],
-      nasc: ['', Validators.compose([Validators.required])],
       email: ['', Validators.compose([Validators.required, EmailValidator.isValid])],
       password: ['', Validators.compose([Validators.minLength(6), Validators.required])]
     });
@@ -38,7 +37,7 @@ export class CadastroPage {
       let me = this;
       user.delete().then(function() {
         me.authData.signupUser(me.signupForm.value.email, me.signupForm.value.password).then((success) => {
-          me.userData.cadUser(me.signupForm.value.nome, me.signupForm.value.nasc, me.signupForm.value.email, 'http://usevou.com/profile/ft_perfil/padrao.png').then(() => {
+          me.userData.cadUser(me.signupForm.value.nome, null, me.signupForm.value.email, 'http://usevou.com/profile/ft_perfil/padrao.png').then(() => {
             me.splashScreen.show();
             window.location.reload();
           }, (error) => {

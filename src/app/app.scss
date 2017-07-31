@@ -176,6 +176,7 @@ ion-content {
   }
 }
 
+@include makeIcon(icon-my_events, $icon-my_events);
 @include makeIcon(icon-acessibilidade, $icon-acessibilidade);
 @include makeIcon(icon-estacionamento, $icon-estacionamento);
 @include makeIcon(icon-vous, $icon-vous);
