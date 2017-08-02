@@ -3,6 +3,7 @@ import { NavController, Platform, AlertController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
 import { CriarEventoPage } from '../criar-evento/criar-evento';
 import { EventDetailPage } from '../event-detail/event-detail';
+import { IndicacaoPage } from '../indicacao/indicacao';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { EventoProvider } from '../../providers/evento/evento';
 import { ErrorProvider } from '../../providers/error/error';
@@ -44,8 +45,23 @@ export class EventsPage {
   click = [];
 
   carregando = true;
+  cidade;
 
-  constructor(platform: Platform, public filtro: Events, public db: AngularFireDatabase, private storage: Storage, public navCtrl: NavController, afAuth: AngularFireAuth, public geolocation: Geolocation, public evento: EventoProvider, public alertCtrl: AlertController, public err: ErrorProvider) {
+  cidades: FirebaseListObservable<any>;
+  showCity = false;
+
+  constructor(
+    platform: Platform,
+    public filtro: Events,
+    public db: AngularFireDatabase,
+    private storage: Storage,
+    public navCtrl: NavController,
+    afAuth: AngularFireAuth,
+    public geolocation: Geolocation,
+    public evento: EventoProvider,
+    public alertCtrl: AlertController,
+    public err: ErrorProvider
+  ) {
     this.plat = platform;
     const authObserver = afAuth.authState.subscribe( user => {
       if (user) {
@@ -66,6 +82,7 @@ export class EventsPage {
         this.isCasa = true;
       }
     });
+    this.cidades = db.list('/cidades');
   }
 
   ionViewDidLoad(){
@@ -80,15 +97,32 @@ export class EventsPage {
     this.carregando = true;
     this.storage.get('cidade').then((val) => {
       this.stCity = val;
+      this.cidade = val;
+      this.cidades.forEach(cid => {
+        let j = 0;
+        cid.forEach(ci => {
+          if ( ci.nome != this.cidade ){
+            j++;
+          }
+        });
+        if ( cid.length == j ){
+          this.showCity = true;
+        }
+      });
       this.storage.get('dt_filtro').then((val) => {
         this.stDtini = val;
         let date = new Date(val);
-        date.setDate(date.getDate()+1);
+        let lastDay = new Date(date.getFullYear(), date.getMonth()+1, 0).getDate();
+        if ( this.plat.is('android') ){
+          date.setDate(new Date(this.stDtini).getDate());
+        } else {
+          date.setDate(date.getDate()+1);
+        }
+        if ( lastDay == date.getDate() ){
+          date.setMonth(new Date(this.stDtini).getMonth());
+        }
         date.setHours(20);
         date.setMinutes(59);
-    	  if ( this.plat.is('android') ){
-    		  date.setDate(new Date(this.stDtini).getDate());
-    	  }
         this.stDtfim = date.toISOString().slice(0,-1);
         this.storage.get('tag').then((val) => {
           this.stTag = val;
@@ -334,6 +368,10 @@ export class EventsPage {
       });
       alert.present();
     }
+  }
+
+  indicar(){
+    this.navCtrl.push(IndicacaoPage,{city: this.cidade});
   }
 
 }

@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import firebase from 'firebase';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
-import Querybase from 'querybase';
 
 @Injectable()
 export class EventoProvider {

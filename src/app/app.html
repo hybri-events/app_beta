@@ -21,6 +21,7 @@
       <button ion-item [disabled]="!this.authentic" menuToggle *ngIf="!isCasa" (click)="openMenuPage(7)"><ion-icon item-left name="icon-promo"></ion-icon>Códigos promocionais</button>
       <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(4)"><ion-icon item-left name="icon-conv"></ion-icon>Convidar amigos</button>
       <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(5)"><ion-icon item-left name="icon-page"></ion-icon>Meus estabelecimentos</button>
+      <button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(8)"><ion-icon item-left name="icon-bug"></ion-icon>Reportar Bug</button>
       <!--<button ion-item [disabled]="!this.authentic" menuToggle (click)="openMenuPage(6)"><ion-icon item-left name="icon-settings"></ion-icon>Configurações</button>-->
       <button ion-item menuToggle (click)="exit()" *ngIf="this.authentic"><ion-icon item-left name="icon-cancel"></ion-icon>Sair</button>
     </ion-list>
@@ -33,7 +34,8 @@
       <ion-item>
         <ion-label stacked>Cidade</ion-label>
         <ion-select interface="popover" [(ngModel)]="city">
-          <div *ngFor="let c of cidades | async"><ion-option value="{{c.$key}}" *ngIf="c.$key[0] != '-'">{{c.$key}}</ion-option></div>
+          <ion-option value="{{city}}" *ngIf='showCity'>{{city}}</ion-option>
+          <div *ngFor="let c of cidades | async"><ion-option value="{{c.nome}}">{{c.nome}}</ion-option></div>
         </ion-select>
       </ion-item>
       <ion-item>

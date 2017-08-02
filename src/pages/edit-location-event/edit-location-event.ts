@@ -2,12 +2,10 @@ import { Component, ViewChild, ElementRef } from '@angular/core';
 import { NavController, NavParams, ModalController, LoadingController, Loading, AlertController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
 import { AutocompletePage } from '../autocomplete/autocomplete';
-import { InvitePage } from '../invite/invite';
 import { EventoProvider } from '../../providers/evento/evento';
 import { ErrorProvider } from '../../providers/error/error';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
-import firebase from 'firebase';
 import { Storage } from '@ionic/storage';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 

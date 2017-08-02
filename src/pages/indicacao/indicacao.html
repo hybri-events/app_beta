@@ -1,0 +1,53 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Indicação</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-list>
+    <ion-item>
+      <ion-label fixed>Tipo</ion-label>
+      <ion-select interface="popover" [(ngModel)]="tipoInd">
+        <ion-option value="evento">Evento</ion-option>
+        <ion-option value="lugar">Lugar</ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label fixed>Nome</ion-label>
+      <ion-input type="text" [(ngModel)]="ind"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label fixed>Cidade</ion-label>
+      <ion-input type="text" [(ngModel)]="cidade"></ion-input>
+    </ion-item>
+    <ion-item style='margin-top:-24px;' *ngIf="tipoInd == 'evento'" (click)="isResp = true">
+      <p>Conhece o responsável por este evento?<p>
+    </ion-item>
+    <ion-item style='margin-top:-24px;' *ngIf="tipoInd == 'lugar'" (click)="isResp = true">
+      <p>Conhece o responsável por este lugar?<p>
+    </ion-item>
+    <div *ngIf="isResp">
+      <ion-list-header>
+        Dados do responsável
+        <ion-icon item-end name="icon-cancel" (click)="isResp = false"></ion-icon>
+      </ion-list-header>
+      <ion-item>
+        <ion-label fixed>Nome</ion-label>
+        <ion-input type="text" [(ngModel)]="nome"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label fixed>Telefone</ion-label>
+        <ion-input type="text" [(ngModel)]="telefone"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label fixed>E-mail</ion-label>
+        <ion-input type="text" [(ngModel)]="email"></ion-input>
+      </ion-item>
+    </div>
+  </ion-list>
+  <button ion-button block (click)="indicar()">Indicar</button>
+</ion-content>

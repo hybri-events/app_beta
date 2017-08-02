@@ -22,6 +22,7 @@ import { QrCodePage } from '../pages/qr-code/qr-code';
 import { TutorialPage } from '../pages/tutorial/tutorial';
 
 import { EventsPage } from '../pages/events/events';
+import { IndicacaoPage } from '../pages/indicacao/indicacao';
 import { EventDetailPage } from '../pages/event-detail/event-detail';
 import { CriarEventoPage } from '../pages/criar-evento/criar-evento';
 import { SetLocationEventPage } from '../pages/set-location-event/set-location-event';
@@ -41,6 +42,7 @@ import { PerfilPage } from '../pages/perfil/perfil';
 import { MyEventPage } from '../pages/my-event/my-event';
 import { AgendaPage } from '../pages/agenda/agenda';
 import { InvitesPage } from '../pages/invites/invites';
+import { ReportBugPage } from '../pages/report-bug/report-bug';
 
 import { PromocaoPage } from '../pages/promocao/promocao';
 import { ListPromoPage } from '../pages/list-promo/list-promo';
@@ -112,7 +114,9 @@ const firebaseConfig = {
     EditLocationCasaPage,
     EditLocationEventPage,
     ListPromoPage,
-    TutorialPage
+    TutorialPage,
+    IndicacaoPage,
+    ReportBugPage
   ],
   imports: [
     BrowserModule,
@@ -158,7 +162,9 @@ const firebaseConfig = {
     EditLocationCasaPage,
     EditLocationEventPage,
     ListPromoPage,
-    TutorialPage
+    TutorialPage,
+    IndicacaoPage,
+    ReportBugPage
   ],
   providers: [
     StatusBar,

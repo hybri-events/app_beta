@@ -24,7 +24,11 @@ export class CodCadastroPage {
   u = [];
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, public alertCtrl: AlertController, public db: AngularFireDatabase, public contaData: ContaProvider) {
-    this.promo = this.db.list('/promocoes/'+navParams.data.id+'/0');
+    if ( navParams.data.id == 'convite' ){
+      this.promo = this.db.list('/promocoes/'+navParams.data.id+'/');
+    } else {
+      this.promo = this.db.list('/promocoes/'+navParams.data.id+'/0');
+    }
     this.info = this.db.list('/promocoes/ativas/');
     this.user = this.db.list('/usuario/'+firebase.auth().currentUser.uid+'/codigos/');
     this.promo.subscribe(list => this.p = list);
@@ -46,10 +50,10 @@ export class CodCadastroPage {
       document.getElementById("p"+this.codigo.length+"").style.backgroundColor = "#652C90";
       if ( this.codigo.length == 6 ){
         let error = 0;
+        let j = this.p.length;
         this.p.forEach(i => {
-          console.log(i);
-          if ( i.$value == this.codigo ){
-            if ( this.navParams.data.id == 'convite' ){
+          if ( this.navParams.data.id == 'convite' ){
+            if ( i.cod == this.codigo ){
               if ( i.uid == firebase.auth().currentUser.uid ){
                 let alert = this.alertCtrl.create({
                   title: "Esse código é seu!",
@@ -70,7 +74,7 @@ export class CodCadastroPage {
                   buttons: [{
                     text: "Ok",
                     handler: data => {
-                      let p = this.db.list('/promocoes/'+this.navParams.data.id+'/'+this.codigo);
+                      let p = this.db.list('/promocoes/'+this.navParams.data.id+'/'+i.$key+'/usados');
                       p.push({[firebase.auth().currentUser.uid]: "ok"});
                       this.user.push({id: this.navParams.data.id, codigo: this.codigo, nome: this.nome, valor: this.valor});
                       let tzoffset = (new Date()).getTimezoneOffset() * 60000;
@@ -90,6 +94,24 @@ export class CodCadastroPage {
                 alert.present();
               }
             } else {
+              error++;
+            }
+            if ( error == j ){
+              let alert = this.alertCtrl.create({
+                title: "Esse código não existe!",
+                message: "Verifique se você está preenchendo o código corretamente.",
+                buttons: [{
+                  text: "Ok",
+                  role: 'cancel'
+                }]
+              });
+              alert.present();
+              for ( let i=0;i<6;i++ ){
+                this.apagar();
+              }
+            }
+          } else {
+            if ( i.$value == this.codigo ){
               let alert = this.alertCtrl.create({
                 title: "Código correto!",
                 message: "Parabéns, você  ganhou V$"+this.valor+"!",
@@ -110,19 +132,19 @@ export class CodCadastroPage {
                 }]
               });
               alert.present();
-            }
-          } else {
-            let alert = this.alertCtrl.create({
-              title: "Esse código não existe!",
-              message: "Verifique se você está preenchendo o código corretamente.",
-              buttons: [{
-                text: "Ok",
-                role: 'cancel'
-              }]
-            });
-            alert.present();
-            for ( let i=0;i<6;i++ ){
-              this.apagar();
+            } else {
+              let alert = this.alertCtrl.create({
+                title: "Esse código não existe!",
+                message: "Verifique se você está preenchendo o código corretamente.",
+                buttons: [{
+                  text: "Ok",
+                  role: 'cancel'
+                }]
+              });
+              alert.present();
+              for ( let i=0;i<6;i++ ){
+                this.apagar();
+              }
             }
           }
         });
@@ -132,7 +154,7 @@ export class CodCadastroPage {
 
   apagar(){
     if ( this.codigo.length > 0 ){
-      document.getElementById(this.codigo.length+"").style.background = "transparent";
+      document.getElementById('p'+this.codigo.length).style.background = "transparent";
       this.codigo = this.codigo.substr(0,this.codigo.length-1);
     }
   }

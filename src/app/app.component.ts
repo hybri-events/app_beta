@@ -26,6 +26,7 @@ import { InvitesPage } from '../pages/invites/invites';
 import { PromocaoPage } from '../pages/promocao/promocao';
 import { InviteFriendsPage } from '../pages/invite-friends/invite-friends';
 import { CreatePage } from '../pages/create/create';
+import { ReportBugPage } from '../pages/report-bug/report-bug';
 import { SettingsPage } from '../pages/settings/settings';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
@@ -45,6 +46,8 @@ export class MyApp {
 
   cidades: FirebaseListObservable<any>;
   city = null;
+  showCity = false;
+  geoCity;
 
   nomeUser;
   perfilUser;
@@ -92,7 +95,19 @@ export class MyApp {
           for ( let k=0;k<data.results[0].address_components[j].types.length;k++ ){
             if ( data.results[0].address_components[j].types[k] == 'locality' ){
               this.city = data.results[0].address_components[j].long_name;
+              this.geoCity = data.results[0].address_components[j].long_name;
               this.storage.set('cidade', this.city);
+              this.cidades.forEach(cid => {
+                let j = 0;
+                cid.forEach(ci => {
+                  if ( ci.nome != this.city ){
+                    j++;
+                  }
+                });
+                if ( cid.length == j ){
+                  this.showCity = true;
+                }
+              });
               break;
             }
           }
@@ -106,7 +121,7 @@ export class MyApp {
       console.log(err);
     });
 
-    this.cidades = db.list('/evento');
+    this.cidades = db.list('/cidades');
 
     this.tags = db.list('/tags');
 
@@ -164,9 +179,8 @@ export class MyApp {
       }
     });
     platform.ready().then(() => {
-      // Okay, so the platform is ready and our plugins are available.
-      // Here you can do any higher level native things you might need.
-      statusBar.styleDefault();
+      statusBar.overlaysWebView(false);
+      statusBar.backgroundColorByHexString('#652C90');
       splashScreen.hide();
     });
   }
@@ -194,6 +208,8 @@ export class MyApp {
       this.nav.push(SettingsPage, null);
     } else if ( i == 7 ){
       this.nav.push(PromocaoPage, null);
+    } else if ( i == 8 ){
+      this.nav.push(ReportBugPage, null);
     }
   }
 
@@ -220,6 +236,18 @@ export class MyApp {
       this.storage.set('tag', this.tag).then(() => {
         this.storage.set('faixa', this.faixa).then(() => {
           this.storage.set('cidade', this.city).then(() => {
+            this.showCity = false;
+            this.cidades.forEach(cid => {
+              let j = 0;
+              cid.forEach(ci => {
+                if ( ci.nome != this.city ){
+                  j++;
+                }
+              });
+              if ( cid.length == j ){
+                this.showCity = true;
+              }
+            });
             this.events.publish('filtro:change', null);
           });
         });
@@ -240,7 +268,21 @@ export class MyApp {
     this.storage.set('dt_filtro', this.date).then(() => {
       this.storage.set('tag', this.tag).then(() => {
         this.storage.set('faixa', this.faixa).then(() => {
-          this.events.publish('filtro:change', null);
+          this.storage.set('cidade', this.geoCity).then(() => {
+            this.showCity = false;
+            this.cidades.forEach(cid => {
+              let j = 0;
+              cid.forEach(ci => {
+                if ( ci.nome != this.geoCity ){
+                  j++;
+                }
+              });
+              if ( cid.length == j ){
+                this.showCity = true;
+              }
+            });
+            this.events.publish('filtro:change', null);
+          });
         });
       });
     });
@@ -254,14 +296,20 @@ export class MyApp {
   }
 
   evidentTag(id, nome){
-    this.tag = nome;
-    this.tags.forEach((tag) => {
-      tag.forEach((t) => {
-        document.getElementById(t.$key).style.background = "#652C90";
-        document.getElementById(t.$key).style.color = "white";
+    if (this.tag == nome){
+      this.tag = null;
+      document.getElementById(id).style.background = "#652C90";
+      document.getElementById(id).style.color = "white";
+    } else {
+      this.tag = nome;
+      this.tags.forEach((tag) => {
+        tag.forEach((t) => {
+          document.getElementById(t.$key).style.background = "#652C90";
+          document.getElementById(t.$key).style.color = "white";
+        });
       });
-    });
-    document.getElementById(id).style.background = "white";
-    document.getElementById(id).style.color = "#652C90";
+      document.getElementById(id).style.background = "white";
+      document.getElementById(id).style.color = "#652C90";
+    }
   }
 }

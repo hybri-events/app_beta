@@ -1,0 +1,24 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Reportar um Bug</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-list>
+    <ion-item>
+      <ion-label floating>Onde ocorreu o bug?</ion-label>
+      <ion-input type="text" [(ngModel)]="area"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label floating>O que aconteceu?</ion-label>
+      <div item-content style="width:100%;">
+        <ion-textarea #ionTxtArea [(ngModel)]="descricao" (ngModelChange)='onChange($event)'></ion-textarea>
+      </div>
+    </ion-item>
+  </ion-list>
+  <button ion-button block (click)="reportBug()" style="margin-top:48px;">Reportar</button>
+</ion-content>

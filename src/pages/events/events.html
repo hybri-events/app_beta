@@ -39,14 +39,14 @@
     <div *ngSwitchCase="'map'" style="width:100%;height:100%;">
       <div #map id="map"></div>
     </div>
-    <div *ngSwitchCase="'list'" class="card-background-page">
+    <div *ngSwitchCase="'list'">
       <div class="breve" *ngIf="carregando" style="width:100%;">
         <div class="txt_breve" style="width:100%;"><img src="assets/loading.gif" style="width:200px;margin:0px auto;"></div>
       </div>
-      <div class="breve" padding *ngIf="(events | async)?.length == 0 || (eve.length == 0 && (stTag != null || stFaixa.lower != 0))">
+      <div class="breve" padding *ngIf="((events | async)?.length == 0 || (eve.length == 0 && (stTag != null || stFaixa.lower != 0))) && !showCity">
         <div class="txt_breve">Infelizmente não foi encontrado nenhum evento.</div>
       </div>
-      <div *ngFor="let e of eve">
+      <div *ngFor="let e of eve" class="card-background-page">
         <ion-card [ngStyle]="{'background-image': 'url('+e.img+')' }" *ngIf="e.priv == '0'" (click)="openEvent(e.$key)">
           <div class="fundo_card">
             <div class="amigos_list" *ngIf="e.coin"><img src="assets/selo.png"></div>
@@ -84,6 +84,25 @@
           </div>
         </ion-card>
       </div>
+      <ion-card *ngIf="!carregando && !showCity">
+        <img src="assets/fundo.jpeg"/>
+        <ion-card-content>
+          <ion-card-title>
+            Sentiu falta de algum evento ou lugar?
+          </ion-card-title>
+          <button ion-button block (click)="indicar()">Faça sua indicação</button>
+        </ion-card-content>
+      </ion-card>
+      <ion-card *ngIf="showCity">
+        <img src="assets/fundo.jpeg"/>
+        <ion-card-content>
+          <ion-card-title>
+            Infelizmente a Vou ainda não chegou na sua cidade 😞
+          </ion-card-title>
+          <p>Indique, para nós, eventos ou lugares importantes da sua cidade.</p>
+          <button ion-button block (click)="indicar()">Faça sua indicação</button>
+        </ion-card-content>
+      </ion-card>
     </div>
   </div>
 </ion-content>
