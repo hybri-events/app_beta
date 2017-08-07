@@ -240,9 +240,11 @@ export class EventsPage {
 
         let content = '<div class="card-background-page-map" id="'+e.$key+'">'+
                         '<div style="background-image:url('+e.img+')" class="card">'+
-                          '<div class="fundo_card">';
+                          '<div class="fundo_card ';
                 if ( e.coin ){
-                  content += '<div class="amigos_list"><img src="assets/selo.png"></div>';
+                  content += 'coin"><div class="amigos_list"><img src="assets/selo.png"></div>';
+                } else {
+                  content += '">';
                 }
                   content += '<div class="info_list">'+
                                 '<div class="icon_list"><ion-icon class="icon-coin"></ion-icon><div>'+(e.faixa_ini==0?'Gratuito':'R$'+e.faixa_ini)+''+(e.faixa_fim==0?'':(e.faixa_fim!=e.faixa_ini?' - R$'+e.faixa_fim:''))+'</div></div>';
@@ -340,7 +342,7 @@ export class EventsPage {
 
   openEvent(id){
     if ( this.authentic ){
-      this.navCtrl.push(EventDetailPage, {id: id});
+      this.navCtrl.push(EventDetailPage, {id: this.stCity+'/'+id});
     } else {
       let alert = this.alertCtrl.create({
         title: "Você precisa estar logado!",

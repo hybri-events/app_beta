@@ -180,7 +180,7 @@ export class MyApp {
     });
     platform.ready().then(() => {
       statusBar.overlaysWebView(false);
-      statusBar.backgroundColorByHexString('#652C90');
+      statusBar.backgroundColorByHexString('#461969');
       splashScreen.hide();
     });
   }

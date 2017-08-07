@@ -17,7 +17,7 @@
 
 ion-content {
   background-color: white;
-}
+} 
 
 .tags{
  width: 100%;
@@ -176,6 +176,8 @@ ion-content {
   }
 }
 
+@include makeIcon(icon-select-on, $icon-select-on);
+@include makeIcon(icon-select-off, $icon-select-off);
 @include makeIcon(icon-bug, $icon-bug);
 @include makeIcon(icon-my_events, $icon-my_events);
 @include makeIcon(icon-acessibilidade, $icon-acessibilidade);

@@ -20,7 +20,7 @@ export class MyEventPage {
   casa = [];
 
   constructor(public navCtrl: NavController, public db: AngularFireDatabase, public navParams: NavParams, private storage: Storage) {
-    this.eve = db.list("/evento/");
+    this.eve = db.list("/evento/Jaraguá do Sul");
     this.conf = db.list("/usuario/"+firebase.auth().currentUser.uid+"/confirmados/");
     db.list('/casas/').subscribe(list => this.casa = list );
     this.storage.get('casa').then((val) => {

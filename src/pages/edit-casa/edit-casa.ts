@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams, AlertController } from 'ionic-angular';
-import { EditLocationCasaPage } from '../edit-location-casa/edit-location-casa';
+import { EditListAdmPage } from '../edit-list-adm/edit-list-adm';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 
 @Component({
@@ -35,6 +35,8 @@ export class EditCasaPage {
   cartao = false;
   dinheiro = false;
   coins = false;
+  valid = false;
+  adms = [];
 
   lat;
   lng;
@@ -60,8 +62,10 @@ export class EditCasaPage {
           this.cartao = c[this.id].cartao;
           this.dinheiro = c[this.id].dinheiro;
           this.coins = c[this.id].coins;
+          this.valid = c[this.id].valid;
           this.lat = c[this.id].lat;
           this.lng = c[this.id].lng;
+          this.adms = c[this.id].adms;
         }
       })
     })
@@ -139,11 +143,12 @@ export class EditCasaPage {
                   cartao: this.cartao,
                   dinheiro: this.dinheiro,
                   coins: this.coins,
-                  valid: true,
+                  valid: this.valid,
                   lat: this.lat,
                   lng: this.lng,
-                  id: this.id};
-    this.navCtrl.push(EditLocationCasaPage, params);
+                  id: this.id,
+                  adms: this.adms};
+    this.navCtrl.push(EditListAdmPage, params);
   }
 
 }

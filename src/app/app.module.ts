@@ -53,6 +53,8 @@ import { SettingsPage } from '../pages/settings/settings';
 
 import { NewEstabPage } from '../pages/new-estab/new-estab';
 import { SetLocationCasaPage } from '../pages/set-location-casa/set-location-casa';
+import { ListAdmPage } from '../pages/list-adm/list-adm';
+import { EditListAdmPage } from '../pages/edit-list-adm/edit-list-adm';
 import { EditCasaPage } from '../pages/edit-casa/edit-casa';
 import { EditLocationCasaPage } from '../pages/edit-location-casa/edit-location-casa';
 
@@ -116,7 +118,9 @@ const firebaseConfig = {
     ListPromoPage,
     TutorialPage,
     IndicacaoPage,
-    ReportBugPage
+    ReportBugPage,
+    ListAdmPage,
+    EditListAdmPage
   ],
   imports: [
     BrowserModule,
@@ -164,7 +168,9 @@ const firebaseConfig = {
     ListPromoPage,
     TutorialPage,
     IndicacaoPage,
-    ReportBugPage
+    ReportBugPage,
+    ListAdmPage,
+    EditListAdmPage
   ],
   providers: [
     StatusBar,

@@ -62,52 +62,10 @@ export class EventDetailPage {
     this.data = new Date(Date.now() - tzoffset).toISOString().slice(0,-1);
 
     this.db.list('/casas/').subscribe(cas => this.casa = cas);
+    console.log('/evento/'+this.id+'/')
     this.event = db.list('/evento/'+this.id+'/');
     this.eventoConf = db.list('/evento/'+this.id+'/confirmados/');
     this.userConf = db.list('/usuario/'+this.uid+'/confirmados/');
-    this.event.forEach( evento => {
-      evento.forEach( eve => {
-        if ( eve.$key == "tags" ){
-          this.e[eve.$key] = [];
-          eve.forEach(ev => {
-            this.e[eve.$key].push(ev);
-          });
-        } else if ( eve.$key == "confirmados" ){
-          this.eventoConf.forEach(j => {
-            this.numCheck = 0;
-            j.forEach(i => {
-              if ( i.check ){
-                this.numCheck++;
-              }
-            });
-            this.numConf = j.length;
-          });
-        } else {
-          if ( eve.$key == 'dti' ){
-            if ( this.e['dtf'] != "" ){
-              let dtf = new Date(this.e['dtf']);
-              console.log(this.data >= dtf.toISOString().slice(0,-1));
-              if ( this.data >= dtf.toISOString().slice(0,-1) ){
-                this.periodoCheck = false;
-              }
-            } else {
-              let dti = new Date(eve.$value);
-              dti.setHours(dti.getHours() + 12);
-              if ( this.data >= dti.toISOString().slice(0,-1) ){
-                this.periodoCheck = false;
-              }
-            }
-          } else if ( eve.$key == 'criador' && eve.$value[0] == "-" ){
-            this.casa.forEach(ca => {
-              if( ca[eve.$value] != null ){
-                this.e['casa'] = ca[eve.$value];
-              }
-            });
-          }
-          this.e[eve.$key] = eve.$value;
-        }
-      });
-    });
 
     this.storage.get('casa').then((val) => {
       if ( val != null ){
@@ -146,8 +104,52 @@ export class EventDetailPage {
         }
       }
     });
-    this.loadMap(this.e['lat'], this.e['lng']);
     this.checkConf();
+    this.event.forEach( evento => {
+      evento.forEach( eve => {
+        if ( eve.$key == "tags" ){
+          this.e[eve.$key] = [];
+          eve.forEach(ev => {
+            this.e[eve.$key].push(ev);
+          });
+        } else if ( eve.$key == "confirmados" ){
+          this.eventoConf.forEach(j => {
+            this.numCheck = 0;
+            j.forEach(i => {
+              if ( i.check ){
+                this.numCheck++;
+              }
+            });
+            this.numConf = j.length;
+          });
+        } else {
+          if ( eve.$key == 'dti' ){
+            if ( this.e['dtf'] != "" ){
+              let dtf = new Date(this.e['dtf']);
+              console.log(this.data >= dtf.toISOString().slice(0,-1));
+              if ( this.data >= dtf.toISOString().slice(0,-1) ){
+                this.periodoCheck = false;
+              }
+            } else {
+              let dti = new Date(eve.$value);
+              dti.setHours(dti.getHours() + 12);
+              if ( this.data >= dti.toISOString().slice(0,-1) ){
+                this.periodoCheck = false;
+              }
+            }
+          } else if ( eve.$key == 'criador' && eve.$value[0] == "-" ){
+            this.casa.forEach(ca => {
+              if( ca[eve.$value] != null ){
+                this.e['casa'] = ca[eve.$value];
+              }
+            });
+          } else if ( eve.$key == 'lng' ){
+            this.loadMap(this.e['lat'], eve.$value);
+          }
+          this.e[eve.$key] = eve.$value;
+        }
+      });
+    });
   }
 
   loadMap(lat, lng){
@@ -179,6 +181,17 @@ export class EventDetailPage {
 
     google.maps.event.addListener(marker, 'click', () => {
 
+    });
+  }
+
+  startExternalMap() {
+    this.platform.ready().then(() => {
+      if (this.platform.is('ios')) {
+        window.open('maps://?q=' + this.e['nomeCriador'] + '&saddr=' + this.e['lat'] + ',' + this.e['lng'] + '&daddr=' + this.e['lat'] + ',' + this.e['lng'], '_system');
+      }
+      if (this.platform.is('android')) {
+        window.open('geo://' + this.e['lat'] + ',' + this.e['lng'] + '?q=' + this.e['lat'] + ',' + this.e['lng'] + '(' + this.e['nomeCriador'] + ')', '_system');
+      }
     });
   }
 

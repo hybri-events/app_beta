@@ -1,12 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { NavController, NavParams, AlertController } from 'ionic-angular';
-import { SetLocationCasaPage } from '../set-location-casa/set-location-casa';
+import { ListAdmPage } from '../list-adm/list-adm';
+import { Camera, CameraOptions } from '@ionic-native/camera';
 
 @Component({
   selector: 'page-new-estab',
   templateUrl: 'new-estab.html',
 })
 export class NewEstabPage {
+  //image
+  img = 'assets/estab_default.png';
   nome: string = "";
   email: string = "";
   fone: string = "";
@@ -32,11 +35,26 @@ export class NewEstabPage {
   dinheiro = false;
   coins = false;
 
+  //descricao
+  desc: string = "";
+  lineHeight: any = 34;
+  txtArea: any;
+  @ViewChild('ionTxtArea') ionTxtArea;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController) {}
+  //tags
+  tags: any = [];
+  cidtag: number = 0;
+  tagname: string;
+
+  //preco
+  faixa = {lower: 330, upper: 660};
+  sel_faixa: any = 0;
+
+
+  constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private camera: Camera) {}
 
   validEmail(email): boolean{
-    const re = /^\w+@[a-zA-Z_.]+?\.[a-zA-Z]{2,3}$/.test(email);
+    const re = /[a-zA-Z0-9_.]+@[a-zA-Z_.]+?\.[a-zA-Z]{2,3}$/.test(email);
 
     if (re){
       return false;
@@ -45,6 +63,16 @@ export class NewEstabPage {
     return true;
 
   }
+
+  /*ngAfterViewInit(){
+    this.txtArea = this.ionTxtArea._elementRef.nativeElement.children[0];
+    this.txtArea.style.height = this.lineHeight + "px";
+  }
+
+  onChange(newValue){
+    this.txtArea.style.height = this.lineHeight + "px";
+    this.txtArea.style.height =  this.txtArea.scrollHeight + "px";
+  }*/
 
   trim(str){
     return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
@@ -86,6 +114,15 @@ export class NewEstabPage {
         buttons: ['OK']
       });
       alert.present();
+    } else if ( parseInt(""+this.faixa.lower) == 330 && parseInt(""+this.faixa.lower) == 660 ){
+      let alert = this.alertCtrl.create({
+        title: 'Faixa de preço!',
+        subTitle: 'Tem certeza que a faixa de preço é entre R$330,00 e R$660,00?',
+        buttons: [{text: 'Não', handler: () => {}},{text: 'Sim', handler: () => {
+          this.nextPage();
+        }}]
+      });
+      alert.present();
     } else {
       this.nextPage();
     }
@@ -107,8 +144,45 @@ export class NewEstabPage {
                   cartao: this.cartao,
                   dinheiro: this.dinheiro,
                   coins: this.coins,
-                  valid: false};
-    this.navCtrl.push(SetLocationCasaPage, params);
+                  valid: false/*,
+                  desc: this.desc,
+                  faixa: this.faixa,
+                  tags: this.tags,
+                  img: this.img*/};
+    this.navCtrl.push(ListAdmPage, params);
+  }
+
+  addTag(){
+    this.cidtag++;
+    this.tags.push({id: this.cidtag, nome: this.tagname});
+    this.tagname = "";
+  }
+
+  delTag(id){
+    for(let i = 0; i < this.tags.length; i++) {
+      if(this.tags[i].id === id) {
+        this.tags.splice(i, 1);
+      }
+    }
+  }
+
+  openGallery(){
+    const options: CameraOptions = {
+      quality: 100,
+      destinationType: this.camera.DestinationType.DATA_URL,
+      sourceType: this.camera.PictureSourceType.PHOTOLIBRARY,
+      encodingType: this.camera.EncodingType.JPEG,
+      mediaType: this.camera.MediaType.PICTURE
+    }
+
+    this.camera.getPicture(options).then((imageData) => {
+      let base64Image = 'data:image/jpeg;base64,' + imageData;
+      this.img = imageData;
+      document.getElementById("foto_evento").style.backgroundImage = "url("+base64Image+")";
+      document.getElementById("button").innerHTML = "Trocar imagem";
+    }, (err) => {
+
+    });
   }
 
 }

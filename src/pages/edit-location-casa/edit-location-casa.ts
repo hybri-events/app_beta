@@ -48,6 +48,7 @@ export class EditLocationCasaPage {
       this.casa.update(this.param['id'],this.param);
       this.navCtrl.pop();
       this.navCtrl.pop();
+      this.navCtrl.pop();
     });
   }
 

@@ -11,6 +11,9 @@
 
 
 <ion-content>
+  <!--<div id="foto_evento">
+    <label for="input" id="button" (click)="openGallery()">Selecionar a logo do estabelecimento</label>
+  </div>-->
   <ion-list padding>
     <ion-item>
       <ion-label floating>Nome do estabelecimento</ion-label>
@@ -148,6 +151,54 @@
       <ion-label floating>Até</ion-label>
       <ion-datetime displayFormat="HH:mm" [(ngModel)]="hora.sab.fim"></ion-datetime>
     </ion-item>
+
+    <!--<ion-item style="margin-top: 12px;">
+      <ion-label floating>Descrição padrão</ion-label>
+      <div item-content style="width:100%;">
+        <ion-textarea #ionTxtArea [(ngModel)]="desc" (ngModelChange)='onChange($event)'></ion-textarea>
+      </div>
+    </ion-item>
+
+    <ion-item style="margin-top: 12px;">
+      <ion-label stacked>Tags padrões</ion-label>
+      <ion-input type="text" [(ngModel)]="tagname" (keyup.space)="addTag()" (keyup.enter)="addTag()"></ion-input>
+    </ion-item>
+
+    <ion-item class="label_check" style="margin-top: 4px;">
+      <p>Digite a tag e pressione "Ir" para adicioná-la.</p>
+      <div class="tags">
+        <div class="tag" *ngFor="let tag of tags">#{{tag.nome}}<ion-icon (click)="delTag(tag.id)" name="icon-cancel"></ion-icon></div>
+      </div>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked>Faixa de preço dos ingressos</ion-label>
+      <ion-select interface="popover" [(ngModel)]="sel_faixa">
+        <ion-option value="0" selected="true">Digitar valores</ion-option>
+        <ion-option value="1">Selecionar valores</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item class="label_check" *ngIf="sel_faixa == 1" style="margin-top:-8px;">
+      <ion-label stacked>
+        De: <ion-badge item-end>{{faixa.lower}}</ion-badge>
+        Até: <ion-badge item-end>{{faixa.upper}}</ion-badge>
+      </ion-label>
+      <ion-range dualKnobs="true" pin="true" [(ngModel)]="faixa" min="0" max="1000" step="5">
+        <ion-label range-left>Grátis</ion-label>
+        <ion-label range-right>+1000</ion-label>
+      </ion-range>
+    </ion-item>
+
+    <ion-item style="width:50%;float:left;margin-top:-8px;margin-bottom:10px;" *ngIf="sel_faixa == 0">
+      <ion-label stacked>De</ion-label>
+      <ion-input type="number" [(ngModel)]="faixa.lower"></ion-input>
+    </ion-item>
+
+    <ion-item style="width:50%;margin-top:-8px;" *ngIf="sel_faixa == 0">
+      <ion-label stacked>Até</ion-label>
+      <ion-input type="number" [(ngModel)]="faixa.upper"></ion-input>
+    </ion-item>-->
 
     <ion-item-divider>
         Características do estabelecimento

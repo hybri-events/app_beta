@@ -1,0 +1,33 @@
+page-edit-list-adm {
+  .adms{
+    float: left;
+    padding: 12px;
+  }
+  .adms:first-child{
+    padding-left: 16px;
+  }
+  .adms:last-child{
+    padding-right: 16px;
+  }
+  .perfil{
+    background-position: center;
+    background-size: cover;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  .remover{
+    position: absolute;
+    background-color: #652C90;
+    border-radius: 50%;
+    padding: 6px;
+    font-size: 14px;
+    margin-top: -16px;
+    margin-left: 24px;
+  }
+  ion-footer{
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+}

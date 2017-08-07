@@ -13,9 +13,27 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 })
 export class CreatePage {
   list: FirebaseListObservable<any>;
+  allCasas = [];
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public db: AngularFireDatabase, private storage: Storage, public splashScreen: SplashScreen, public alertCtrl: AlertController) {
     this.list = db.list("casas/"+firebase.auth().currentUser.uid+"/");
+    db.list("casas/").subscribe(casas => {
+      casas.forEach(casa => { 
+        if ( casa.$key != firebase.auth().currentUser.uid ){
+          db.list("casas/"+casa.$key).subscribe(cas => {
+            cas.forEach(ca => {
+              if ( ca.adms ){
+                for ( let i=0;i<ca.adms.length;i++ ){
+                  if ( ca.adms[i][0] == firebase.auth().currentUser.uid ){
+                    this.allCasas.push(ca);
+                  }
+                }
+              }
+            })
+          })
+        }
+      })
+    })
   }
 
   ionViewDidLoad() {

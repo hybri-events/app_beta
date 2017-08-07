@@ -41,14 +41,14 @@
     </div>
     <div *ngSwitchCase="'list'">
       <div class="breve" *ngIf="carregando" style="width:100%;">
-        <div class="txt_breve" style="width:100%;"><img src="assets/loading.gif" style="width:200px;margin:0px auto;"></div>
+        <div class="txt_breve" style="width:100%;"><img src="assets/loading.gif" style="width:150px;margin:0px auto;"></div>
       </div>
       <div class="breve" padding *ngIf="((events | async)?.length == 0 || (eve.length == 0 && (stTag != null || stFaixa.lower != 0))) && !showCity">
         <div class="txt_breve">Infelizmente não foi encontrado nenhum evento.</div>
       </div>
       <div *ngFor="let e of eve" class="card-background-page">
         <ion-card [ngStyle]="{'background-image': 'url('+e.img+')' }" *ngIf="e.priv == '0'" (click)="openEvent(e.$key)">
-          <div class="fundo_card">
+          <div class="" [attr.class]="e.coin ? 'coin fundo_card' : 'fundo_card'">
             <div class="amigos_list" *ngIf="e.coin"><img src="assets/selo.png"></div>
             <div class="info_list">
               <div class="icon_list"><ion-icon name="icon-coin"></ion-icon><div>{{(e.faixa_ini==0?'Gratuito':'R$'+e.faixa_ini)}}{{(e.faixa_fim==0?'':(e.faixa_fim!=e.faixa_ini?' - R$'+e.faixa_fim:''))}}</div></div>

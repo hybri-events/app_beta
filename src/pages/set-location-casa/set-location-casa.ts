@@ -46,6 +46,7 @@ export class SetLocationCasaPage {
       this.casa.push(this.param);
       this.navCtrl.pop();
       this.navCtrl.pop();
+      this.navCtrl.pop();
     });
   }
 
@@ -101,6 +102,12 @@ export class SetLocationCasaPage {
       this.marker.setPosition(new google.maps.LatLng(this.lat, this.lng));
     });
 
+  }
+
+  saveImg(key,img){
+    firebase.storage().ref('/ft_estab/').child(key+'.png').putString(img, 'base64', {contentType: 'image/png'}).then((savedPicture) => {
+      firebase.database().ref(`evento`).child(key).child('img').set(savedPicture.downloadURL);
+    });
   }
 
 }
