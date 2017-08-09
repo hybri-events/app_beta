@@ -18,7 +18,7 @@ export class CreatePage {
   constructor(public navCtrl: NavController, public navParams: NavParams, public db: AngularFireDatabase, private storage: Storage, public splashScreen: SplashScreen, public alertCtrl: AlertController) {
     this.list = db.list("casas/"+firebase.auth().currentUser.uid+"/");
     db.list("casas/").subscribe(casas => {
-      casas.forEach(casa => { 
+      casas.forEach(casa => {
         if ( casa.$key != firebase.auth().currentUser.uid ){
           db.list("casas/"+casa.$key).subscribe(cas => {
             cas.forEach(ca => {
@@ -45,7 +45,7 @@ export class CreatePage {
   }
 
   changeProfile(key){
-    this.storage.set('casa', key);
+    this.storage.set('casa', firebase.auth().currentUser.uid+"/"+key);
     this.splashScreen.show();
     window.location.reload();
   }

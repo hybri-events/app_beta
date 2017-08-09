@@ -10,60 +10,28 @@ import firebase from 'firebase';
   templateUrl: 'my-event.html',
 })
 export class MyEventPage {
-  tabs: string = "con";
+  tabs: string = "pro";
   events = [];
-  cri = [];
-  eve: FirebaseListObservable<any>;
+  eve = [];
   conf: FirebaseListObservable<any>;
+  eveCasa : FirebaseListObservable<any>;
 
   isCasa = false;
   casa = [];
+  idCasa;
+
+  carregando = true;
 
   constructor(public navCtrl: NavController, public db: AngularFireDatabase, public navParams: NavParams, private storage: Storage) {
-    this.eve = db.list("/evento/Jaraguá do Sul");
     this.conf = db.list("/usuario/"+firebase.auth().currentUser.uid+"/confirmados/");
-    db.list('/casas/').subscribe(list => this.casa = list );
     this.storage.get('casa').then((val) => {
       if ( val != null ){
-        this.eve.forEach(ev => {
-          this.cri = [];
-          ev.forEach(e => {
-            if ( e.criador == val ){
-              this.casa.forEach(ca => {
-                if( ca[e.criador] != null ){
-                  e['casa'] = ca[e.criador];
-                  this.cri.unshift(e);
-                }
-              });
-            }
-          })
-        })
         this.isCasa = true;
-        this.tabs = "cri";
-      } else {
-        this.conf.forEach(co => {
-          this.events = [];
-          co.forEach(c => {
-            this.eve.forEach(ev => {
-              ev.forEach(e => {
-                if ( c.event == e.$key ){
-                  if ( e.criador[0] == "-" ){
-                    this.casa.forEach(ca => {
-                      if( ca[e.criador] != null ){
-                        e['casa'] = ca[e.criador];
-                      }
-                    });
-                  } else {
-                    e['casa'] = {estac: false, bar: false, cozinha: false, acess: false, wifi: false, fum: false};
-                  }
-                  this.events.unshift(e);
-                }
-              });
-            });
-          })
-        });
-        console.log(this.events);
+        this.idCasa = val;
+        db.list('/casas/'+val).subscribe(list => this.casa = list);
+        this.eveCasa = db.list('/casas/'+val+'/eventos');
       }
+      this.changeTabs();
     });
   }
 
@@ -76,38 +44,129 @@ export class MyEventPage {
   }
 
   changeTabs(){
-    if ( this.tabs == "con" ){
-      this.conf.forEach(co => {
-        this.events = [];
-        co.forEach(c => {
-          this.eve.forEach(ev => {
-            ev.forEach(e => {
-              if ( c.event == e.$key ){
-                if ( e.criador[0] == "-" ){
-                  this.casa.forEach(ca => {
-                    if( ca[e.criador] != null ){
-                      e['casa'] = ca[e.criador];
-                    }
-                  });
-                } else {
-                  e['casa'] = {estac: false, bar: false, cozinha: false, acess: false, wifi: false, fum: false};
-                }
-                this.events.unshift(e);
+    this.carregando = true;
+    this.events = [];
+    let h = 0;
+    if ( this.isCasa ){
+      if ( this.tabs == 'pro' ){
+        this.eveCasa.forEach(con => {
+          for (let i=0;i<con.length;i++){
+            h++;
+            this.db.list("/evento/"+con[i].evento).subscribe(list => this.eve = list);
+            let p = [];
+            this.eve.forEach(e => {
+              if ( e.$key == 'criador' ){
+                let casa = this.db.list('/casas/'+e.$value);
+                casa.forEach(cas => {
+                  p['casa'] = [];
+                  cas.forEach(ca => {
+                    p['casa'][ca.$key] = ca.$value;
+                  })
+                });
               }
+              p[e.$key] = e.$value;
             });
-          });
-        })
-      });
-    } else if ( this.tabs == "cri" ){
-      this.eve.forEach(ev => {
-        this.cri = [];
-        ev.forEach(e => {
-          if ( e.criador == firebase.auth().currentUser.uid ){
-            e['casa'] = {estac: false, bar: false, cozinha: false, acess: false, wifi: false, fum: false};
-            this.cri.unshift(e);
+            this.carregando = false;
+            let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+            if ( p['dti'] > new Date(Date.now() - tzoffset).toISOString().slice(0,-1) ){
+              p['key'] = con[i].evento;
+              this.events.push(p);
+            }
           }
-        })
-      })
+        });
+        if ( h == 0 ){
+          this.carregando = false;
+        }
+      } else if ( this.tabs == 'ant' ){
+        this.eveCasa.forEach(con => {
+          for (let i=0;i<con.length;i++){
+            h++;
+            this.db.list("/evento/"+con[i].evento).subscribe(list => this.eve = list);
+            let p = [];
+            this.eve.forEach(e => {
+              if ( e.$key == 'criador' ){
+                let casa = this.db.list('/casas/'+e.$value);
+                casa.forEach(cas => {
+                  p['casa'] = [];
+                  cas.forEach(ca => {
+                    p['casa'][ca.$key] = ca.$value;
+                  })
+                });
+              }
+              p[e.$key] = e.$value;
+            });
+            this.carregando = false;
+            let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+            if ( p['dti'] <= new Date(Date.now() - tzoffset).toISOString().slice(0,-1) ){
+              p['key'] = con[i].evento;
+              this.events.push(p);
+            }
+          }
+        });
+        if ( h == 0 ){
+          this.carregando = false;
+        }
+      }
+    } else {
+      if ( this.tabs == 'pro' ){
+        this.conf.forEach(con => {
+          for (let i=0;i<con.length;i++){
+            h++;
+            this.db.list("/evento/"+con[i].event).subscribe(list => this.eve = list);
+            let p = [];
+            this.eve.forEach(e => {
+              if ( e.$key == 'criador' ){
+                let casa = this.db.list('/casas/'+e.$value);
+                casa.forEach(cas => {
+                  p['casa'] = [];
+                  cas.forEach(ca => {
+                    p['casa'][ca.$key] = ca.$value;
+                  })
+                });
+              }
+              p[e.$key] = e.$value;
+            });
+            this.carregando = false;
+            let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+            if ( p['dti'] > new Date(Date.now() - tzoffset).toISOString().slice(0,-1) ){
+              p['key'] = con[i].event;
+              this.events.push(p);
+            }
+          }
+        });
+        if ( h == 0 ){
+          this.carregando = false;
+        }
+      } else if ( this.tabs == 'ant' ){
+        this.conf.forEach(con => {
+          for (let i=0;i<con.length;i++){
+            h++;
+            this.db.list("/evento/"+con[i].event).subscribe(list => this.eve = list);
+            let p = [];
+            this.eve.forEach(e => {
+              if ( e.$key == 'criador' ){
+                let casa = this.db.list('/casas/'+e.$value);
+                casa.forEach(cas => {
+                  p['casa'] = [];
+                  cas.forEach(ca => {
+                    p['casa'][ca.$key] = ca.$value;
+                  })
+                });
+              }
+              p[e.$key] = e.$value;
+            });
+            this.carregando = false;
+            let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+            if ( p['dti'] <= new Date(Date.now() - tzoffset).toISOString().slice(0,-1) ){
+              p['key'] = con[i].event;
+              this.events.push(p);
+            }
+          }
+        });
+        if ( h == 0 ){
+          this.carregando = false;
+        }
+      }
     }
   }
 

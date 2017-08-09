@@ -115,9 +115,14 @@
         height: 100%;
       }
 
-      .map {
+      .content-md .map {
         width: 100%;
-        height: 100%;
+        height: calc(100% - 60px);
+      }
+
+      .content-ios .map {
+        width: 100%;
+        height: calc(100% - 68px);
       }
 
       .gm-style-iw {

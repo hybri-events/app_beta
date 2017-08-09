@@ -47,8 +47,10 @@ export class SetLocationEventPage {
     this.http.get(url).map(res => res.json()).subscribe(data => {
       let cidade;
       for ( let j=0;j<data.results[0].address_components.length;j++ ){
-        if ( data.results[0].address_components[j].types[0] == 'locality' ){
-          cidade = data.results[0].address_components[j].long_name;
+        for ( let k=0;k<data.results[0].address_components[j].types.length;k++ ){
+          if ( data.results[0].address_components[j].types[k] == 'locality' ){
+            cidade = data.results[0].address_components[j].long_name;
+          }
         }
       }
       this.param.push({lat: this.lat, lng: this.lng, cidade: cidade});
@@ -58,6 +60,8 @@ export class SetLocationEventPage {
         if ( this.isCasa ){
           this.param.push({nomeCriador: this.nomeCasa});
           this.event.cadEvento(this.param, this.keyCasa).then((e) => {
+            let casa = this.db.list('/casas/'+this.keyCasa+'/eventos');
+            casa.push({evento:cidade+'/'+e.key,dt:this.param[0]['dt_ini']});
             if ( this.param[0].img != 'assets/event_default.png' ){
               this.event.saveImg(e.key,this.param[0].img);
             }
@@ -123,7 +127,7 @@ export class SetLocationEventPage {
     this.storage.get('casa').then((val) => {
       if ( val != null ){
         this.keyCasa = val;
-        this.casa = this.db.list("casas/"+firebase.auth().currentUser.uid+"/"+val+"/");
+        this.casa = this.db.list("casas/"+val+"/");
         this.casa.forEach(ca => {
           ca.forEach(c => {
             if ( c.$key == 'nome' ){

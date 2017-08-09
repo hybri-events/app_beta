@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { NavController, Platform, AlertController } from 'ionic-angular';
+import { NavController, Platform, AlertController, LoadingController, Loading } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
 import { CriarEventoPage } from '../criar-evento/criar-evento';
 import { EventDetailPage } from '../event-detail/event-detail';
@@ -8,8 +8,10 @@ import { AngularFireAuth } from 'angularfire2/auth';
 import { EventoProvider } from '../../providers/evento/evento';
 import { ErrorProvider } from '../../providers/error/error';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { Storage } from '@ionic/storage';
 import { Events } from 'ionic-angular';
+import { ContaProvider } from '../../providers/conta/conta';
 
 declare var google;
 
@@ -50,6 +52,13 @@ export class EventsPage {
   cidades: FirebaseListObservable<any>;
   showCity = false;
 
+  dataQRC;
+  eventoConf: FirebaseListObservable<any>;
+  userConf: FirebaseListObservable<any>;
+  e = [];
+  loading: Loading;
+  id;
+
   constructor(
     platform: Platform,
     public filtro: Events,
@@ -60,7 +69,10 @@ export class EventsPage {
     public geolocation: Geolocation,
     public evento: EventoProvider,
     public alertCtrl: AlertController,
-    public err: ErrorProvider
+    public err: ErrorProvider,
+    public contaData: ContaProvider,
+    private barcodeScanner: BarcodeScanner,
+    public loadingCtrl: LoadingController
   ) {
     this.plat = platform;
     const authObserver = afAuth.authState.subscribe( user => {
@@ -156,24 +168,17 @@ export class EventsPage {
                 }
                 this.carregando = false;
                 if ( ok ){
-                  if ( e.criador[0] == "-" ){
-                    this.casa.forEach(ca => {
-                      if( ca[e.criador] != null ){
-                        e['casa'] = ca[e.criador];
-                        if ( e.coin ){
-                          t.unshift(e);
-                        } else {
-                          t.push(e);
-                        }
-                      }
-                    });
+                  let casa = this.db.list('/casas/'+e.criador);
+                  casa.forEach(cas => {
+                    e['casa'] = [];
+                    cas.forEach(ca => {
+                      e['casa'][ca.$key] = ca.$value;
+                    })
+                  });
+                  if ( e.coin ){
+                    t.unshift(e);
                   } else {
-                    e['casa'] = {bar: false, cozinha: false, fum: false, estac: false, wifi: false, acess: false};
-                    if ( e.coin ){
-                      t.unshift(e);
-                    } else {
-                      t.push(e);
-                    }
+                    t.push(e);
                   }
                   this.eve = t;
                 }
@@ -213,15 +218,13 @@ export class EventsPage {
       this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
 
       this.eve.forEach(e => {
-        if ( e.criador[0] == "-" ){
-          this.casa.forEach(ca => {
-            if( ca[e.criador] != null ){
-              e['casa'] = ca[e.criador];
-            }
-          });
-        } else {
-          e['casa'] = {bar: false, cozinha: false, fum: false, estac: false, wifi: false, acess: false};
-        }
+        let casa = this.db.list('/casas/'+e.criador);
+        casa.forEach(cas => {
+          e['casa'] = [];
+          cas.forEach(ca => {
+            e['casa'][ca.$key] = ca.$value;
+          })
+        });
 
         let iconS = {
           url: 'assets/ic_pin_n.png',
@@ -248,7 +251,6 @@ export class EventsPage {
                 }
                   content += '<div class="info_list">'+
                                 '<div class="icon_list"><ion-icon class="icon-coin"></ion-icon><div>'+(e.faixa_ini==0?'Gratuito':'R$'+e.faixa_ini)+''+(e.faixa_fim==0?'':(e.faixa_fim!=e.faixa_ini?' - R$'+e.faixa_fim:''))+'</div></div>';
-                if ( e.criador[0] == '-' ){
                   content += '<div class="icon_list">'+
                                   (e.casa.bar?'<ion-icon class="icon-bar"></ion-icon>':'')+
                                   (e.casa.cozinha?'<ion-icon class="icon-comida"></ion-icon>':'')+
@@ -262,7 +264,6 @@ export class EventsPage {
                                   (e.casa.dinheiro?'<ion-icon class="icon-dinheiro"></ion-icon>':'')+
                                   (e.casa.cartao?'<ion-icon class="icon-cartao"></ion-icon>':'')+
                                 '</div>';
-                }
                 content += '</div>'+
                              '<div class="bottom_list">'+
                                '<div style="display:table-cell;vertical-align:bottom;width:50px;">'+
@@ -375,5 +376,80 @@ export class EventsPage {
   indicar(){
     this.navCtrl.push(IndicacaoPage,{city: this.cidade});
   }
+
+  /*readQRC(){
+    let options = {
+      showTorchButton : true,
+      prompt : "Posicione o QRCode na área marcada.",
+    }
+    this.barcodeScanner.scan(options).then((barcodeData) => {
+      this.dataQRC = barcodeData.text;
+      alert(this.dataQRC);
+      //dia atual e dia anterior
+      //query com o evento nesse período
+      let eventos = this.db.list('casas/'+this.dataQRC+'/eventos');
+      eventos.forEach(evento => {
+        //foreach do evento
+      });
+    }, (err) => {
+      alert("Error occured : " + err);
+    });
+  }
+
+  confirmCheck(id){
+    let ekey;
+    let ukey;
+    this.eventoConf.forEach(eve => {
+      eve.forEach(c => {
+        if ( c.uid == firebase.auth().currentUser.uid ){
+          ekey = c.$key;
+        }
+      });
+    });
+    this.eventoConf.update(ekey,{check: true});
+    this.userConf.forEach(eve => {
+      eve.forEach(c => {
+        if ( c.event == this.id ){
+          ukey = c.$key;
+        }
+      });
+    });
+    this.userConf.update(ukey,{check: true});
+    if ( this.e['coin'] ){
+      let cont = 0;
+      this.userConf.forEach(us => {
+        us.forEach(u => {
+          if ( u.criador == this.e['criador'] && u.check ){
+            cont++;
+          }
+        })
+      });
+      let valor = 0;
+      cont -= 1;
+      if ( cont == 0 || cont % 10 == 5 ){
+        valor = 50;
+      } else if ( cont % 10 == 0 ){
+        valor = 100;
+      } else {
+        valor = 30;
+      }
+      let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+      this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Check-in no evento \""+this.e['nome']+"\". "+(cont+1)+"ª vez neste estabelecimento.", valor, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
+      this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
+        this.contaData.altSaldo(1, s[0].id, s[0].saldo, valor, firebase.auth().currentUser.uid);
+        this.contaData.cadTransacao(this.e['criador'], "Check-in no seu evento \""+this.e['nome']+"\".", valor, 'Saída', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'saida','-');
+        this.contaData.getSaldo(this.e['criador']).then(s => {
+          this.contaData.altSaldo(0, s[0].id, s[0].saldo, valor, this.e['criador']);
+        });
+      });
+    }
+    this.loading.dismiss();
+    let alert = this.alertCtrl.create({
+      title: 'Check-in realizado com sucesso!',
+      subTitle: 'O check-in neste evento foi realizado com sucesso, agora vamos nos divertir.',
+      buttons: ['OK']
+    });
+    alert.present();
+  }*/
 
 }

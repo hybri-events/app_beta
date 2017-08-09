@@ -40,11 +40,13 @@ export class EditLocationEventPage {
     this.http.get(url).map(res => res.json()).subscribe(data => {
       let cidade;
       for ( let j=0;j<data.results[0].address_components.length;j++ ){
-        if ( data.results[0].address_components[j].types[0] == 'locality' ){
-          cidade = data.results[0].address_components[j].long_name;
+        for ( let k=0;k<data.results[0].address_components[j].types.length;k++ ){
+          if ( data.results[0].address_components[j].types[k] == 'locality' ){
+            cidade = data.results[0].address_components[j].long_name;
+          }
         }
       }
-      this.evento = this.db.list('/evento/'+cidade);
+      this.evento = this.db.list('/evento/');
       this.param['lat'] = this.lat;
       this.param['lng'] = this.lng;
       this.param['cidade'] = cidade;

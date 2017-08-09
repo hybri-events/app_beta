@@ -39,7 +39,6 @@ export class EventDetailPage {
 
   isCasa = false;
   keyCasa;
-  casa;
 
   timeout = null;
 
@@ -61,8 +60,6 @@ export class EventDetailPage {
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     this.data = new Date(Date.now() - tzoffset).toISOString().slice(0,-1);
 
-    this.db.list('/casas/').subscribe(cas => this.casa = cas);
-    console.log('/evento/'+this.id+'/')
     this.event = db.list('/evento/'+this.id+'/');
     this.eventoConf = db.list('/evento/'+this.id+'/confirmados/');
     this.userConf = db.list('/usuario/'+this.uid+'/confirmados/');
@@ -72,6 +69,51 @@ export class EventDetailPage {
         this.keyCasa = val;
         this.isCasa = true;
       }
+    });
+    this.event.forEach( evento => {
+      evento.forEach( eve => {
+        if ( eve.$key == "tags" ){
+          this.e[eve.$key] = [];
+          eve.forEach(ev => {
+            this.e[eve.$key].push(ev);
+          });
+        } else if ( eve.$key == "confirmados" ){
+          this.eventoConf.forEach(j => {
+            this.numCheck = 0;
+            j.forEach(i => {
+              if ( i.check ){
+                this.numCheck++;
+              }
+            });
+            this.numConf = j.length;
+          });
+        } else {
+          if ( eve.$key == 'dti' ){
+            if ( this.e['dtf'] != "" ){
+              let dtf = new Date(this.e['dtf']);
+              console.log(this.data >= dtf.toISOString().slice(0,-1));
+              if ( this.data >= dtf.toISOString().slice(0,-1) ){
+                this.periodoCheck = false;
+              }
+            } else {
+              let dti = new Date(eve.$value);
+              dti.setHours(dti.getHours() + 12);
+              if ( this.data >= dti.toISOString().slice(0,-1) ){
+                this.periodoCheck = false;
+              }
+            }
+          } else if ( eve.$key == 'criador' ){
+            let casa = this.db.list('/casas/'+eve.$value);
+            casa.forEach(cas => {
+              this.e['casa'] = [];
+              cas.forEach(ca => {
+                this.e['casa'][ca.$key] = ca.$value;
+              })
+            });
+          }
+          this.e[eve.$key] = eve.$value;
+        }
+      });
     });
   }
 
@@ -105,51 +147,7 @@ export class EventDetailPage {
       }
     });
     this.checkConf();
-    this.event.forEach( evento => {
-      evento.forEach( eve => {
-        if ( eve.$key == "tags" ){
-          this.e[eve.$key] = [];
-          eve.forEach(ev => {
-            this.e[eve.$key].push(ev);
-          });
-        } else if ( eve.$key == "confirmados" ){
-          this.eventoConf.forEach(j => {
-            this.numCheck = 0;
-            j.forEach(i => {
-              if ( i.check ){
-                this.numCheck++;
-              }
-            });
-            this.numConf = j.length;
-          });
-        } else {
-          if ( eve.$key == 'dti' ){
-            if ( this.e['dtf'] != "" ){
-              let dtf = new Date(this.e['dtf']);
-              console.log(this.data >= dtf.toISOString().slice(0,-1));
-              if ( this.data >= dtf.toISOString().slice(0,-1) ){
-                this.periodoCheck = false;
-              }
-            } else {
-              let dti = new Date(eve.$value);
-              dti.setHours(dti.getHours() + 12);
-              if ( this.data >= dti.toISOString().slice(0,-1) ){
-                this.periodoCheck = false;
-              }
-            }
-          } else if ( eve.$key == 'criador' && eve.$value[0] == "-" ){
-            this.casa.forEach(ca => {
-              if( ca[eve.$value] != null ){
-                this.e['casa'] = ca[eve.$value];
-              }
-            });
-          } else if ( eve.$key == 'lng' ){
-            this.loadMap(this.e['lat'], eve.$value);
-          }
-          this.e[eve.$key] = eve.$value;
-        }
-      });
-    });
+    this.loadMap(this.e['lat'], this.e['lng']);
   }
 
   loadMap(lat, lng){
@@ -372,6 +370,14 @@ export class EventDetailPage {
       buttons: [{text: 'Não', handler: () => {}},{text: 'Sim', handler: () => {
         let list = this.db.list('/evento/');
         list.remove(this.id);
+        let casa = this.db.list('/casas/'+this.keyCasa+'/eventos');
+        casa.forEach(cas => {
+          for (let i=0;i<cas.length;i++){
+            if ( cas[i].evento == this.id ){
+              casa.remove(cas[i].$key);
+            }
+          }
+        });
         this.navCtrl.pop();
       }}]
     });

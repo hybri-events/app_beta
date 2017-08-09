@@ -35,6 +35,7 @@
 
 <ion-content>
   <button ion-button block clear style="width:calc(100% - 24px);margin:12px;" (click)="openNewEvent()" *ngIf="isCasa">Criar um evento</button>
+  <!--<button ion-button block clear style="width:calc(100% - 24px);margin:12px;" (click)="readQRC()" *ngIf="!isCasa">Check-in rápido com QRCode</button>-->
   <div [ngSwitch]="maps" class="map">
     <div *ngSwitchCase="'map'" style="width:100%;height:100%;">
       <div #map id="map"></div>
@@ -52,7 +53,7 @@
             <div class="amigos_list" *ngIf="e.coin"><img src="assets/selo.png"></div>
             <div class="info_list">
               <div class="icon_list"><ion-icon name="icon-coin"></ion-icon><div>{{(e.faixa_ini==0?'Gratuito':'R$'+e.faixa_ini)}}{{(e.faixa_fim==0?'':(e.faixa_fim!=e.faixa_ini?' - R$'+e.faixa_fim:''))}}</div></div>
-              <div class="icon_list" *ngIf="e.criador[0] == '-'">
+              <div class="icon_list">
                 <ion-icon name="icon-estacionamento" *ngIf="e.casa.estac"></ion-icon>
                 <ion-icon name="icon-acessibilidade" *ngIf="e.casa.acess"></ion-icon>
                 <ion-icon name="icon-fumante" *ngIf="e.casa.fum"></ion-icon>
@@ -60,7 +61,7 @@
                 <ion-icon name="icon-comida" *ngIf="e.casa.cozinha"></ion-icon>
                 <ion-icon name="icon-bar" *ngIf="e.casa.bar"></ion-icon>
               </div>
-              <div class="icon_list" *ngIf="e.criador[0] == '-'">
+              <div class="icon_list">
                 <ion-icon name="icon-cartao" *ngIf="e.casa.cartao"></ion-icon>
                 <ion-icon name="icon-dinheiro" *ngIf="e.casa.dinheiro"></ion-icon>
                 <ion-icon *ngIf="e.coin" name="icon-vous"></ion-icon>
@@ -85,7 +86,7 @@
         </ion-card>
       </div>
       <ion-card *ngIf="!carregando && !showCity">
-        <img src="assets/fundo.jpeg"/>
+        <img src="assets/indicar.png"/>
         <ion-card-content>
           <ion-card-title>
             Sentiu falta de algum evento ou lugar?
@@ -94,7 +95,7 @@
         </ion-card-content>
       </ion-card>
       <ion-card *ngIf="showCity">
-        <img src="assets/fundo.jpeg"/>
+        <img src="assets/indicar.png"/>
         <ion-card-content>
           <ion-card-title>
             Infelizmente a Vou ainda não chegou na sua cidade 😞
