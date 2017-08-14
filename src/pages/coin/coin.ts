@@ -29,11 +29,8 @@ export class CoinPage {
   saldoRS = 0;
 
   txtVS: number = 0;
-  auxVS: number = 0;
   txtRS: number = 0;
-  auxRS: number = 0;
-  cRS: number = 0;
-  lenRS: number = 99999999999999;
+  timePay = null;
   plat: any;
 
   options: BarcodeScannerOptions;
@@ -90,8 +87,10 @@ export class CoinPage {
 
     this.storage.get('casa').then((val) => {
       if ( val != null ){
+        this.casa = this.db.list("casas/"+val+"/");
+        let index = val.indexOf('/');
+        val = val.slice(index+1,val.length);
         this.keyCasa = val;
-        this.casa = this.db.list("casas/"+firebase.auth().currentUser.uid+"/"+val+"/");
         this.casa.forEach(ca => {
           ca.forEach(c => {
             if ( c.$key == 'coins' ){
@@ -102,6 +101,11 @@ export class CoinPage {
           });
         });
         this.isCasa = true;
+      }
+      if ( this.coins == "home" ){
+        this.changeTabs();
+      } else if (this.coins == "receive"){
+        this.coins = 'home';
       }
     });
   }
@@ -121,17 +125,13 @@ export class CoinPage {
   }
 
   ionViewDidEnter(){
-    if ( this.coins == "home" ){
-      this.changeTabs();
-    } else if (this.coins == "receive"){
-      this.coins = 'home';
-    }
+
   }
 
   changeTabs(){
     if ( this.coins == "home" ){
       if (this.authentic) {
-        if ( this.isCasa ){
+        if ( this.isCasa && this.coinCasa ){
           this.contaData.getSaldo(this.keyCasa).then( eventListSnap => {
             this.saldoVS = eventListSnap[0].saldo;
             this.saldoRS = eventListSnap[0].saldo * 0.04;
@@ -179,6 +179,9 @@ export class CoinPage {
           });
         }
       }
+    } else if (this.coins == "pay"){
+      this.txtVS = 0;
+      this.txtRS = 0;
     } else if (this.coins == "receive"){
       if ( this.authentic ){
         if ( !this.isCasa ){
@@ -373,35 +376,34 @@ export class CoinPage {
     });
   }
 
-  keyUpVS(evt){
-    //if (evt.keyCode == 229 ){
-    if (evt.keyCode == 110 ){
-      this.txtVS = this.auxVS;
-    } else {
-      this.auxVS = this.txtVS;
-    }
-    this.txtRS = parseFloat((this.txtVS * 0.04).toFixed(2));
+  aumentar(){
+    this.txtVS += 25;
+    this.txtRS += 1;
+    this.timePay = setInterval(() => {
+      if ( (this.txtVS + 25) <= this.saldoVS ){
+        this.txtVS += 25;
+        this.txtRS += 1;
+      } else {
+        this.parar();
+      }
+    },100);
   }
 
-  keyUpRS(evt){
-    //if (evt.keyCode == 229 ){
-    if (evt.keyCode == 110 ){
-      if ( this.cRS > 0 ){
-        this.txtRS = this.auxRS;
-      } else {
-        this.lenRS = (''+this.auxRS).length;
-        this.auxRS = this.txtRS;
-        this.cRS++;
-        console.log(this.lenRS);
-      }
+  parar(){
+    clearInterval(this.timePay);
+  }
+
+  diminuir(){
+    this.txtVS -= 25;
+    this.txtRS -= 1;
+    this.timePay = setInterval(() => {
+    if ( this.txtVS > 25 ){
+      this.txtVS -= 25;
+      this.txtRS -= 1;
     } else {
-      if ( this.lenRS > (''+this.txtRS).length ){
-        this.cRS = 0;
-      }
-      this.txtRS = parseFloat((parseFloat(''+this.txtRS)).toFixed(2));
-      this.auxRS = this.txtRS;
+      this.parar();
     }
-    this.txtVS = parseInt((this.txtRS / 0.04).toFixed(0));
+    },100);
   }
 
   openButtonPage(i) {
@@ -413,29 +415,24 @@ export class CoinPage {
   }
 
   genQRCode(){
-    if ( this.txtVS > this.saldoVS ){
-      let alert = this.alertCtrl.create({
-        title: "Saldo insuficiente!",
-        message: "Seu saldo é menor que o valor digitado.",
+	if ( this.txtVS == 0 ){
+	  let al = this.alertCtrl.create({
+        title: "Valor nulo!",
+        message: "Selecione um valor acima de 0 para gerar o QRCode.",
         buttons: [{
           text: "Ok",
-          role: 'cancel'
+          handler: data => {
+            clearTimeout(this.timeout);
+            this.timeout = null;
+            this.coins = 'home';
+            this.changeTabs();
+          }
         }]
       });
-      alert.present();
-    } else if ( this.txtVS == 0 || this.txtVS == null ){
-      let alert = this.alertCtrl.create({
-        title: "Digite um valor!",
-        message: "Digite um valor para gerar o QRCode.",
-        buttons: [{
-          text: "Ok",
-          role: 'cancel'
-        }]
-      });
-      alert.present();
-    } else {
-      this.navCtrl.push(QrCodePage, {vous: parseInt(''+this.txtVS)});
-    }
+      al.present();
+	} else {
+	  this.navCtrl.push(QrCodePage, {vous: this.txtVS});
+	}
   }
 
 }

@@ -43,6 +43,10 @@ export class SetLocationEventPage {
   }
 
   continuar(){
+    this.loading = this.loadingCtrl.create({
+      content: "Cadastrando o estabelecimento, aguarde...",
+      dismissOnPageChange: true,
+    });
     var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + this.lat + "," + this.lng;
     this.http.get(url).map(res => res.json()).subscribe(data => {
       let cidade;
@@ -65,6 +69,7 @@ export class SetLocationEventPage {
             if ( this.param[0].img != 'assets/event_default.png' ){
               this.event.saveImg(e.key,this.param[0].img);
             }
+            this.loading.dismiss();
             this.navCtrl.pop();
             this.navCtrl.pop();
           }, (error) => {
@@ -87,6 +92,7 @@ export class SetLocationEventPage {
               if ( this.param[0].img != 'assets/event_default.png' ){
                 this.event.saveImg(e.key,this.param[0].img);
               }
+              this.loading.dismiss();
               this.navCtrl.pop();
               this.navCtrl.pop();
             }, (error) => {

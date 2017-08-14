@@ -87,7 +87,8 @@ export class EditEventPage {
 
     this.storage.get('casa').then((val) => {
       if ( val != null ){
-        this.casa = this.db.list("casas/"+firebase.auth().currentUser.uid+"/"+val+"/");
+
+        this.casa = this.db.list("casas/"+val+"/");
         this.casa.forEach(ca => {
           ca.forEach(c => {
             if ( c.$key == 'coins' ){

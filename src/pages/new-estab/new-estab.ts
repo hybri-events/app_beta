@@ -64,7 +64,7 @@ export class NewEstabPage {
 
   }
 
-  /*ngAfterViewInit(){
+  ngAfterViewInit(){
     this.txtArea = this.ionTxtArea._elementRef.nativeElement.children[0];
     this.txtArea.style.height = this.lineHeight + "px";
   }
@@ -72,7 +72,7 @@ export class NewEstabPage {
   onChange(newValue){
     this.txtArea.style.height = this.lineHeight + "px";
     this.txtArea.style.height =  this.txtArea.scrollHeight + "px";
-  }*/
+  }
 
   trim(str){
     return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
@@ -114,7 +114,7 @@ export class NewEstabPage {
         buttons: ['OK']
       });
       alert.present();
-    } else if ( parseInt(""+this.faixa.lower) == 330 && parseInt(""+this.faixa.lower) == 660 ){
+    } else if ( parseInt(""+this.faixa.lower) == 330 && parseInt(""+this.faixa.upper) == 660 ){
       let alert = this.alertCtrl.create({
         title: 'Faixa de preço!',
         subTitle: 'Tem certeza que a faixa de preço é entre R$330,00 e R$660,00?',
@@ -144,11 +144,11 @@ export class NewEstabPage {
                   cartao: this.cartao,
                   dinheiro: this.dinheiro,
                   coins: this.coins,
-                  valid: false/*,
+                  valid: false,
                   desc: this.desc,
                   faixa: this.faixa,
                   tags: this.tags,
-                  img: this.img*/};
+                  img: this.img};
     this.navCtrl.push(ListAdmPage, params);
   }
 

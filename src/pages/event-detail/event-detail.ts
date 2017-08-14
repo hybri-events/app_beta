@@ -6,6 +6,7 @@ import { ContaProvider } from '../../providers/conta/conta';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Storage } from '@ionic/storage';
 import { EditEventPage } from '../edit-event/edit-event';
+import { StatusBar } from '@ionic-native/status-bar';
 
 declare var google;
 
@@ -39,6 +40,7 @@ export class EventDetailPage {
 
   isCasa = false;
   keyCasa;
+  isAdm = false;
 
   timeout = null;
 
@@ -54,7 +56,8 @@ export class EventDetailPage {
     public geolocation: Geolocation,
     public contaData: ContaProvider,
     private storage: Storage,
-    public loadingCtrl: LoadingController
+    public loadingCtrl: LoadingController,
+    statusBar: StatusBar
   ) {
     this.id = navParams.data.id;
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
@@ -114,6 +117,10 @@ export class EventDetailPage {
           this.e[eve.$key] = eve.$value;
         }
       });
+    });
+	platform.ready().then(() => {
+	  //statusBar.backgroundColorByHexString('#461969');
+	  statusBar.styleLightContent();
     });
   }
 
@@ -227,76 +234,108 @@ export class EventDetailPage {
       this.userConf.remove(ukey);
       this.confirm = false;
     } else {
-      this.eventoConf.push({uid: this.uid, check: false, date: new Date().toISOString().slice(0,-1)});
-      this.userConf.push({event: this.id, check: false, criador: this.e['criador'], date: new Date().toISOString().slice(0,-1)});
+      let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+      this.eventoConf.push({uid: this.uid, check: false, date: new Date(Date.now() - tzoffset).toISOString().slice(0,-1)});
+      this.userConf.push({event: this.id, check: false, criador: this.e['criador'], date: new Date(Date.now() - tzoffset).toISOString().slice(0,-1)});
       this.confirm = true;
     }
   }
 
   check(){
-    if ( !this.ischeck ){
-      this.loading = this.loadingCtrl.create({
-        content: "Realizando check-in. Aguarde...",
-        dismissOnPageChange: true,
-      });
-      this.loading.present();
-      this.geolocation.getCurrentPosition().then((position) => {
-        let latitude = position.coords.latitude;
-        let longitude = position.coords.longitude;
-        let lat = this.e['lat'];
-        let lng = this.e['lng'];
+    let adms = this.db.list('casas/'+this.e['criador']+'/adms/');
+    adms.forEach(adm => {
+      for ( let i=0;i<adm.length;i++ ){
+        if ( this.uid == adm[i][0] ){
+          this.isAdm = true;
+          break;
+        }
+      }
+    });
+    let index = this.e['criador'].indexOf('/');
+    if ( !this.isAdm || this.uid == this.e['criador'].slice(0,index) ){
+      if ( !this.ischeck ){
+        this.loading = this.loadingCtrl.create({
+          content: "Realizando check-in. Aguarde...",
+          dismissOnPageChange: true,
+        });
+        this.loading.present();
+        this.geolocation.getCurrentPosition().then((position) => {
+          let latitude = position.coords.latitude;
+          let longitude = position.coords.longitude;
+          let lat = this.e['lat'];
+          let lng = this.e['lng'];
 
-        if ( (latitude*-1) <= ((lat*-1)+0.0003) && (latitude*-1) >= ((lat*-1)-0.0003) && (longitude*-1) <= ((lng*-1)+0.0003) && (longitude*-1) >= ((lng*-1)-0.0003) ){
-          let lastCheck = null;
-          this.userConf.forEach(eve => {
-            eve.forEach(c => {
-              if ( c.check ){
-                lastCheck = c.date;
-              }
+          if ( (latitude*-1) <= ((lat*-1)+0.0003) && (latitude*-1) >= ((lat*-1)-0.0003) && (longitude*-1) <= ((lng*-1)+0.0003) && (longitude*-1) >= ((lng*-1)-0.0003) ){
+            let lastCheck = null;
+            this.userConf.forEach(eve => {
+              eve.forEach(c => {
+                if ( c.check ){
+                  lastCheck = c.date;
+                }
+              });
             });
-          });
-          if ( lastCheck != null ){
-            let d = new Date(lastCheck);
-            d.setHours(d.getHours()+12);
-            if ( this.data >= d.toISOString().slice(0,-1) ){
+            if ( lastCheck != null ){
+              let d = new Date(lastCheck);
+              d.setHours(d.getHours()+12);
+              if ( this.data >= d.toISOString().slice(0,-1) ){
+                this.loading.dismiss();
+                if ( !this.confirm ){
+                  this.conf();
+                }
+                this.confirmCheck();
+              } else {
+                this.loading.dismiss();
+                let alert = this.alertCtrl.create({
+                  title: 'Você já realizou um check-in antes!',
+                  subTitle: 'Você já fez outro check-in nas últimas 12 horas.',
+                  buttons: ['OK']
+                });
+                alert.present();
+              }
+            } else {
               this.loading.dismiss();
               if ( !this.confirm ){
                 this.conf();
               }
               this.confirmCheck();
-            } else {
-              this.loading.dismiss();
-              let alert = this.alertCtrl.create({
-                title: 'Você já realizou um check-in antes!',
-                subTitle: 'Você já fez outro check-in nas últimas 12 horas.',
-                buttons: ['OK']
-              });
-              alert.present();
             }
           } else {
             this.loading.dismiss();
-            if ( !this.confirm ){
-              this.conf();
-            }
-            this.confirmCheck();
+            let alert = this.alertCtrl.create({
+              title: 'Você está muito longe!',
+              subTitle: 'Você não está próximo o suficiente do evento para fazer o check-in.',
+              buttons: ['OK']
+            });
+            alert.present();
           }
-        } else {
+        }, (err) => {
           this.loading.dismiss();
-          let alert = this.alertCtrl.create({
-            title: 'Você está muito longe!',
-            subTitle: 'Você não está próximo o suficiente do evento para fazer o check-in.',
-            buttons: ['OK']
-          });
-          alert.present();
-        }
-      }, (err) => {
-        this.loading.dismiss();
-        console.log(err);
-      });
+          console.log(err);
+        });
+      } else {
+        let alert = this.alertCtrl.create({
+          title: 'Check-in já realizado!',
+          subTitle: 'Você já fez check-in neste evento.',
+          buttons: ['OK']
+        });
+        alert.present();
+      }
     } else {
+      if ( this.e['coin'] ){
+        let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+        let index = this.e['criador'].indexOf('/');
+        this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Check-in no evento \""+this.e['nome']+"\".", 50, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
+        this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
+          this.contaData.altSaldo(1, s[0].id, s[0].saldo, 50, firebase.auth().currentUser.uid);
+          this.contaData.cadTransacao(this.e['criador'].slice(index+1,this.e['criador'].length), "Check-in no seu evento \""+this.e['nome']+"\".", 50, 'Saída', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'saida','-');
+          this.contaData.getSaldo(this.e['criador'].slice(index+1,this.e['criador'].length)).then(s => {
+            this.contaData.altSaldo(0, s[0].id, s[0].saldo, 50, this.e['criador'].slice(index+1,this.e['criador'].length));
+          });
+        });
+      }
       let alert = this.alertCtrl.create({
-        title: 'Check-in já realizado!',
-        subTitle: 'Você já fez check-in neste evento.',
+        title: 'Check-in realizado com sucesso!',
+        subTitle: 'O check-in neste evento foi realizado com sucesso, agora vamos nos divertir.',
         buttons: ['OK']
       });
       alert.present();
@@ -313,7 +352,7 @@ export class EventDetailPage {
         }
       });
     });
-    this.eventoConf.update(ekey,{check: true});
+    this.eventoConf.update(ekey,{check: true, mode: 'button'});
     this.userConf.forEach(eve => {
       eve.forEach(c => {
         if ( c.event == this.id ){
@@ -321,7 +360,7 @@ export class EventDetailPage {
         }
       });
     });
-    this.userConf.update(ukey,{check: true});
+    this.userConf.update(ukey,{check: true, mode: 'button'});
     if ( this.e['coin'] ){
       let cont = 0;
       this.userConf.forEach(us => {
@@ -333,20 +372,19 @@ export class EventDetailPage {
       });
       let valor = 0;
       cont -= 1;
-      if ( cont == 0 || cont % 10 == 5 ){
+      if ( cont == 0 || cont % 5 == 0 ){
         valor = 50;
-      } else if ( cont % 10 == 0 ){
-        valor = 100;
       } else {
         valor = 30;
       }
       let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+      let index = this.e['criador'].indexOf('/');
       this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Check-in no evento \""+this.e['nome']+"\". "+(cont+1)+"ª vez neste estabelecimento.", valor, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
       this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
         this.contaData.altSaldo(1, s[0].id, s[0].saldo, valor, firebase.auth().currentUser.uid);
-        this.contaData.cadTransacao(this.e['criador'], "Check-in no seu evento \""+this.e['nome']+"\".", valor, 'Saída', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'saida','-');
-        this.contaData.getSaldo(this.e['criador']).then(s => {
-          this.contaData.altSaldo(0, s[0].id, s[0].saldo, valor, this.e['criador']);
+        this.contaData.cadTransacao(this.e['criador'].slice(index+1,this.e['criador'].length), "Check-in no seu evento \""+this.e['nome']+"\".", valor, 'Saída', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'saida','-');
+        this.contaData.getSaldo(this.e['criador'].slice(index+1,this.e['criador'].length)).then(s => {
+          this.contaData.altSaldo(0, s[0].id, s[0].saldo, valor, this.e['criador'].slice(index+1,this.e['criador'].length));
         });
       });
     }

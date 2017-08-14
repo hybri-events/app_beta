@@ -74,13 +74,62 @@ page-coin {
     text-align: right;
   }
 
-  .pay .item-block{
-    width: calc(100% - 32px);
+  .vous, .reais{
+    width: calc(100% - 64px);
+    margin-left: 32px;
+    float: left;
+    text-align: center;
+    border-radius: 10px;
   }
-  .pay .item-md{
-    padding-left: 0px;
-    margin-left: 16px;
-    margin-right: 16px;
+  .vous{
+    //border: 1px solid #652C90;
+    height: 73px;
+  }
+  .vous .botoes{
+    width: 40px;
+    float: left;
+  }
+  .vous .botoes button{
+    width: 40px;
+    height: 36px;
+    float: left;
+    padding: 0px;
+    font-size: 2em;
+    margin: 0px;
+    border-radius: 0px;
+  }
+  .vous .botoes button:first-child{
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+  .vous .botoes button:last-child{
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+  .vous .botoes button span{
+    margin-left: 1px;
+    margin-top: -1px;
+  }
+  .vous .valor {
+    float: left;
+    font-size: 3em;
+    line-height: 1.7em;
+    font-family: Lato-Black;
+    color: #652C90;
+    width: calc(100% - 40px);
+  }
+  .vous .valor span {
+    font-family: Lato-Medium;
+    color: #1B97C6;
+  }
+  .reais {
+    font-size: 1.5em;
+    margin-top: 16px;
+    margin-bottom: 32px;
+    margin-left: 72px;
+    width: calc(100% - 104px);
+    font-family: Lato-Medium;
+    color: #666666;
   }
 
   .cont{

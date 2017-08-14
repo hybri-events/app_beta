@@ -66,18 +66,14 @@
       <div class="saldo" style="padding-bottom:32px;">
         <div class="lbl_saldo">Valor para pagamento</div>
       </div>
-      <ion-list style="padding-bottom:16px;" class="pay">
-        <ion-item>
-          <ion-label>V$</ion-label>
-          <ion-input type="number" [(ngModel)]="this.txtVS" (keyup)="keyUpVS($event)"></ion-input>
-        </ion-item>
-      </ion-list>
-      <ion-list style="padding-bottom:32px;" class="pay">
-        <ion-item>
-          <ion-label>R$</ion-label>
-          <ion-input type="number" id="rs" [(ngModel)]="this.txtRS" (keyup)="keyUpRS($event)"></ion-input>
-        </ion-item>
-      </ion-list>
+      <div class="vous">
+        <div class="botoes">
+          <button ion-button color="primary" [disabled]="(txtVS + 24) > saldoVS" (touchstart)="aumentar()" (touchend)="parar()">+</button>
+          <button ion-button color="primary" [disabled]="txtRS == 1" (touchstart)="diminuir()" (touchend)="parar()">-</button>
+        </div>
+        <div class="valor"><span>V$</span> {{txtVS}}</div>
+      </div>
+      <div class="reais"><span>R$</span> {{txtRS}}</div>
       <button ion-button block color="primary" (click)="genQRCode()">Gerar QRCode</button>
     </div>
     <div *ngSwitchCase="'receive'">

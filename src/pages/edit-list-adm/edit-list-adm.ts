@@ -19,12 +19,13 @@ export class EditListAdmPage {
   uid = firebase.auth().currentUser.uid;
 
   constructor(public platform: Platform, public navCtrl: NavController, public navParams: NavParams, public db: AngularFireDatabase) {
+    this.param = navParams.data;
     this.usuarios = db.list('/usuario/');
     this.updateSearch();
     setTimeout(() => {
       this.updateSearch();
       setTimeout(() => {
-        this.param = navParams.data;
+        this.param = this.navParams.data;
         for (let i=0; i<this.param['adms'].length; i++){
           this.addAdm(this.param['adms'][i][0],this.param['adms'][i][1]);
         }
@@ -33,6 +34,7 @@ export class EditListAdmPage {
   }
 
   continuar(){
+    console.log(this.param)
     this.param['adms'] = this.adms;
     this.navCtrl.push(EditLocationCasaPage, this.param);
   }
@@ -44,7 +46,7 @@ export class EditListAdmPage {
       usuario.forEach(usu => {
         let user = this.db.list('/usuario/'+usu.$key)
         user.forEach(us => {
-          if ( us[0].nome.toLowerCase().indexOf(this.search.toLowerCase()) > -1 ){
+          if ( (""+us[0].nome).toLowerCase().indexOf(this.search.toLowerCase()) > -1 ){
             this.users.push([us[0].nome,us[0].ft_perfil,usu.$key])
           }
         });

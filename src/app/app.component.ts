@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Platform, NavController, AlertController } from 'ionic-angular';
+import { Platform, NavController, AlertController, LoadingController, Loading } from 'ionic-angular';
 import { ViewChild } from '@angular/core';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -56,8 +56,10 @@ export class MyApp {
 
   isCasa = false;
   casa: FirebaseListObservable<any>;
+  acessEvents = true;
 
   faixa = {lower: 0, upper: 200}
+  public loading:Loading;
 
   constructor(
     platform: Platform,
@@ -73,7 +75,8 @@ export class MyApp {
     public alertCtrl: AlertController,
     public err: ErrorProvider,
     public geolocation: Geolocation,
-    public http: Http
+    public http: Http, 
+	public loadingCtrl: LoadingController
   ) {
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     let fdata = new Date(Date.now() - tzoffset);
@@ -145,6 +148,10 @@ export class MyApp {
             this.storage.set('codcad', eventListSnap[0].codcad);
             this.storage.get('casa').then((val) => {
               if ( val != null ){
+                let index = val.indexOf('/');
+                if ( val.slice(0,index) != firebase.auth().currentUser.uid ){
+                  this.acessEvents = false;
+                }
                 this.casa = this.db.list("casas/"+val+"/");
                 this.casa.forEach(ca => {
                   ca.forEach(c => {
@@ -179,16 +186,24 @@ export class MyApp {
       }
     });
     platform.ready().then(() => {
-      statusBar.overlaysWebView(false);
-      statusBar.backgroundColorByHexString('#461969');
+	  //statusBar.backgroundColorByHexString('#461969');
+	  statusBar.styleDefault();
       splashScreen.hide();
     });
   }
 
   returnProfile() {
+	this.loading = this.loadingCtrl.create({
+      content: "Trocando de perfil, aguarde...",
+      dismissOnPageChange: true,
+    });
+    this.loading.present();
     this.storage.remove('casa');
-    this.splashScreen.show();
-    window.location.reload();
+	setTimeout(() => {
+	  this.loading.dismiss();
+      this.splashScreen.show();
+      window.location.reload();
+	},2000)
   }
 
   openMenuPage(i) {

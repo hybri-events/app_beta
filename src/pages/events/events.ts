@@ -12,6 +12,7 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { Storage } from '@ionic/storage';
 import { Events } from 'ionic-angular';
 import { ContaProvider } from '../../providers/conta/conta';
+import firebase from 'firebase';
 
 declare var google;
 
@@ -58,6 +59,8 @@ export class EventsPage {
   e = [];
   loading: Loading;
   id;
+  confirm;
+  ischeck = false;
 
   constructor(
     platform: Platform,
@@ -377,26 +380,165 @@ export class EventsPage {
     this.navCtrl.push(IndicacaoPage,{city: this.cidade});
   }
 
-  /*readQRC(){
+  readQRC(){
+    this.e = [];
+    this.id = null;
+    this.confirm = null;
+    this.ischeck = false;
     let options = {
       showTorchButton : true,
       prompt : "Posicione o QRCode na área marcada.",
     }
     this.barcodeScanner.scan(options).then((barcodeData) => {
       this.dataQRC = barcodeData.text;
-      alert(this.dataQRC);
-      //dia atual e dia anterior
-      //query com o evento nesse período
-      let eventos = this.db.list('casas/'+this.dataQRC+'/eventos');
+      let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+      let day1 = new Date(Date.now() - tzoffset);
+      let day2 = new Date(Date.now() - tzoffset);
+      day1.setHours(day1.getHours()-12);
+      let eventos = this.db.list('casas/'+this.dataQRC+'/eventos', {
+        query: {
+          orderByChild: 'dt',
+          startAt: day1.toISOString().slice(0,-1),
+          endAt: day2.toISOString().slice(0,-1)
+        }
+      });
       eventos.forEach(evento => {
-        //foreach do evento
+        let currentDt = null;
+        for(let i=0;i<evento.length;i++){
+          if ( currentDt == null || currentDt < evento[i].dt ){
+            currentDt = evento[i].dt;
+            this.id = evento[i].evento;
+          }
+        }
+        this.eventoConf = this.db.list('/evento/'+this.id+'/confirmados/');
+        this.userConf = this.db.list('/usuario/'+firebase.auth().currentUser.uid+'/confirmados/');
+        this.checkConf();
+        let eve = this.db.list('evento/'+this.id);
+        eve.forEach(even => {
+          even.forEach(ev => {
+            this.e[ev.$key] = ev.$value;
+          });
+        });
+        this.check();
       });
     }, (err) => {
       alert("Error occured : " + err);
     });
   }
 
-  confirmCheck(id){
+  conf(){
+    if ( this.confirm ){
+      let ekey;
+      let ukey;
+      this.eventoConf.forEach(eve => {
+        eve.forEach(c => {
+          if ( c.uid == firebase.auth().currentUser.uid ){
+            ekey = c.$key;
+          }
+        });
+      });
+      this.eventoConf.remove(ekey);
+      this.userConf.forEach(eve => {
+        eve.forEach(c => {
+          if ( c.event == this.id ){
+            ukey = c.$key;
+          }
+        });
+      });
+      this.userConf.remove(ukey);
+      this.confirm = false;
+    } else {
+      let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+      this.eventoConf.push({uid: firebase.auth().currentUser.uid, check: false, date: new Date(Date.now() - tzoffset).toISOString().slice(0,-1)});
+      this.userConf.push({event: this.id, check: false, criador: this.e['criador'], date: new Date(Date.now() - tzoffset).toISOString().slice(0,-1)});
+      this.confirm = true;
+    }
+  }
+
+  checkConf(){
+    this.eventoConf.forEach(eve => {
+      eve.forEach(c => {
+        if ( c.uid == firebase.auth().currentUser.uid ){
+          this.ischeck = c.check;
+          this.confirm = true;
+        }
+      });
+    });
+  }
+
+  check(){
+    if ( !this.ischeck ){
+      this.loading = this.loadingCtrl.create({
+        content: "Realizando check-in. Aguarde...",
+        dismissOnPageChange: true,
+      });
+      this.loading.present();
+      this.geolocation.getCurrentPosition().then((position) => {
+        let latitude = position.coords.latitude;
+        let longitude = position.coords.longitude;
+        let lat = this.e['lat'];
+        let lng = this.e['lng'];
+
+        if ( (latitude*-1) <= ((lat*-1)+0.0003) && (latitude*-1) >= ((lat*-1)-0.0003) && (longitude*-1) <= ((lng*-1)+0.0003) && (longitude*-1) >= ((lng*-1)-0.0003) ){
+          let lastCheck = null;
+          this.userConf.forEach(eve => {
+            eve.forEach(c => {
+              if ( c.check ){
+                lastCheck = c.date;
+              }
+            });
+          });
+          if ( lastCheck != null ){
+            let d = new Date(lastCheck);
+            d.setHours(d.getHours()+12);
+            let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+            let datenow = new Date(Date.now() - tzoffset).toISOString().slice(0,-1);
+            if ( datenow >= d.toISOString().slice(0,-1) ){
+              this.loading.dismiss();
+              if ( !this.confirm ){
+                this.conf();
+              }
+              this.confirmCheck();
+            } else {
+              this.loading.dismiss();
+              let al = this.alertCtrl.create({
+                title: 'Você já realizou um check-in antes!',
+                subTitle: 'Você já fez outro check-in nas últimas 12 horas.',
+                buttons: ['OK']
+              });
+              al.present();
+            }
+          } else {
+            this.loading.dismiss();
+            if ( !this.confirm ){
+              this.conf();
+            }
+            this.confirmCheck();
+          }
+        } else {
+          this.loading.dismiss();
+          let al = this.alertCtrl.create({
+            title: 'Você está muito longe!',
+            subTitle: 'Você não está próximo o suficiente do evento para fazer o check-in.',
+            buttons: ['OK']
+          });
+          al.present();
+        }
+      }, (err) => {
+        this.loading.dismiss();
+        console.log(err);
+      });
+    } else {
+      let al = this.alertCtrl.create({
+        title: 'Check-in já realizado!',
+        subTitle: 'Você já fez check-in neste evento.',
+        buttons: ['OK']
+      });
+      al.present();
+    }
+  }
+
+  confirmCheck(){
     let ekey;
     let ukey;
     this.eventoConf.forEach(eve => {
@@ -406,7 +548,7 @@ export class EventsPage {
         }
       });
     });
-    this.eventoConf.update(ekey,{check: true});
+    this.eventoConf.update(ekey,{check: true, mode: 'qrcode'});
     this.userConf.forEach(eve => {
       eve.forEach(c => {
         if ( c.event == this.id ){
@@ -414,7 +556,7 @@ export class EventsPage {
         }
       });
     });
-    this.userConf.update(ukey,{check: true});
+    this.userConf.update(ukey,{check: true, mode: 'qrcode'});
     if ( this.e['coin'] ){
       let cont = 0;
       this.userConf.forEach(us => {
@@ -434,6 +576,8 @@ export class EventsPage {
         valor = 30;
       }
       let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+      let index = this.e['criador'].indexOf('/');
+      this.e['criador'] = this.e['criador'].slice(index+1,this.e['criador'].length);
       this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Check-in no evento \""+this.e['nome']+"\". "+(cont+1)+"ª vez neste estabelecimento.", valor, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
       this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
         this.contaData.altSaldo(1, s[0].id, s[0].saldo, valor, firebase.auth().currentUser.uid);
@@ -444,12 +588,12 @@ export class EventsPage {
       });
     }
     this.loading.dismiss();
-    let alert = this.alertCtrl.create({
+    let al = this.alertCtrl.create({
       title: 'Check-in realizado com sucesso!',
       subTitle: 'O check-in neste evento foi realizado com sucesso, agora vamos nos divertir.',
       buttons: ['OK']
     });
-    alert.present();
-  }*/
+    al.present();
+  }
 
 }

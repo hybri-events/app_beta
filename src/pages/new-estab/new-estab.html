@@ -11,9 +11,9 @@
 
 
 <ion-content>
-  <!--<div id="foto_evento">
-    <label for="input" id="button" (click)="openGallery()">Selecionar a logo do estabelecimento</label>
-  </div>-->
+  <div id="foto_evento">
+    <label padding for="input" id="button" (click)="openGallery()">Selecionar a logo do estabelecimento</label>
+  </div>
   <ion-list padding>
     <ion-item>
       <ion-label floating>Nome do estabelecimento</ion-label>
@@ -152,7 +152,7 @@
       <ion-datetime displayFormat="HH:mm" [(ngModel)]="hora.sab.fim"></ion-datetime>
     </ion-item>
 
-    <!--<ion-item style="margin-top: 12px;">
+    <ion-item style="margin-top: 12px;">
       <ion-label floating>Descrição padrão</ion-label>
       <div item-content style="width:100%;">
         <ion-textarea #ionTxtArea [(ngModel)]="desc" (ngModelChange)='onChange($event)'></ion-textarea>
@@ -172,7 +172,7 @@
     </ion-item>
 
     <ion-item>
-      <ion-label stacked>Faixa de preço dos ingressos</ion-label>
+      <ion-label stacked>Faixa de preço padrão dos ingressos</ion-label>
       <ion-select interface="popover" [(ngModel)]="sel_faixa">
         <ion-option value="0" selected="true">Digitar valores</ion-option>
         <ion-option value="1">Selecionar valores</ion-option>
@@ -198,7 +198,7 @@
     <ion-item style="width:50%;margin-top:-8px;" *ngIf="sel_faixa == 0">
       <ion-label stacked>Até</ion-label>
       <ion-input type="number" [(ngModel)]="faixa.upper"></ion-input>
-    </ion-item>-->
+    </ion-item>
 
     <ion-item-divider>
         Características do estabelecimento

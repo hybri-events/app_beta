@@ -46,10 +46,21 @@ export class EventoProvider {
     });
   }
 
+  cadEstab(params): firebase.Promise<any> {
+    for ( let i=0;i<params['tags'].length;i++ ){
+      this.cadTags(params['tags'][i].nome);
+    }
+    return firebase.database().ref('/casas/'+firebase.auth().currentUser.uid+'/').push(params);
+  }
+
   saveImg(key,img){
     firebase.storage().ref('/ft_evento/').child(key+'.png').putString(img, 'base64', {contentType: 'image/png'}).then((savedPicture) => {
       firebase.database().ref(`evento`).child(key).child('img').set(savedPicture.downloadURL);
     });
+  }
+
+  saveImgEstab(key,img): firebase.Promise<any>{
+    return firebase.storage().ref('/ft_estab/').child(key+'.png').putString(img, 'base64', {contentType: 'image/png'});
   }
 
   cadTags(nome){

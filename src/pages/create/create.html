@@ -15,20 +15,15 @@
 <ion-content padding>
   <p style="font-size:1.1em;text-align:center">Empresário, cadastre aqui seus estabelecimentos para aproveitar todas as vantagens que oferecemos.</p>
   <ion-list>
-    <ion-item style="white-space:normal" *ngIf="allCasas.length == 0 && (list | async)?.length == 0">
+    <ion-item style="white-space:normal" *ngIf="(list | async)?.length == 0">
       <p>Não há nenhum estabelecimento vinculado à essa conta.</p>
     </ion-item>
-    <ion-item  *ngFor="let l of list | async">
-      <button ion-button clear (click)="changeProfile(l.$key)" [disabled]="!l.valid" class="nome">{{l.nome}}</button><br>
-      <span class="cidade">{{l.cidade}}</span><br>
-      <i class="cidade" style="color:#652C90" *ngIf="!l.valid">Em processo de validação</i>
-      <ion-icon name="icon-edit" item-end style="margin-right:16px;" (click)="editEstab(l.$key)"></ion-icon>
-      <ion-icon name="icon-del" item-end (click)="removeEstab(l.$key)"></ion-icon>
-    </ion-item>
     <ion-item  *ngFor="let a of allCasas">
-      <button ion-button clear (click)="changeProfile(a.$key)" [disabled]="!a.valid" class="nome">{{a.nome}}</button><br>
+      <button ion-button clear (click)="changeProfile(a.id)" [disabled]="!a.valid" class="nome">{{a.nome}}</button><br>
       <span class="cidade">{{a.cidade}}</span><br>
       <i class="cidade" style="color:#652C90" *ngIf="!a.valid">Em processo de validação</i>
+      <ion-icon name="icon-edit" *ngIf="a.edit" item-end style="margin-right:16px;" (click)="editEstab(a.id)"></ion-icon>
+      <ion-icon name="icon-del" *ngIf="a.edit" item-end (click)="removeEstab(a.key, a.id,a.adms)"></ion-icon>
     </ion-item>
   </ion-list>
 </ion-content>

@@ -57,6 +57,7 @@ import { ListAdmPage } from '../pages/list-adm/list-adm';
 import { EditListAdmPage } from '../pages/edit-list-adm/edit-list-adm';
 import { EditCasaPage } from '../pages/edit-casa/edit-casa';
 import { EditLocationCasaPage } from '../pages/edit-location-casa/edit-location-casa';
+import { SwitchEventPage } from '../pages/switch-event/switch-event';
 
 import { CadastroPage } from '../pages/cadastro/cadastro';
 import { CodCadastroPage } from '../pages/cod-cadastro/cod-cadastro';
@@ -120,7 +121,8 @@ const firebaseConfig = {
     IndicacaoPage,
     ReportBugPage,
     ListAdmPage,
-    EditListAdmPage
+    EditListAdmPage,
+    SwitchEventPage
   ],
   imports: [
     BrowserModule,
@@ -170,7 +172,8 @@ const firebaseConfig = {
     IndicacaoPage,
     ReportBugPage,
     ListAdmPage,
-    EditListAdmPage
+    EditListAdmPage,
+    SwitchEventPage
   ],
   providers: [
     StatusBar,

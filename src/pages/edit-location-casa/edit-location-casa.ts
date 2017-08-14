@@ -2,6 +2,7 @@ import { Component, ViewChild, ElementRef } from '@angular/core';
 import { NavController, NavParams, ModalController, LoadingController, Loading, AlertController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
 import { AutocompletePage } from '../autocomplete/autocomplete';
+import { SwitchEventPage } from '../switch-event/switch-event';
 import { EventoProvider } from '../../providers/evento/evento';
 import { ErrorProvider } from '../../providers/error/error';
 import { Http } from '@angular/http';
@@ -28,6 +29,8 @@ export class EditLocationCasaPage {
 
   casa: FirebaseListObservable<any>;
 
+  url;
+
   constructor(public navCtrl: NavController, public db: AngularFireDatabase, public navParams: NavParams, public geolocation: Geolocation, private modalCtrl: ModalController, public http: Http, public event: EventoProvider, public err: ErrorProvider, public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
     this.address = {
       place: ''
@@ -52,11 +55,85 @@ export class EditLocationCasaPage {
       this.param['lat'] = this.lat;
       this.param['lng'] = this.lng;
       this.param['cidade'] = cidade;
-      this.casa.update(this.param['id'],this.param);
+
+      let index = this.param['id'].indexOf('/');
+      this.casa.update(this.param['id'].slice(index+1,this.param['id'].length),this.param);
+      for ( let i=0;i<this.param.tags.length;i++ ){
+        this.event.cadTags(this.param.tags[i].nome);
+      }
+		alert(this.param.img != 'assets/estab_default.png' && this.param.img[0] != 'h')
+      if ( this.param.img != 'assets/estab_default.png' && this.param.img[0] != 'h' ){
+        this.event.saveImgEstab(this.param['id'].slice(index+1,this.param['id'].length),this.param.img).then((savedPicture) => {
+          this.url = savedPicture.downloadURL;
+         alert(this.url); firebase.database().ref('/casas/'+firebase.auth().currentUser.uid+'/').child(this.param['id'].slice(index+1,this.param['id'].length)).child('img').set(savedPicture.downloadURL);
+        });
+      }
+      let al = this.alertCtrl.create({
+        title: 'Alterar eventos',
+        subTitle: 'Deseja aplicar essas alterações em seus eventos?',
+        buttons: [{text: 'Todos os eventos', handler: () => {
+          let casa = this.db.list('/casas/'+this.param['id']+'/eventos/');
+          casa.forEach(cas => {
+            for ( let i=0;i<cas.length;i++ ){
+              let eventos = this.db.list('/evento/');
+              eventos.update(cas[i].evento,{
+                cidade: this.param['cidade'],
+                desc: this.param['desc'],
+                faixa_fim: this.param['faixa']['upper'],
+                faixa_ini: this.param['faixa']['lower'],
+                lat: this.param['lat'],
+                lng: this.param['lng'],
+                nomeCriador: this.param['nome'],
+                tags: this.param['tags']
+              });
+              if ( this.param.img != 'assets/estab_default.png' && this.param.img[0] != 'h' ){
+                eventos.update(cas[i].evento,{img: this.url});
+              }
+            }
+            this.navCtrl.pop();
+            this.navCtrl.pop();
+            this.navCtrl.pop();
+            this.navCtrl.pop();
+          });
+        }},{text: 'Escolher eventos', handler: () => {
+          this.showEventsModal();
+        }},{text: 'Não alterar', handler: () => {
+          this.navCtrl.pop();
+          this.navCtrl.pop();
+          this.navCtrl.pop();
+          this.navCtrl.pop();
+        }}]
+      });
+      al.present();
+    });
+  }
+
+  showEventsModal(){
+    let modal = this.modalCtrl.create(SwitchEventPage, {id: this.param['id']});
+    modal.onDidDismiss(data => {
+      console.log(data);
+      for ( let i=0;i<data.sel.length;i++ ){
+        let eventos = this.db.list('/evento/');
+        eventos.update(data.sel[i],{
+          cidade: this.param['cidade'],
+          desc: this.param['desc'],
+          faixa_fim: this.param['faixa']['upper'],
+          faixa_ini: this.param['faixa']['lower'],
+          lat: this.param['lat'],
+          lng: this.param['lng'],
+          nomeCriador: this.param['nome'],
+          tags: this.param['tags']
+        });
+        if ( this.param.img != 'assets/estab_default.png' && this.param.img[0] != 'h' ){
+          eventos.update(data.sel[i],{img: this.url});
+        }
+      }
+      this.navCtrl.pop();
       this.navCtrl.pop();
       this.navCtrl.pop();
       this.navCtrl.pop();
     });
+    modal.present();
   }
 
   showAddressModal () {

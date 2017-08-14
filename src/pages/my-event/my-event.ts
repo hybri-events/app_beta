@@ -12,7 +12,6 @@ import firebase from 'firebase';
 export class MyEventPage {
   tabs: string = "pro";
   events = [];
-  eve = [];
   conf: FirebaseListObservable<any>;
   eveCasa : FirebaseListObservable<any>;
 
@@ -52,26 +51,29 @@ export class MyEventPage {
         this.eveCasa.forEach(con => {
           for (let i=0;i<con.length;i++){
             h++;
-            this.db.list("/evento/"+con[i].evento).subscribe(list => this.eve = list);
             let p = [];
-            this.eve.forEach(e => {
-              if ( e.$key == 'criador' ){
-                let casa = this.db.list('/casas/'+e.$value);
-                casa.forEach(cas => {
-                  p['casa'] = [];
-                  cas.forEach(ca => {
-                    p['casa'][ca.$key] = ca.$value;
-                  })
-                });
-              }
-              p[e.$key] = e.$value;
+            this.db.list("/evento/"+con[i].evento).subscribe(list => {
+              list.forEach(e => {
+                if ( e.$key == 'criador' ){
+                  let casa = this.db.list('/casas/'+e.$value);
+                  casa.forEach(cas => {
+                    p['casa'] = [];
+                    cas.forEach(ca => {
+                      p['casa'][ca.$key] = ca.$value;
+                    })
+                  });
+                }
+                p[e.$key] = e.$value;
+              });
             });
-            this.carregando = false;
-            let tzoffset = (new Date()).getTimezoneOffset() * 60000;
-            if ( p['dti'] > new Date(Date.now() - tzoffset).toISOString().slice(0,-1) ){
-              p['key'] = con[i].evento;
-              this.events.push(p);
-            }
+            setTimeout(() => {
+              this.carregando = false;
+              let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+              if ( p['dti'] > new Date(Date.now() - tzoffset).toISOString().slice(0,-1) ){
+                p['key'] = con[i].evento;
+                this.events.push(p);
+              }
+            },1000);
           }
         });
         if ( h == 0 ){
@@ -81,26 +83,29 @@ export class MyEventPage {
         this.eveCasa.forEach(con => {
           for (let i=0;i<con.length;i++){
             h++;
-            this.db.list("/evento/"+con[i].evento).subscribe(list => this.eve = list);
             let p = [];
-            this.eve.forEach(e => {
-              if ( e.$key == 'criador' ){
-                let casa = this.db.list('/casas/'+e.$value);
-                casa.forEach(cas => {
-                  p['casa'] = [];
-                  cas.forEach(ca => {
-                    p['casa'][ca.$key] = ca.$value;
-                  })
-                });
-              }
-              p[e.$key] = e.$value;
+            this.db.list("/evento/"+con[i].evento).subscribe(list => {
+              list.forEach(e => {
+                if ( e.$key == 'criador' ){
+                  let casa = this.db.list('/casas/'+e.$value);
+                  casa.forEach(cas => {
+                    p['casa'] = [];
+                    cas.forEach(ca => {
+                      p['casa'][ca.$key] = ca.$value;
+                    })
+                  });
+                }
+                p[e.$key] = e.$value;
+              });
             });
-            this.carregando = false;
-            let tzoffset = (new Date()).getTimezoneOffset() * 60000;
-            if ( p['dti'] <= new Date(Date.now() - tzoffset).toISOString().slice(0,-1) ){
-              p['key'] = con[i].evento;
-              this.events.push(p);
-            }
+            setTimeout(() => {
+              this.carregando = false;
+              let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+              if ( p['dti'] <= new Date(Date.now() - tzoffset).toISOString().slice(0,-1) ){
+                p['key'] = con[i].evento;
+                this.events.push(p);
+              }
+            },1000);
           }
         });
         if ( h == 0 ){
@@ -112,26 +117,29 @@ export class MyEventPage {
         this.conf.forEach(con => {
           for (let i=0;i<con.length;i++){
             h++;
-            this.db.list("/evento/"+con[i].event).subscribe(list => this.eve = list);
             let p = [];
-            this.eve.forEach(e => {
-              if ( e.$key == 'criador' ){
-                let casa = this.db.list('/casas/'+e.$value);
-                casa.forEach(cas => {
-                  p['casa'] = [];
-                  cas.forEach(ca => {
-                    p['casa'][ca.$key] = ca.$value;
-                  })
-                });
-              }
-              p[e.$key] = e.$value;
+            this.db.list("/evento/"+con[i].event).subscribe(list => {
+              list.forEach(e => {
+                if ( e.$key == 'criador' ){
+                  let casa = this.db.list('/casas/'+e.$value);
+                  casa.forEach(cas => {
+                    p['casa'] = [];
+                    cas.forEach(ca => {
+                      p['casa'][ca.$key] = ca.$value;
+                    })
+                  });
+                }
+                p[e.$key] = e.$value;
+              });
             });
-            this.carregando = false;
-            let tzoffset = (new Date()).getTimezoneOffset() * 60000;
-            if ( p['dti'] > new Date(Date.now() - tzoffset).toISOString().slice(0,-1) ){
-              p['key'] = con[i].event;
-              this.events.push(p);
-            }
+            setTimeout(() => {
+              this.carregando = false;
+              let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+              if ( p['dti'] > new Date(Date.now() - tzoffset).toISOString().slice(0,-1) ){
+                p['key'] = con[i].event;
+                this.events.push(p);
+              }
+            },1000);
           }
         });
         if ( h == 0 ){
@@ -141,26 +149,29 @@ export class MyEventPage {
         this.conf.forEach(con => {
           for (let i=0;i<con.length;i++){
             h++;
-            this.db.list("/evento/"+con[i].event).subscribe(list => this.eve = list);
             let p = [];
-            this.eve.forEach(e => {
-              if ( e.$key == 'criador' ){
-                let casa = this.db.list('/casas/'+e.$value);
-                casa.forEach(cas => {
-                  p['casa'] = [];
-                  cas.forEach(ca => {
-                    p['casa'][ca.$key] = ca.$value;
-                  })
-                });
-              }
-              p[e.$key] = e.$value;
+            this.db.list("/evento/"+con[i].event).subscribe(list => {
+              list.forEach(e => {
+                if ( e.$key == 'criador' ){
+                  let casa = this.db.list('/casas/'+e.$value);
+                  casa.forEach(cas => {
+                    p['casa'] = [];
+                    cas.forEach(ca => {
+                      p['casa'][ca.$key] = ca.$value;
+                    })
+                  });
+                }
+                p[e.$key] = e.$value;
+              });
             });
-            this.carregando = false;
-            let tzoffset = (new Date()).getTimezoneOffset() * 60000;
-            if ( p['dti'] <= new Date(Date.now() - tzoffset).toISOString().slice(0,-1) ){
-              p['key'] = con[i].event;
-              this.events.push(p);
-            }
+            setTimeout(() => {
+              this.carregando = false;
+              let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+              if ( p['dti'] <= new Date(Date.now() - tzoffset).toISOString().slice(0,-1) ){
+                p['key'] = con[i].event;
+                this.events.push(p);
+              }
+            },1000);
           }
         });
         if ( h == 0 ){

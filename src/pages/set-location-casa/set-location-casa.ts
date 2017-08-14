@@ -26,17 +26,19 @@ export class SetLocationCasaPage {
   param: any;
   public loading:Loading;
 
-  casa: FirebaseListObservable<any>;
-
   constructor(public navCtrl: NavController, public db: AngularFireDatabase, public navParams: NavParams, public geolocation: Geolocation, private modalCtrl: ModalController, public http: Http, public event: EventoProvider, public err: ErrorProvider, public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
     this.address = {
       place: ''
     };
     this.param = navParams.data;
-    this.casa = this.db.list('/casas/'+firebase.auth().currentUser.uid+'/');
   }
 
   continuar(){
+    this.loading = this.loadingCtrl.create({
+      content: "Cadastrando o estabelecimento, aguarde...",
+      dismissOnPageChange: true,
+    });
+    this.loading.present();
     var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + this.lat + "," + this.lng;
     this.http.get(url).map(res => res.json()).subscribe(data => {
       let cidade;
@@ -50,10 +52,31 @@ export class SetLocationCasaPage {
       this.param['lat'] = this.lat;
       this.param['lng'] = this.lng;
       this.param['cidade'] = cidade;
-      this.casa.push(this.param);
-      this.navCtrl.pop();
-      this.navCtrl.pop();
-      this.navCtrl.pop();
+      this.event.cadEstab(this.param).then((e) => {
+        this.db.list('/usuario/'+firebase.auth().currentUser.uid+'/estab/').push({id: firebase.auth().currentUser.uid+'/'+e.key});
+        if ( this.param['img'] != 'assets/estab_default.png' ){
+          this.event.saveImgEstab(e.key,this.param['img']);
+        }
+        for ( let i=0;i<this.param['adms'].length;i++ ){
+          this.db.list('/usuario/'+this.param['adms'][i][0]+'/estab/').push({id: firebase.auth().currentUser.uid+'/'+e.key});
+        }
+        this.loading.dismiss();
+        this.navCtrl.pop();
+        this.navCtrl.pop();
+        this.navCtrl.pop();
+      }, (error) => {
+        this.loading.dismiss().then( () => {
+          let alert = this.alertCtrl.create({
+            title: "Ocorreu um erro!",
+            message: this.err.messageError(error["code"]),
+            buttons: [{
+              text: "Ok",
+              role: 'cancel'
+            }]
+          });
+          alert.present();
+        });
+      });
     });
   }
 
