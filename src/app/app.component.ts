@@ -30,6 +30,7 @@ import { ReportBugPage } from '../pages/report-bug/report-bug';
 import { SettingsPage } from '../pages/settings/settings';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
+import { LocationAccuracy } from '@ionic-native/location-accuracy';
 
 @Component({
   templateUrl: 'app.html'
@@ -45,7 +46,7 @@ export class MyApp {
   teste: FirebaseListObservable<any>;
 
   cidades: FirebaseListObservable<any>;
-  city = null;
+  city;
   showCity = false;
   geoCity;
 
@@ -56,7 +57,6 @@ export class MyApp {
 
   isCasa = false;
   casa: FirebaseListObservable<any>;
-  acessEvents = true;
 
   faixa = {lower: 0, upper: 200}
   public loading:Loading;
@@ -75,8 +75,9 @@ export class MyApp {
     public alertCtrl: AlertController,
     public err: ErrorProvider,
     public geolocation: Geolocation,
-    public http: Http, 
-	public loadingCtrl: LoadingController
+    public http: Http,
+	  public loadingCtrl: LoadingController,
+    private locationAccuracy: LocationAccuracy
   ) {
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     let fdata = new Date(Date.now() - tzoffset);
@@ -87,42 +88,6 @@ export class MyApp {
 
     this.storage.set('dt_filtro', this.date);
     this.storage.set('faixa', this.faixa);
-
-    this.geolocation.getCurrentPosition().then((position) => {
-
-      let lat = position.coords.latitude;
-      let lng = position.coords.longitude;
-      var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng;
-      this.http.get(url).map(res => res.json()).subscribe(data => {
-        for ( let j=0;j<data.results[0].address_components.length;j++ ){
-          for ( let k=0;k<data.results[0].address_components[j].types.length;k++ ){
-            if ( data.results[0].address_components[j].types[k] == 'locality' ){
-              this.city = data.results[0].address_components[j].long_name;
-              this.geoCity = data.results[0].address_components[j].long_name;
-              this.storage.set('cidade', this.city);
-              this.cidades.forEach(cid => {
-                let j = 0;
-                cid.forEach(ci => {
-                  if ( ci.nome != this.city ){
-                    j++;
-                  }
-                });
-                if ( cid.length == j ){
-                  this.showCity = true;
-                }
-              });
-              break;
-            }
-          }
-          if ( this.city != null ){
-            break;
-          }
-        }
-      });
-
-    }, (err) => {
-      console.log(err);
-    });
 
     this.cidades = db.list('/cidades');
 
@@ -148,15 +113,13 @@ export class MyApp {
             this.storage.set('codcad', eventListSnap[0].codcad);
             this.storage.get('casa').then((val) => {
               if ( val != null ){
-                let index = val.indexOf('/');
-                if ( val.slice(0,index) != firebase.auth().currentUser.uid ){
-                  this.acessEvents = false;
-                }
                 this.casa = this.db.list("casas/"+val+"/");
                 this.casa.forEach(ca => {
                   ca.forEach(c => {
                     if ( c.$key == 'nome' ){
                       this.nomeUser = c.$value;
+                    } else if ( c.$key == 'img' ) {
+                      this.perfilPrin = c.$value;
                     }
                   });
                 });
@@ -186,9 +149,55 @@ export class MyApp {
       }
     });
     platform.ready().then(() => {
-	  //statusBar.backgroundColorByHexString('#461969');
-	  statusBar.styleDefault();
+      if ( platform.is('android') ){
+        statusBar.backgroundColorByHexString('#461969');
+      } else {
+        statusBar.backgroundColorByHexString('#FFFFFF');
+  	    statusBar.styleDefault();
+      }
       splashScreen.hide();
+
+      this.locationAccuracy.canRequest().then((canRequest: boolean) => {
+        if(canRequest) {
+          this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(null,null);
+        }
+      });
+
+      this.geolocation.getCurrentPosition().then((position) => {
+
+        let lat = position.coords.latitude;
+        let lng = position.coords.longitude;
+        var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng;
+        this.http.get(url).map(res => res.json()).subscribe(data => {
+          for ( let j=0;j<data.results[0].address_components.length;j++ ){
+            for ( let k=0;k<data.results[0].address_components[j].types.length;k++ ){
+              if ( data.results[0].address_components[j].types[k] == 'locality' ){
+                this.city = data.results[0].address_components[j].long_name;
+                this.geoCity = data.results[0].address_components[j].long_name;
+                this.storage.set('cidade', this.city);
+                this.cidades.forEach(cid => {
+                  let j = 0;
+                  cid.forEach(ci => {
+                    if ( ci.nome != this.city ){
+                      j++;
+                    }
+                  });
+                  if ( cid.length == j ){
+                    this.showCity = true;
+                  }
+                });
+                break;
+              }
+            }
+            if ( this.city != null ){
+              break;
+            }
+          }
+        });
+
+      }, (err) => {
+        console.log(err);
+      });
     });
   }
 

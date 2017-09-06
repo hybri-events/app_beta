@@ -4,7 +4,6 @@ import { EditLocationEventPage } from '../edit-location-event/edit-location-even
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { Storage } from '@ionic/storage';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
-import firebase from 'firebase';
 
 @Component({
   selector: 'page-edit-event',

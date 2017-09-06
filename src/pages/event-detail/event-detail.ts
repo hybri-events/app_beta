@@ -1,5 +1,5 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
-import { Platform, NavController, NavParams, Content, AlertController, LoadingController, Loading } from 'ionic-angular';
+import { Component, ViewChild, ElementRef, NgZone } from '@angular/core';
+import { Platform, NavController, NavParams, Content, AlertController, LoadingController, Loading, Navbar } from 'ionic-angular';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import firebase from 'firebase';
 import { ContaProvider } from '../../providers/conta/conta';
@@ -7,6 +7,7 @@ import { Geolocation } from '@ionic-native/geolocation';
 import { Storage } from '@ionic/storage';
 import { EditEventPage } from '../edit-event/edit-event';
 import { StatusBar } from '@ionic-native/status-bar';
+import { BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationResponse } from '@ionic-native/background-geolocation';
 
 declare var google;
 
@@ -18,6 +19,8 @@ export class EventDetailPage {
   id;
   event: FirebaseListObservable<any>;
   e = [];
+
+  @ViewChild(Navbar) navBar: Navbar;
 
   @ViewChild('map') mapElement: ElementRef;
   map: any;
@@ -45,8 +48,12 @@ export class EventDetailPage {
   timeout = null;
 
   loading:Loading;
-  perm;
 
+  permanencia: number = 0;
+
+  ukey = null;
+  ekey = null;
+  
   constructor(
     public platform: Platform,
     public navCtrl: NavController,
@@ -57,9 +64,12 @@ export class EventDetailPage {
     public contaData: ContaProvider,
     private storage: Storage,
     public loadingCtrl: LoadingController,
-    statusBar: StatusBar
+    private statusBar: StatusBar,
+    private backgroundGeolocation: BackgroundGeolocation,
+    private zone: NgZone
   ) {
     this.id = navParams.data.id;
+    console.log(this.id);
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     this.data = new Date(Date.now() - tzoffset).toISOString().slice(0,-1);
 
@@ -118,13 +128,20 @@ export class EventDetailPage {
         }
       });
     });
-	platform.ready().then(() => {
-	  //statusBar.backgroundColorByHexString('#461969');
-	  statusBar.styleLightContent();
+	  platform.ready().then(() => {
+      if ( platform.is('ios') ){
+        statusBar.styleLightContent();
+      }
     });
   }
 
   ngAfterViewInit() {
+    this.navBar.backButtonClick = (e:UIEvent)=>{
+      if ( this.platform.is('ios') ){
+        this.statusBar.styleDefault();
+      }
+      this.navCtrl.pop();
+    }
     this.content.ionScroll.subscribe((data) => {
       let h;
       if ( this.platform.is('ios') ){
@@ -143,7 +160,7 @@ export class EventDetailPage {
         document.getElementById('fundo').style.opacity = '1';
         document.getElementById('title').style.opacity = '1';
       }
-      if ( this.data < this.e['dti'] && !this.isCasa ){
+      if ( this.data < this.e['dti'] && !this.isCasa && this.e['coin'] ){
         if ( (data.scrollTop - 38) >= (document.getElementById('fundo').offsetHeight - h) ){
           document.getElementById('tabs').style.position = 'fixed';
           document.getElementById('list').style.paddingTop = '91px';
@@ -204,9 +221,17 @@ export class EventDetailPage {
     this.eventoConf.forEach(eve => {
       eve.forEach(c => {
         if ( c.uid == this.uid ){
+          this.ekey = c.$key;
           this.ischeck = c.check;
-          this.perm = c.perm;
+          this.permanencia = c.perm;
           this.confirm = true;
+        }
+      });
+    });
+    this.userConf.forEach(eve => {
+      eve.forEach(c => {
+        if ( c.event == this.id ){
+          this.ukey = c.$key;
         }
       });
     });
@@ -214,29 +239,13 @@ export class EventDetailPage {
 
   conf(){
     if ( this.confirm ){
-      let ekey;
-      let ukey;
-      this.eventoConf.forEach(eve => {
-        eve.forEach(c => {
-          if ( c.uid == this.uid ){
-            ekey = c.$key;
-          }
-        });
-      });
-      this.eventoConf.remove(ekey);
-      this.userConf.forEach(eve => {
-        eve.forEach(c => {
-          if ( c.event == this.id ){
-            ukey = c.$key;
-          }
-        });
-      });
-      this.userConf.remove(ukey);
+      this.eventoConf.remove(this.ekey);
+      this.userConf.remove(this.ukey);
       this.confirm = false;
     } else {
       let tzoffset = (new Date()).getTimezoneOffset() * 60000;
-      this.eventoConf.push({uid: this.uid, check: false, date: new Date(Date.now() - tzoffset).toISOString().slice(0,-1)});
-      this.userConf.push({event: this.id, check: false, criador: this.e['criador'], date: new Date(Date.now() - tzoffset).toISOString().slice(0,-1)});
+      this.eventoConf.push({uid: this.uid, perm: 0, check: false, date: new Date(Date.now() - tzoffset).toISOString().slice(0,-1)});
+      this.userConf.push({event: this.id, perm: 0, check: false, criador: this.e['criador'], date: new Date(Date.now() - tzoffset).toISOString().slice(0,-1)});
       this.confirm = true;
     }
   }
@@ -255,17 +264,24 @@ export class EventDetailPage {
     if ( !this.isAdm || this.uid == this.e['criador'].slice(0,index) ){
       if ( !this.ischeck ){
         this.loading = this.loadingCtrl.create({
-          content: "Realizando check-in. Aguarde...",
+          content: "Realizando check-in. Aguarde, isso pode levar alguns segundos...",
           dismissOnPageChange: true,
         });
         this.loading.present();
-        this.geolocation.getCurrentPosition().then((position) => {
+        this.geolocation.getCurrentPosition({enableHighAccuracy: true}).then((position) => {
           let latitude = position.coords.latitude;
           let longitude = position.coords.longitude;
           let lat = this.e['lat'];
           let lng = this.e['lng'];
 
-          if ( (latitude*-1) <= ((lat*-1)+0.0003) && (latitude*-1) >= ((lat*-1)-0.0003) && (longitude*-1) <= ((lng*-1)+0.0003) && (longitude*-1) >= ((lng*-1)-0.0003) ){
+          console.log(latitude)
+          console.log(longitude)
+          console.log(lat)
+          console.log(lng)
+
+          console.log("Accuracy: "+position.coords.accuracy)
+
+          if ( ( this.calcDist(latitude, longitude, lat, lng) - position.coords.accuracy ) <= 50 ){
             let lastCheck = null;
             this.userConf.forEach(eve => {
               eve.forEach(c => {
@@ -278,11 +294,7 @@ export class EventDetailPage {
               let d = new Date(lastCheck);
               d.setHours(d.getHours()+12);
               if ( this.data >= d.toISOString().slice(0,-1) ){
-                this.loading.dismiss();
-                if ( !this.confirm ){
-                  this.conf();
-                }
-                this.confirmCheck();
+                this.backgroundCheck();
               } else {
                 this.loading.dismiss();
                 let alert = this.alertCtrl.create({
@@ -293,11 +305,7 @@ export class EventDetailPage {
                 alert.present();
               }
             } else {
-              this.loading.dismiss();
-              if ( !this.confirm ){
-                this.conf();
-              }
-              this.confirmCheck();
+              this.backgroundCheck();
             }
           } else {
             this.loading.dismiss();
@@ -342,25 +350,169 @@ export class EventDetailPage {
     }
   }
 
+  calcDist(latitude, longitude, lat, lng){
+    let radLat1 = latitude * 0.01745;
+    let radLng1 = longitude * 0.01745;
+    let radLat2 = lat * 0.01745;
+    let radLng2 = lng * 0.01745;
+
+    let difLat = radLat1 - radLat2;
+    let difLng = radLng1 - radLng2;
+
+    let a = ( Math.pow(Math.sin(difLat/2),2) + Math.cos(radLat1) ) * Math.cos(radLat2) * Math.pow(Math.sin(difLng/2),2);
+    let c = 2 * Math.atan(Math.sqrt(a) / Math.sqrt(1 - a));
+    let d = 6371 * c;
+
+    console.log(d * 1000);
+    console.log(parseInt(''+(d * 1000))+' metros');
+
+    return parseInt(''+(d * 1000));
+  }
+
+  backgroundCheck(){
+    if ( !this.confirm ){
+      this.conf();
+    } else {
+      let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+      if ( this.permanencia == 0 ){
+        this.eventoConf.update(this.ekey,{date: new Date(Date.now() - tzoffset).toISOString().slice(0,-1)});
+        this.userConf.update(this.ukey,{date: new Date(Date.now() - tzoffset).toISOString().slice(0,-1)});
+      }
+    }
+
+    const config: BackgroundGeolocationConfig = {
+      desiredAccuracy: 0,
+      stationaryRadius: 10,
+      distanceFilter: 10,
+      debug: false,
+      notificationTitle: "Verificação de permanência",
+      notificationText: "Permaneça por, no mínimo, 1 hora neste evento",
+      notificationIconColor: "#652C90",
+      stopOnTerminate: true,
+      url: 'http://www.usevou.com/api/teste.php',
+    };
+
+    this.backgroundGeolocation.configure(config).subscribe((location: BackgroundGeolocationResponse) => {
+      console.log(location);
+      this.zone.run(() => {
+        let dt = new Date().getTime();
+        let latitude = location.latitude;
+        let longitude = location.longitude;
+        let lat = this.e['lat'];
+        let lng = this.e['lng'];
+
+        if ( ( this.calcDist(latitude, longitude, lat, lng) - location.accuracy ) <= 50 ){
+          this.loading.dismiss().then(() => {
+            let al = this.alertCtrl.create({
+              title: 'Aguarde a validação do check-in!',
+              subTitle: 'Não feche o aplicativo, apenas minimize-o e aguarde, no mínimo, 1 hora no evento. Caso o aplicativo seja fechado, faça o check-in novamente que ele continuará de onde parou.',
+              buttons: ['OK']
+            });
+            al.present();
+          });
+          let date;
+          this.eventoConf.forEach(eve => {
+            eve.forEach(c => {
+              if ( c.uid == this.uid ){
+                date = new Date(c.date).getTime();
+                this.permanencia = (dt - date);
+              }
+            });
+          });
+          this.eventoConf.update(this.ekey,{perm: (dt - date)});
+          this.userConf.update(this.ukey,{perm: (dt - date)});
+          console.log(this.ischeck)
+          if ( (dt - date) >= 3600000 && !this.ischeck ){
+            this.confirmCheck();
+          }
+        } else {
+          this.loading.dismiss().then(() => {
+            let al = this.alertCtrl.create({
+              title: 'Check-in não realizado!',
+              subTitle: 'Tente novamente mais tarde.',
+              buttons: ['OK']
+            });
+            al.present();
+          });
+          let date;
+          this.eventoConf.forEach(eve => {
+            eve.forEach(c => {
+              if ( c.uid == this.uid ){
+                date = new Date(c.date).getTime();
+              }
+            });
+          });
+          this.eventoConf.update(this.ekey,{perm: (dt - date)});
+          this.userConf.update(this.ukey,{perm: (dt - date)});
+          this.backgroundGeolocation.stop();
+          this.backgroundGeolocation.finish();
+        }
+      });
+    });
+
+    this.backgroundGeolocation.start();
+
+    /*this.bgGeo.on('location', (location, taskId) => {
+        var coords = location.coords;
+        var lat    = coords.latitude;
+        var lng    = coords.longitude;
+        console.log('- Location: ', JSON.stringify(location));
+
+        //this.bgGeo.finish(taskId);
+        //this.bgGeo.stop();
+    }, (errorCode) => {
+        console.warn('- BackgroundGeoLocation error: ', errorCode);
+    });
+
+    this.bgGeo.on('motionchange', (isMoving) => {
+      console.log('- onMotionChange: ', isMoving);
+    });
+
+    this.bgGeo.on('geofence', (geofence) => {
+      console.log('- onGeofence: ', geofence.identifier, geofence.location);
+    });
+
+    this.bgGeo.on('http', (response) => {
+      console.log('http success: ', response.responseText);
+    }, function(response) {
+      console.log('http failure: ', response.status);
+    });
+
+    this.bgGeo.configure({
+
+        desiredAccuracy: 0,
+        distanceFilter: 10,
+        stationaryRadius: 10,
+
+        activityRecognitionInterval: 10000,
+        stopTimeout: 5,
+
+        debug: true,
+        stopOnTerminate: false,
+        startOnBoot: true,
+
+        url: "http://usevou.com/api/teste.php",
+        method: "POST",
+        autoSync: true,
+        maxDaysToPersist: 3,
+        httpRootProperty: 'data',
+        locationTemplate: '{ "lat":<%= latitude %>, "lng":<%= longitude %> }',
+        extras: {
+          "auth_token": firebase.auth().currentUser.uid
+        }
+    }, (state) => {
+        console.log("BackgroundGeolocation ready: ", state);
+        if (!state.enabled) {
+            this.bgGeo.start();
+        }
+    });
+
+    this.bgGeo.start();*/
+  }
+
   confirmCheck(){
-    let ekey;
-    let ukey;
-    this.eventoConf.forEach(eve => {
-      eve.forEach(c => {
-        if ( c.uid == this.uid ){
-          ekey = c.$key;
-        }
-      });
-    });
-    this.eventoConf.update(ekey,{check: true, mode: 'button'});
-    this.userConf.forEach(eve => {
-      eve.forEach(c => {
-        if ( c.event == this.id ){
-          ukey = c.$key;
-        }
-      });
-    });
-    this.userConf.update(ukey,{check: true, mode: 'button'});
+    this.eventoConf.update(this.ekey,{check: true, mode: 'button'});
+    this.userConf.update(this.ukey,{check: true, mode: 'button'});
     if ( this.e['coin'] ){
       let cont = 0;
       this.userConf.forEach(us => {
@@ -370,13 +522,16 @@ export class EventDetailPage {
           }
         })
       });
+      console.log(cont);
       let valor = 0;
       cont -= 1;
+      console.log(cont);
       if ( cont == 0 || cont % 5 == 0 ){
         valor = 50;
       } else {
         valor = 30;
       }
+      console.log('check value')
       let tzoffset = (new Date()).getTimezoneOffset() * 60000;
       let index = this.e['criador'].indexOf('/');
       this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Check-in no evento \""+this.e['nome']+"\". "+(cont+1)+"ª vez neste estabelecimento.", valor, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
@@ -387,8 +542,8 @@ export class EventDetailPage {
           this.contaData.altSaldo(0, s[0].id, s[0].saldo, valor, this.e['criador'].slice(index+1,this.e['criador'].length));
         });
       });
+      console.log('finish')
     }
-    this.loading.dismiss();
     let alert = this.alertCtrl.create({
       title: 'Check-in realizado com sucesso!',
       subTitle: 'O check-in neste evento foi realizado com sucesso, agora vamos nos divertir.',

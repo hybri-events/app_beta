@@ -63,7 +63,13 @@
     <div class="tab_event">
       <p style="margin: 16px;font-family:Lato-Black">{{numConf}}<br>{{(numConf == 1?'CONFIRMADO':'CONFIRMADOS')}}</p>
     </div>
-    <div class="tab_event" style="width:100%;" *ngIf="periodoCheck && !isCasa">
+    <div class="tab_event" style="width:100%;" *ngIf="periodoCheck && !isCasa && e.coin">
+      <button ion-button icon-left clear full (click)="check()">
+        <ion-icon name="icon-one-check"></ion-icon>
+        GANHAR VOUS
+      </button>
+    </div>
+    <div class="tab_event" style="width:100%;" *ngIf="periodoCheck && !isCasa && !e.coin">
       <button ion-button icon-left clear full (click)="check()">
         <ion-icon name="icon-one-check"></ion-icon>
         FAZER CHECK-IN

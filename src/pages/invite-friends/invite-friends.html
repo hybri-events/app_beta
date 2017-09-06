@@ -8,6 +8,9 @@
 
 
 <ion-content padding>
-  <p padding style="text-align:center;font-size:1.2em;">Convide seus amigos para utilizar o aplicativo e peça para que eles cadastrem o código abaixo na área de códigos promocionais para que vocês ganhem Vous.</p>
-  <input type="text" value="{{cod}}" disabled>
+  <p style="text-align:center;font-size:1.2em;padding:0px 16px 16px 16px;">Convide seus amigos para utilizar o aplicativo e peça para eles utilizarem o código abaixo para ambos ganharem um bônus de V$25!</p>
+  <div class="ion-canvas" id="canvas-ion">
+      <canvas #canvas id="canvas"></canvas>
+  </div>
+  <button ion-button block style="margin-top:316px;" (click)="saveSharableImage()">Compartilhar</button>
 </ion-content>

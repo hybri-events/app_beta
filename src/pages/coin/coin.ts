@@ -397,7 +397,7 @@ export class CoinPage {
     this.txtVS -= 25;
     this.txtRS -= 1;
     this.timePay = setInterval(() => {
-    if ( this.txtVS > 25 ){
+    if ( this.txtVS >= 25 ){
       this.txtVS -= 25;
       this.txtRS -= 1;
     } else {
@@ -421,12 +421,7 @@ export class CoinPage {
         message: "Selecione um valor acima de 0 para gerar o QRCode.",
         buttons: [{
           text: "Ok",
-          handler: data => {
-            clearTimeout(this.timeout);
-            this.timeout = null;
-            this.coins = 'home';
-            this.changeTabs();
-          }
+          handler: data => {}
         }]
       });
       al.present();

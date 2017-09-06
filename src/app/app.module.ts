@@ -74,6 +74,10 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { UserDataProvider } from '../providers/user-data/user-data';
 import { PromoProvider } from '../providers/promo/promo';
 
+import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
+import { LocationAccuracy } from '@ionic-native/location-accuracy';
+import { SocialSharing } from '@ionic-native/social-sharing';
+
 const firebaseConfig = {
   apiKey: "AIzaSyDddpec8MwZts4DyXIRvR9t9kAtEU3Bgh0",
   authDomain: "api-4996752536673032512-480980.firebaseapp.com",
@@ -188,7 +192,10 @@ const firebaseConfig = {
     EventoProvider,
     Camera,
     BarcodeScanner,
-    PromoProvider
+    PromoProvider,
+    BackgroundGeolocation,
+    LocationAccuracy,
+    SocialSharing
   ]
 })
 export class AppModule {}

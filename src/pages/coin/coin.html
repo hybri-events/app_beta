@@ -69,12 +69,12 @@
       <div class="vous">
         <div class="botoes">
           <button ion-button color="primary" [disabled]="(txtVS + 24) > saldoVS" (touchstart)="aumentar()" (touchend)="parar()">+</button>
-          <button ion-button color="primary" [disabled]="txtRS == 1" (touchstart)="diminuir()" (touchend)="parar()">-</button>
+          <button ion-button color="primary" [disabled]="txtRS == 0" (touchstart)="diminuir()" (touchend)="parar()">-</button>
         </div>
         <div class="valor"><span>V$</span> {{txtVS}}</div>
       </div>
       <div class="reais"><span>R$</span> {{txtRS}}</div>
-      <button ion-button block color="primary" (click)="genQRCode()">Gerar QRCode</button>
+      <button ion-button block color="primary" (click)="genQRCode()">Gerar pagamento</button>
     </div>
     <div *ngSwitchCase="'receive'">
       <ion-list class="receive">

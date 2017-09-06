@@ -61,11 +61,10 @@ export class EditLocationCasaPage {
       for ( let i=0;i<this.param.tags.length;i++ ){
         this.event.cadTags(this.param.tags[i].nome);
       }
-		alert(this.param.img != 'assets/estab_default.png' && this.param.img[0] != 'h')
       if ( this.param.img != 'assets/estab_default.png' && this.param.img[0] != 'h' ){
         this.event.saveImgEstab(this.param['id'].slice(index+1,this.param['id'].length),this.param.img).then((savedPicture) => {
           this.url = savedPicture.downloadURL;
-         alert(this.url); firebase.database().ref('/casas/'+firebase.auth().currentUser.uid+'/').child(this.param['id'].slice(index+1,this.param['id'].length)).child('img').set(savedPicture.downloadURL);
+          firebase.database().ref('/casas/'+firebase.auth().currentUser.uid+'/').child(this.param['id'].slice(index+1,this.param['id'].length)).child('img').set(savedPicture.downloadURL);
         });
       }
       let al = this.alertCtrl.create({

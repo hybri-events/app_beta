@@ -111,8 +111,13 @@ export class EventsPage {
     this.eve = [];
     this.carregando = true;
     this.storage.get('cidade').then((val) => {
-      this.stCity = val;
-      this.cidade = val;
+      if ( val == null ){
+        this.stCity = "Jaraguá do Sul";
+        this.cidade = "Jaraguá do Sul";
+      } else {
+        this.stCity = val;
+        this.cidade = val;
+      }
       this.cidades.forEach(cid => {
         let j = 0;
         cid.forEach(ci => {
@@ -156,7 +161,19 @@ export class EventsPage {
               h++;
               ev.forEach(e => {
                 let ok = false;
-                if ( e.faixa_ini >= parseInt(""+this.stFaixa.lower) && e.faixa_fim <= parseInt(""+this.stFaixa.upper) ){
+                if ( parseInt(""+this.stFaixa.upper) == 200 && e.faixa_ini >= parseInt(""+this.stFaixa.lower) ){
+                  if ( this.stTag != null ){
+                    if ( e.tags != undefined ){
+                      for ( let j=0;j<e.tags.length;j++ ){
+                        if ( e.tags[j].nome == this.stTag ){
+                          ok = true;
+                        }
+                      }
+                    }
+                  } else {
+                    ok = true;
+                  }
+                } else if ( e.faixa_ini >= parseInt(""+this.stFaixa.lower) && e.faixa_fim <= parseInt(""+this.stFaixa.upper) ){
                   if ( this.stTag != null ){
                     if ( e.tags != undefined ){
                       for ( let j=0;j<e.tags.length;j++ ){
@@ -169,6 +186,7 @@ export class EventsPage {
                     ok = true;
                   }
                 }
+
                 this.carregando = false;
                 if ( ok ){
                   let casa = this.db.list('/casas/'+e.criador);
@@ -201,7 +219,7 @@ export class EventsPage {
 
   loadMap(){
 
-    this.geolocation.getCurrentPosition().then((position) => {
+    this.geolocation.getCurrentPosition({enableHighAccuracy: true}).then((position) => {
 
       this.lat = position.coords.latitude;
       this.lng = position.coords.longitude;
@@ -473,7 +491,7 @@ export class EventsPage {
         dismissOnPageChange: true,
       });
       this.loading.present();
-      this.geolocation.getCurrentPosition().then((position) => {
+      this.geolocation.getCurrentPosition({enableHighAccuracy: true}).then((position) => {
         let latitude = position.coords.latitude;
         let longitude = position.coords.longitude;
         let lat = this.e['lat'];

@@ -67,7 +67,7 @@ export class SetLocationEventPage {
             let casa = this.db.list('/casas/'+this.keyCasa+'/eventos');
             casa.push({evento:cidade+'/'+e.key,dt:this.param[0]['dt_ini']});
             if ( this.param[0].img != 'assets/event_default.png' ){
-              this.event.saveImg(e.key,this.param[0].img);
+              this.event.saveImg(cidade+'/'+e.key,this.param[0].img);
             }
             this.loading.dismiss();
             this.navCtrl.pop();

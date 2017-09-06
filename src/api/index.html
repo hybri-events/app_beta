@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase-database.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyDddpec8MwZts4DyXIRvR9t9kAtEU3Bgh0",
+        authDomain: "api-4996752536673032512-480980.firebaseapp.com",
+        databaseURL: "https://api-4996752536673032512-480980.firebaseio.com",
+        projectId: "api-4996752536673032512-480980",
+        storageBucket: "api-4996752536673032512-480980.appspot.com",
+        messagingSenderId: "941134234980"
+      };
+      firebase.initializeApp(config);
+      firebase.auth().signInAnonymously();
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          firebase.database().ref().child('/teste/').push({'teste':'teste'})
+        }
+      });
+    </script>
+  </body>
+</html>

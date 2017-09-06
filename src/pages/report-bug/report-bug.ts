@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { NavController, NavParams, AlertController } from 'ionic-angular';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import firebase from 'firebase';
 
 @Component({
   selector: 'page-report-bug',
@@ -20,7 +21,7 @@ export class ReportBugPage {
   }
 
   reportBug() {
-    this.report.push({area: this.area, desc: this.descricao, data: new Date().toISOString().slice(0,-1)})
+    this.report.push({area: this.area, desc: this.descricao, data: new Date().toISOString().slice(0,-1), uid: firebase.auth().currentUser.uid})
     let alert = this.alertCtrl.create({
       title: "Obrigado pela reportação!",
       message: "Esse bug será analisado e corrigido o mais rápido possível.",
