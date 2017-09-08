@@ -18,7 +18,8 @@ page-agenda {
   .cont{
     font-size: 5em;
     line-height: 1em;
-    font-family: Lato-Black;
+    font-family: 'Lato', sans-serif;
+    font-weight: 900;
   }
   .ano{
     font-size: 2.9em;
@@ -45,7 +46,8 @@ page-agenda {
     background-color: #652C90;
   }
   .sel{
-    font-family: Lato-Black;
+    font-family: 'Lato', sans-serif;
+    font-weight: 900;
     color: #652C90;
   }
 }

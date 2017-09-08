@@ -408,37 +408,39 @@ export class EventsPage {
       prompt : "Posicione o QRCode na área marcada.",
     }
     this.barcodeScanner.scan(options).then((barcodeData) => {
-      this.dataQRC = barcodeData.text;
-      let tzoffset = (new Date()).getTimezoneOffset() * 60000;
-      let day1 = new Date(Date.now() - tzoffset);
-      let day2 = new Date(Date.now() - tzoffset);
-      day1.setHours(day1.getHours()-12);
-      let eventos = this.db.list('casas/'+this.dataQRC+'/eventos', {
-        query: {
-          orderByChild: 'dt',
-          startAt: day1.toISOString().slice(0,-1),
-          endAt: day2.toISOString().slice(0,-1)
-        }
-      });
-      eventos.forEach(evento => {
-        let currentDt = null;
-        for(let i=0;i<evento.length;i++){
-          if ( currentDt == null || currentDt < evento[i].dt ){
-            currentDt = evento[i].dt;
-            this.id = evento[i].evento;
+      if (!barcodeData.cancelled){
+        this.dataQRC = barcodeData.text;
+        let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+        let day1 = new Date(Date.now() - tzoffset);
+        let day2 = new Date(Date.now() - tzoffset);
+        day1.setHours(day1.getHours()-12);
+        let eventos = this.db.list('casas/'+this.dataQRC+'/eventos', {
+          query: {
+            orderByChild: 'dt',
+            startAt: day1.toISOString().slice(0,-1),
+            endAt: day2.toISOString().slice(0,-1)
           }
-        }
-        this.eventoConf = this.db.list('/evento/'+this.id+'/confirmados/');
-        this.userConf = this.db.list('/usuario/'+firebase.auth().currentUser.uid+'/confirmados/');
-        this.checkConf();
-        let eve = this.db.list('evento/'+this.id);
-        eve.forEach(even => {
-          even.forEach(ev => {
-            this.e[ev.$key] = ev.$value;
-          });
         });
-        this.check();
-      });
+        eventos.forEach(evento => {
+          let currentDt = null;
+          for(let i=0;i<evento.length;i++){
+            if ( currentDt == null || currentDt < evento[i].dt ){
+              currentDt = evento[i].dt;
+              this.id = evento[i].evento;
+            }
+          }
+          this.eventoConf = this.db.list('/evento/'+this.id+'/confirmados/');
+          this.userConf = this.db.list('/usuario/'+firebase.auth().currentUser.uid+'/confirmados/');
+          this.checkConf();
+          let eve = this.db.list('evento/'+this.id);
+          eve.forEach(even => {
+            even.forEach(ev => {
+              this.e[ev.$key] = ev.$value;
+            });
+          });
+          this.check();
+        });
+      }
     }, (err) => {
       alert("Error occured : " + err);
     });

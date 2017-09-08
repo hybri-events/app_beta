@@ -14,11 +14,11 @@
   .fundo_card .bottom_list .top .block{float:left;margin-left:10px;width:8px;height:8px;background-color:#652C90;}
   .fundo_card .bottom_list .top .block:last-child{float:left;margin-left:44px;}
   .fundo_card .bottom_list .date_list{float:left;background-color:#652C90;border-radius:5px;width:80px;}
-  .fundo_card .bottom_list .date_list .mes_list{float:left;font-size:1.2em;width:100%;text-align:center;font-family:Lato-Medium;line-height:1em;padding:6px;}
-  .fundo_card .bottom_list .date_list .dia_list{float:left;clear:both;width:calc(100% - 16px);text-align:center;font-size:2.3em;line-height:1em;font-family:Lato-Black;margin-left:8px;margin-right:8px;padding:6px;border-radius:5px;background-color:white;color:#652C90;}
+  .fundo_card .bottom_list .date_list .mes_list{float:left;font-size:1.2em;width:100%;text-align:center;font-family:'Lato', sans-serif;font-weight:400;line-height:1em;padding:6px;}
+  .fundo_card .bottom_list .date_list .dia_list{float:left;clear:both;width:calc(100% - 16px);text-align:center;font-size:2.3em;line-height:1em;font-family:'Lato', sans-serif;font-weight:900;margin-left:8px;margin-right:8px;padding:6px;border-radius:5px;background-color:white;color:#652C90;}
   .fundo_card .bottom_list .date_list .hr_list{float:left;clear:both;width:100%;text-align:center;line-height:1em;padding:6px;}
   .fundo_card .bottom_list .present_list{display:table-cell;vertical-align:middle;width:calc(100% - 96px);padding-left:16px;}
-  .fundo_card .bottom_list .present_list .name_event{float:left;font-size:1.7em;line-height:1.2em;font-family:Lato-Medium;}
+  .fundo_card .bottom_list .present_list .name_event{float:left;font-size:1.7em;line-height:1.2em;font-family:'Lato', sans-serif;font-weight:400;}
   .fundo_card .bottom_list .present_list .name_create{float:left;clear:both;font-size:1.2em;line-height:1.5em;}
   .fundo_card .bottom_list .present_list .name_locale{float:left;clear:both;font-size:1em;line-height:1.5em;}
   .coin{border: 3px solid #C58E30}
@@ -43,11 +43,11 @@
   .fundo_card .bottom_list .top .block{float:left;margin-left:8px;width:4px;height:4px;background-color:#652C90;}
   .fundo_card .bottom_list .top .block:last-child{float:left;margin-left:26px;}
   .fundo_card .bottom_list .date_list{float:left;background-color:#652C90;border-radius:5px;width:50px;}
-  .fundo_card .bottom_list .date_list .mes_list{float:left;font-size:1.1em;width:100%;text-align:center;font-family:Lato-Medium;line-height:1em;padding:4px;}
-  .fundo_card .bottom_list .date_list .dia_list{float:left;clear:both;width:calc(100% - 8px);text-align:center;font-size:1.8em;line-height:1em;font-family:Lato-Black;margin-left:4px;margin-right:4px;padding:3px;border-radius:5px;background-color:white;color:#652C90;}
+  .fundo_card .bottom_list .date_list .mes_list{float:left;font-size:1.1em;width:100%;text-align:center;font-family:'Lato', sans-serif;font-weight:400;line-height:1em;padding:4px;}
+  .fundo_card .bottom_list .date_list .dia_list{float:left;clear:both;width:calc(100% - 8px);text-align:center;font-size:1.8em;line-height:1em;font-family:'Lato', sans-serif;font-weight:900;margin-left:4px;margin-right:4px;padding:3px;border-radius:5px;background-color:white;color:#652C90;}
   .fundo_card .bottom_list .date_list .hr_list{float:left;clear:both;width:100%;text-align:center;line-height:1em;padding:4px;}
   .fundo_card .bottom_list .present_list{display:table-cell;vertical-align:middle;width:calc(100% - 66px);padding-left:16px;}
-  .fundo_card .bottom_list .present_list .name_event{float:left;font-size:1.5em;line-height:1.2em;font-family:Lato-Medium;}
+  .fundo_card .bottom_list .present_list .name_event{float:left;font-size:1.5em;line-height:1.2em;font-family:'Lato', sans-serif;font-weight:400;}
   .fundo_card .bottom_list .present_list .name_create{float:left;clear:both;font-size:1em;line-height:1.5em;}
   .fundo_card .bottom_list .present_list .name_locale{float:left;clear:both;font-size:1em;line-height:1.5em;}
   .coin{border: 3px solid #C58E30}

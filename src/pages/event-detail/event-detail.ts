@@ -7,7 +7,7 @@ import { Geolocation } from '@ionic-native/geolocation';
 import { Storage } from '@ionic/storage';
 import { EditEventPage } from '../edit-event/edit-event';
 import { StatusBar } from '@ionic-native/status-bar';
-import { BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationResponse } from '@ionic-native/background-geolocation';
+//import { BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationResponse } from '@ionic-native/background-geolocation';
 
 declare var google;
 
@@ -53,7 +53,7 @@ export class EventDetailPage {
 
   ukey = null;
   ekey = null;
-  
+
   constructor(
     public platform: Platform,
     public navCtrl: NavController,
@@ -65,7 +65,7 @@ export class EventDetailPage {
     private storage: Storage,
     public loadingCtrl: LoadingController,
     private statusBar: StatusBar,
-    private backgroundGeolocation: BackgroundGeolocation,
+    /*private backgroundGeolocation: BackgroundGeolocation,*/
     private zone: NgZone
   ) {
     this.id = navParams.data.id;
@@ -148,6 +148,15 @@ export class EventDetailPage {
         h = 44;
       } else {
         h = 56;
+        if ( this.data < this.e['dti'] && !this.isCasa && this.e['coin'] ){
+          if ( (data.scrollTop - 38) >= (document.getElementById('fundo').offsetHeight - h) ){
+            document.getElementById('tabs').style.position = 'fixed';
+            document.getElementById('list').style.paddingTop = '91px';
+          } else {
+            document.getElementById('tabs').style.position = 'initial';
+            document.getElementById('list').style.paddingTop = '8px';
+          }
+        }
       }
       if ( data.scrollTop < (document.getElementById('fundo').offsetHeight - h)  ){
         document.getElementById('fundo').style.opacity = ''+(1 - (data.scrollTop / (document.getElementById('fundo').offsetHeight - h)));
@@ -159,15 +168,6 @@ export class EventDetailPage {
         document.getElementById('tool').classList.add('header_af');
         document.getElementById('fundo').style.opacity = '1';
         document.getElementById('title').style.opacity = '1';
-      }
-      if ( this.data < this.e['dti'] && !this.isCasa && this.e['coin'] ){
-        if ( (data.scrollTop - 38) >= (document.getElementById('fundo').offsetHeight - h) ){
-          document.getElementById('tabs').style.position = 'fixed';
-          document.getElementById('list').style.paddingTop = '91px';
-        } else {
-          document.getElementById('tabs').style.position = 'initial';
-          document.getElementById('list').style.paddingTop = '8px';
-        }
       }
     });
     this.checkConf();
@@ -274,13 +274,6 @@ export class EventDetailPage {
           let lat = this.e['lat'];
           let lng = this.e['lng'];
 
-          console.log(latitude)
-          console.log(longitude)
-          console.log(lat)
-          console.log(lng)
-
-          console.log("Accuracy: "+position.coords.accuracy)
-
           if ( ( this.calcDist(latitude, longitude, lat, lng) - position.coords.accuracy ) <= 50 ){
             let lastCheck = null;
             this.userConf.forEach(eve => {
@@ -292,14 +285,16 @@ export class EventDetailPage {
             });
             if ( lastCheck != null ){
               let d = new Date(lastCheck);
-              d.setHours(d.getHours()+12);
+              d.setHours(d.getHours()+1);
+              console.log(d.toISOString().slice(0,-1))
+              console.log(this.data)
               if ( this.data >= d.toISOString().slice(0,-1) ){
                 this.backgroundCheck();
               } else {
                 this.loading.dismiss();
                 let alert = this.alertCtrl.create({
                   title: 'Você já realizou um check-in antes!',
-                  subTitle: 'Você já fez outro check-in nas últimas 12 horas.',
+                  subTitle: 'Aguarde um período de 1 hora pra fazer um novo check-in.',
                   buttons: ['OK']
                 });
                 alert.present();
@@ -380,7 +375,11 @@ export class EventDetailPage {
       }
     }
 
-    const config: BackgroundGeolocationConfig = {
+    this.loading.dismiss();
+
+    this.confirmCheck();
+
+    /*const config: BackgroundGeolocationConfig = {
       desiredAccuracy: 0,
       stationaryRadius: 10,
       distanceFilter: 10,
@@ -450,7 +449,7 @@ export class EventDetailPage {
       });
     });
 
-    this.backgroundGeolocation.start();
+    this.backgroundGeolocation.start();*/
 
     /*this.bgGeo.on('location', (location, taskId) => {
         var coords = location.coords;

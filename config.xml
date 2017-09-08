@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.usevou.vou" version="1.17.20" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:gap="http://phonegap.com/ns/1.0">
+<widget id="com.usevou.vou" version="1.18.22" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:gap="http://phonegap.com/ns/1.0">
     <name>Vou</name>
     <description>An awesome Ionic/Cordova app.</description>
     <author email="gustavo@usevou.com" href="http://usevou.com/">Gustavo Oldenburg</author>
@@ -81,6 +81,7 @@
     </platform>
     <allow-navigation href="http://192.168.56.1:8101" />
     <engine name="android" spec="^6.2.3" />
+    <engine name="ios" spec="^4.4.0" />
     <plugin name="cordova-background-geolocation-lt" spec="^2.8.3">
         <variable name="LICENSE" value="YOUR_LICENSE_KEY" />
         <variable name="BACKGROUND_MODE_LOCATION" value="&lt;string&gt;location&lt;/string&gt;" />
@@ -112,8 +113,13 @@
     <plugin name="cordova-sqlite-storage" spec="^2.0.4" />
     <plugin name="es6-promise-plugin" spec="^4.1.0" />
     <plugin name="ionic-plugin-keyboard" spec="^2.2.1" />
-    <plugin name="phonegap-plugin-barcodescanner" spec="^6.0.6">
-        <variable name="CAMERA_USAGE_DESCRIPTION" value="Esse aplicativo usará sua câmera" />
+    <plugin name="cordova-plugin-googlemaps" spec="https://github.com/mapsplugin/cordova-plugin-googlemaps#multiple_maps">
+        <variable name="API_KEY_FOR_ANDROID" value="AIzaSyCDS1iQAUYcxOPKpEFEvQG3vb0L2IcnQSI" />
+        <variable name="API_KEY_FOR_IOS" value="AIzaSyCDS1iQAUYcxOPKpEFEvQG3vb0L2IcnQSI" />
+        <variable name="LOCATION_WHEN_IN_USE_DESCRIPTION" value="Show your location on the map" />
+        <variable name="LOCATION_ALWAYS_USAGE_DESCRIPTION" value="Trace your location on the map" />
     </plugin>
-    <engine name="ios" spec="~4.4.0" />
+    <plugin name="phonegap-plugin-barcodescanner" spec="~6.0.8">
+        <variable name="CAMERA_USAGE_DESCRIPTION" value="Scan QR-Codes" />
+    </plugin>
 </widget>

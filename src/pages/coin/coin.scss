@@ -13,7 +13,8 @@ page-coin {
   .vs_saldo{
     width:100%;
     text-align: center;
-    font-family: Lato-Black;
+    font-family: 'Lato', sans-serif;
+    font-weight: 900;
     color: #652C90;
     font-size: 3.5em;
     line-height: 1.8em;
@@ -22,17 +23,20 @@ page-coin {
     color: #1B97C6;
   }
   .vs_saldo b{
-    font-family: Lato-Black;
+    font-family: 'Lato', sans-serif;
+    font-weight: 900;
   }
   .rs_saldo{
     width:100%;
     text-align: center;
-    font-family: Lato-Medium;
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
     color: #666666;
     font-size: 1.3em;
   }
   .rs_saldo span{
-    font-family: Lato-Medium;
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
   }
   .switch_date{
     margin-top: 16px;
@@ -56,7 +60,8 @@ page-coin {
   .entrada{color:green;}
   .saida{color:red;}
   .desc_ex{
-    font-family: Lato-Medium;
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
     margin-top: 8px;
     margin-bottom: 8px;
     white-space: normal;
@@ -70,7 +75,8 @@ page-coin {
     vertical-align: middle;
     font-size: 1.3em;
     padding-left: 32px;
-    font-family: Lato-Black;
+    font-family: 'Lato', sans-serif;
+    font-weight: 900;
     text-align: right;
   }
 
@@ -114,12 +120,14 @@ page-coin {
     float: left;
     font-size: 3em;
     line-height: 1.7em;
-    font-family: Lato-Black;
+    font-family: 'Lato', sans-serif;
+    font-weight: 900;
     color: #652C90;
     width: calc(100% - 40px);
   }
   .vous .valor span {
-    font-family: Lato-Medium;
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
     color: #1B97C6;
   }
   .reais {
@@ -128,7 +136,8 @@ page-coin {
     margin-bottom: 32px;
     margin-left: 72px;
     width: calc(100% - 104px);
-    font-family: Lato-Medium;
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
     color: #666666;
   }
 
@@ -152,7 +161,8 @@ page-coin {
   }
   .receive ion-input{
     font-size: 1.2em;
-    font-family: Lato-Medium;
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
     margin-bottom: 8px;
   }
   .receive .text-input[disabled]{

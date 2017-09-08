@@ -104,7 +104,7 @@
   </div>
   <div class="fundo" padding *ngIf="!this.authentic">
     <div class="breve">
-      <div class="txt_breve" style="font-family:Lato-Medium">
+      <div class="txt_breve" style="font-family:'Lato', sans-serif;font-weight: 400;">
         Você precisa estar logado para ter acesso à essa área.<br><br>
         <button ion-button full (click)="openButtonPage(0)">Cadastrar</button>
         <button ion-button full (click)="openButtonPage(1)">Entrar</button>
@@ -113,7 +113,7 @@
   </div>
   <div class="fundo" padding *ngIf="isCasa && !coinCasa">
     <div class="breve">
-      <div class="txt_breve" style="font-family:Lato-Medium">
+      <div class="txt_breve" style="font-family:'Lato', sans-serif;font-weight: 400;">
         Você ainda não tem nosso serviço de distribuição de Vous? Não fique para trás e solicite abaixo.<br><br>
         <button ion-button full (click)="solicitarCoins()">Solicitar distribuição de Vous</button>
       </div>

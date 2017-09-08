@@ -70,10 +70,10 @@ export class InviteFriendsPage {
     this._CONTEXT.fillRect(0, 0, this.width, 600);
     this._CONTEXT.fillStyle = "white";
     this._CONTEXT.textAlign = "center";
-    this._CONTEXT.font = "40px Lato-Medium";
+    this._CONTEXT.font = "400 40px Lato";
     this._CONTEXT.fillText("Use meu código promocional", this._CANVAS.width/2, 96);
     this._CONTEXT.fillText("para ganhar V$25 😉", this._CANVAS.width/2, 148);
-    this._CONTEXT.font = "100px Lato-Light";
+    this._CONTEXT.font = "300 100px Lato";
     this._CONTEXT.fillText(this.cod, this._CANVAS.width/2, (this._CANVAS.height+100)/2);
     this._CONTEXT.strokeStyle = '#FFFFFF';
     this.roundRect(this._CONTEXT,this._CANVAS.width/2-225,(this._CANVAS.height-105)/2,450,132,20,false,true)
