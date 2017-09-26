@@ -1,6 +1,16 @@
-<ion-tabs>
+<button ion-button icon-only id="button-qrcode" *ngIf="!isCasa" (click)="readQRC()"><ion-icon name="icon-check-qrcode"></ion-icon></button>
+<div id="fundo_tabs" *ngIf="!checkqrc">
+  <div class="prin">
+    <h2>Agora ficou mais fácil de fazer seu check-in!</h2>
+    <h4>Basta utilizar o novo botão abaixo, ler o QR-code nos cartazes espalhados nos estabelecimentos e pronto, seu check-in está feito! 😉</h4>
+    <button ion-button (click)="closeCheckqrc()">Entendi</button>
+  </div>
+  <img src="assets/seta_qrcode.png">
+</div>
+<ion-tabs [attr.id]="!checkqrc ? 'cont' : ''">
   <ion-tab [root]="tab1Root" tabTitle="Eventos" tabIcon="icon-events"></ion-tab>
   <!--<ion-tab [root]="tab2Root" tabTitle="Feed" tabIcon="icon-feed"></ion-tab>-->
+  <ion-tab [root]="" tabTitle=" " tabIcon="icon-feed"></ion-tab>
   <ion-tab [root]="tab3Root" tabTitle="Vous" tabIcon="icon-coin"></ion-tab>
-  <!--<ion-tab [root]="tab4Root" tabTitle="Notificações" tabIcon="icon-notifications"></ion-tab>-->
+  <!--<ion-tab [root]="tab4Root" tabTitle="Notificação" tabIcon="icon-notifications"></ion-tab>-->
 </ion-tabs>

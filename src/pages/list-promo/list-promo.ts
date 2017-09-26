@@ -3,6 +3,7 @@ import { NavController, NavParams, AlertController } from 'ionic-angular';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import firebase from 'firebase/app';
 import { CodCadastroPage } from '../cod-cadastro/cod-cadastro';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-list-promo',
@@ -15,7 +16,14 @@ export class ListPromoPage {
 
   show = [];
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public db: AngularFireDatabase, public alertCtrl: AlertController) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public db: AngularFireDatabase,
+    public alertCtrl: AlertController,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Escolher promoção");
     this.codigos = db.list('/usuario/'+firebase.auth().currentUser.uid+'/codigos/');
     this.ativas = db.list('/promocoes/ativas/');
     this.ativas.forEach(at => {

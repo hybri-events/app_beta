@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Platform, NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { SetLocationCasaPage } from '../set-location-casa/set-location-casa';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-list-adm',
@@ -16,7 +17,14 @@ export class ListAdmPage {
   param;
   pular = true;
 
-  constructor(public platform: Platform, public navCtrl: NavController, public navParams: NavParams, public db: AngularFireDatabase) {
+  constructor(
+    public platform: Platform,
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public db: AngularFireDatabase,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Adicionar administradores do estabelecimento");
     this.usuarios = db.list('/usuario/');
     this.updateSearch();
     setTimeout(() => {
@@ -37,7 +45,7 @@ export class ListAdmPage {
       usuario.forEach(usu => {
         let user = this.db.list('/usuario/'+usu.$key)
         user.forEach(us => {
-          if ( us[0].nome.toLowerCase().indexOf(this.search.toLowerCase()) > -1 ){
+          if ( (""+us[0].nome).toLowerCase().indexOf(this.search.toLowerCase()) > -1 ){
             this.users.push([us[0].nome,us[0].ft_perfil,usu.$key])
           }
         });

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import firebase from 'firebase';
 import { Storage } from '@ionic/storage';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-qr-code',
@@ -16,8 +17,13 @@ export class QrCodePage {
   time = new Date().getTime();
   json;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage) {
-
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    private storage: Storage,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Gerou QR-Code para pagamento");
   }
 
   ionViewDidLoad() {

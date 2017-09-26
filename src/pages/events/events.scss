@@ -67,34 +67,34 @@
   }
 
   .icon-coin:before {
-    content: '\e932';
+    content: '\e92b';
   }
   .icon-fumante:before {
-    content: "\e939";
+    content: "\e916";
   }
   .icon-wifi:before {
-    content: "\e938";
+    content: "\e900";
   }
   .icon-comida:before {
-    content: '\e93b';
+    content: '\e92a';
   }
   .icon-bar:before {
-    content: '\e93d';
+    content: '\e931';
   }
   .icon-cartao:before {
-    content: "\e93a";
+    content: "\e92d";
   }
   .icon-dinheiro:before {
-    content: '\e93c';
+    content: '\e924';
   }
   .icon-vous:before {
-    content: "\e93e";
+    content: "\e902";
   }
   .icon-estacionamento:before {
-    content: "\e940";
+    content: "\e921";
   }
   .icon-acessibilidade:before {
-    content: "\e93f";
+    content: "\e935";
   }
 }
 
@@ -117,12 +117,12 @@
 
       .content-md .map {
         width: 100%;
-        height: calc(100% - 60px);
+        height: 100%;
       }
 
       .content-ios .map {
         width: 100%;
-        height: calc(100% - 68px);
+        height: 100%;
       }
 
       .gm-style-iw {

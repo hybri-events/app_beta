@@ -40,11 +40,11 @@
       </div>
       <ion-item class="switch_date">
         <ion-label floating color="primary">De:</ion-label>
-        <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="date2"></ion-datetime>
+        <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="date2" (ionChange)="changeDate()"></ion-datetime>
       </ion-item>
       <ion-item class="switch_date">
         <ion-label floating color="primary">Até:</ion-label>
-        <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="date1"></ion-datetime>
+        <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="date1" (ionChange)="changeDate()"></ion-datetime>
       </ion-item>
       <ion-list *ngIf="(transacoes | async)?.length > 0">
         <ion-item *ngFor="let transacao of transacoes | async">

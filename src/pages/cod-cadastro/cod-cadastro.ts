@@ -4,6 +4,7 @@ import { ContaProvider } from '../../providers/conta/conta';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import firebase from 'firebase';
 import { Storage } from '@ionic/storage';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-cod-cadastro',
@@ -23,7 +24,16 @@ export class CodCadastroPage {
   p = [];
   u = [];
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, public alertCtrl: AlertController, public db: AngularFireDatabase, public contaData: ContaProvider) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    private storage: Storage,
+    public alertCtrl: AlertController,
+    public db: AngularFireDatabase,
+    public contaData: ContaProvider,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Cadastro de código promocional",{"cod":navParams.data.id});
     if ( navParams.data.id == 'convite' ){
       this.promo = this.db.list('/promocoes/'+navParams.data.id+'/');
     } else {

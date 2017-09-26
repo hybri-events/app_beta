@@ -9,6 +9,7 @@ import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 import firebase from 'firebase';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 declare var google;
 
@@ -31,7 +32,20 @@ export class EditLocationCasaPage {
 
   url;
 
-  constructor(public navCtrl: NavController, public db: AngularFireDatabase, public navParams: NavParams, public geolocation: Geolocation, private modalCtrl: ModalController, public http: Http, public event: EventoProvider, public err: ErrorProvider, public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
+  constructor(
+    public navCtrl: NavController,
+    public db: AngularFireDatabase,
+    public navParams: NavParams,
+    public geolocation: Geolocation,
+    private modalCtrl: ModalController,
+    public http: Http,
+    public event: EventoProvider,
+    public err: ErrorProvider,
+    public alertCtrl: AlertController,
+    public loadingCtrl: LoadingController,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Editar localização do estabelecimento");
     this.address = {
       place: ''
     };

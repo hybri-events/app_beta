@@ -8,6 +8,10 @@ import { Storage } from '@ionic/storage';
 import { EditEventPage } from '../edit-event/edit-event';
 import { StatusBar } from '@ionic-native/status-bar';
 //import { BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationResponse } from '@ionic-native/background-geolocation';
+import { Http } from '@angular/http';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/toPromise';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 declare var google;
 
@@ -66,9 +70,12 @@ export class EventDetailPage {
     public loadingCtrl: LoadingController,
     private statusBar: StatusBar,
     /*private backgroundGeolocation: BackgroundGeolocation,*/
-    private zone: NgZone
+    private zone: NgZone,
+    public http: Http,
+    private mixpanel: Mixpanel
   ) {
     this.id = navParams.data.id;
+    this.mixpanel.track("Detalhe do evento",{"id":this.id});
     console.log(this.id);
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     this.data = new Date(Date.now() - tzoffset).toISOString().slice(0,-1);
@@ -242,15 +249,18 @@ export class EventDetailPage {
       this.eventoConf.remove(this.ekey);
       this.userConf.remove(this.ukey);
       this.confirm = false;
+      this.mixpanel.track("Cancelou presença");
     } else {
       let tzoffset = (new Date()).getTimezoneOffset() * 60000;
       this.eventoConf.push({uid: this.uid, perm: 0, check: false, date: new Date(Date.now() - tzoffset).toISOString().slice(0,-1)});
       this.userConf.push({event: this.id, perm: 0, check: false, criador: this.e['criador'], date: new Date(Date.now() - tzoffset).toISOString().slice(0,-1)});
       this.confirm = true;
+      this.mixpanel.track("Confirmou presença");
     }
   }
 
   check(){
+    this.mixpanel.track("Iniciou check-in");
     let adms = this.db.list('casas/'+this.e['criador']+'/adms/');
     adms.forEach(adm => {
       for ( let i=0;i<adm.length;i++ ){
@@ -298,6 +308,7 @@ export class EventDetailPage {
                   buttons: ['OK']
                 });
                 alert.present();
+                this.mixpanel.track("Check-in não realizado",{"motivo":"Já fez check-in em menos de uma hora"});
               }
             } else {
               this.backgroundCheck();
@@ -310,6 +321,7 @@ export class EventDetailPage {
               buttons: ['OK']
             });
             alert.present();
+            this.mixpanel.track("Check-in não realizado",{"motivo":"Não está próximo o suficiente"});
           }
         }, (err) => {
           this.loading.dismiss();
@@ -322,26 +334,16 @@ export class EventDetailPage {
           buttons: ['OK']
         });
         alert.present();
+        this.mixpanel.track("Check-in não realizado",{"motivo":"Já fez check-in neste evento"});
       }
     } else {
-      if ( this.e['coin'] ){
-        let tzoffset = (new Date()).getTimezoneOffset() * 60000;
-        let index = this.e['criador'].indexOf('/');
-        this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Check-in no evento \""+this.e['nome']+"\".", 50, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
-        this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
-          this.contaData.altSaldo(1, s[0].id, s[0].saldo, 50, firebase.auth().currentUser.uid);
-          this.contaData.cadTransacao(this.e['criador'].slice(index+1,this.e['criador'].length), "Check-in no seu evento \""+this.e['nome']+"\".", 50, 'Saída', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'saida','-');
-          this.contaData.getSaldo(this.e['criador'].slice(index+1,this.e['criador'].length)).then(s => {
-            this.contaData.altSaldo(0, s[0].id, s[0].saldo, 50, this.e['criador'].slice(index+1,this.e['criador'].length));
-          });
-        });
-      }
       let alert = this.alertCtrl.create({
-        title: 'Check-in realizado com sucesso!',
-        subTitle: 'O check-in neste evento foi realizado com sucesso, agora vamos nos divertir.',
+        title: 'Você é um administrador do local!',
+        subTitle: 'Não é possível realizar o check-in em seu prórpio estabelecimento.',
         buttons: ['OK']
       });
       alert.present();
+      this.mixpanel.track("Check-in não realizado",{"motivo":"É administrador do estabelecimento"});
     }
   }
 
@@ -525,30 +527,54 @@ export class EventDetailPage {
       let valor = 0;
       cont -= 1;
       console.log(cont);
-      if ( cont == 0 || cont % 5 == 0 ){
+      if ( cont == 0 || (cont+1) % 5 == 0 ){
         valor = 50;
       } else {
         valor = 30;
       }
       console.log('check value')
-      let tzoffset = (new Date()).getTimezoneOffset() * 60000;
       let index = this.e['criador'].indexOf('/');
-      this.contaData.cadTransacao(firebase.auth().currentUser.uid, "Check-in no evento \""+this.e['nome']+"\". "+(cont+1)+"ª vez neste estabelecimento.", valor, 'Entrada', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'entrada','+');
-      this.contaData.getSaldo(firebase.auth().currentUser.uid).then(s => {
-        this.contaData.altSaldo(1, s[0].id, s[0].saldo, valor, firebase.auth().currentUser.uid);
-        this.contaData.cadTransacao(this.e['criador'].slice(index+1,this.e['criador'].length), "Check-in no seu evento \""+this.e['nome']+"\".", valor, 'Saída', new Date(Date.now() - tzoffset).toISOString().slice(0,-1), 'saida','-');
-        this.contaData.getSaldo(this.e['criador'].slice(index+1,this.e['criador'].length)).then(s => {
-          this.contaData.altSaldo(0, s[0].id, s[0].saldo, valor, this.e['criador'].slice(index+1,this.e['criador'].length));
-        });
+      let link = 'http://usevou.com/api/transaction.php';
+      let send = JSON.stringify({
+        de: this.e['criador'].slice(index+1,this.e['criador'].length),
+        para: firebase.auth().currentUser.uid,
+        valor: valor,
+        check: true,
+        nEvent: this.e['nome'],
+        vezes: (cont+1)
+      });
+
+      this.http.post(link, send).subscribe(data => {
+        if ( data['_body'] == 1 ){
+          let alert = this.alertCtrl.create({
+            title: 'Check-in realizado com sucesso!',
+            subTitle: 'O check-in neste evento foi realizado com sucesso, agora vamos nos divertir.',
+            buttons: ['OK']
+          });
+          alert.present();
+          this.mixpanel.track("Check-in realizado com sucesso");
+        } else {
+          let al = this.alertCtrl.create({
+            title: "Problemas de conexão!",
+            message: "Verifique sua conexão com a internet e tente novamente.",
+            buttons: ["Ok"]
+          });
+          al.present();
+          this.mixpanel.track("Check-in não realizado",{"motivo":"Sem conexão com a internet"});
+        }
+      }, error => {
+          console.log(error);
       });
       console.log('finish')
+    } else {
+      let alert = this.alertCtrl.create({
+        title: 'Check-in realizado com sucesso!',
+        subTitle: 'O check-in neste evento foi realizado com sucesso, agora vamos nos divertir.',
+        buttons: ['OK']
+      });
+      alert.present();
+      this.mixpanel.track("Check-in realizado com sucesso");
     }
-    let alert = this.alertCtrl.create({
-      title: 'Check-in realizado com sucesso!',
-      subTitle: 'O check-in neste evento foi realizado com sucesso, agora vamos nos divertir.',
-      buttons: ['OK']
-    });
-    alert.present();
   }
 
   editEvent(){
@@ -556,6 +582,7 @@ export class EventDetailPage {
   }
 
   removeEvent(){
+    this.mixpanel.track("Deletou evento");
     let alert = this.alertCtrl.create({
       title: 'Excluir evento',
       subTitle: 'Tem certeza que você deseja excluir este evento?',

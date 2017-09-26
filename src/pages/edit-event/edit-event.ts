@@ -4,6 +4,7 @@ import { EditLocationEventPage } from '../edit-location-event/edit-location-even
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { Storage } from '@ionic/storage';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-edit-event',
@@ -73,7 +74,16 @@ export class EditEventPage {
   lat;
   lng;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private camera: Camera, public alertCtrl: AlertController, private storage: Storage, public db: AngularFireDatabase) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    private camera: Camera,
+    public alertCtrl: AlertController,
+    private storage: Storage,
+    public db: AngularFireDatabase,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Editar evento");
     let mod = this.dia % 7;
     let div = parseInt((this.dia / 7)+"");
     if ( mod > 0 ){

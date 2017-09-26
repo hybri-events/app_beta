@@ -4,6 +4,7 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 import firebase from 'firebase/app';
 import { SocialSharing } from '@ionic-native/social-sharing';
 import { Storage } from '@ionic/storage';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-invite-friends',
@@ -27,8 +28,11 @@ export class InviteFriendsPage {
     public navParams: NavParams,
     private db: AngularFireDatabase,
     private socialSharing: SocialSharing,
-    private storage: Storage
-  ) {}
+    private storage: Storage,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Convite de amigos");
+  }
 
   ionViewDidLoad(){
     this.width = (document.body.clientWidth - 32) * 2;
@@ -132,6 +136,7 @@ export class InviteFriendsPage {
   }
 
   shared(){
+    this.mixpanel.track("Compartilhou código promocional");
     this.storage.get('nomeUsu').then((val) => {
       let index = val.indexOf(' ');
       val = val.slice(0,index);

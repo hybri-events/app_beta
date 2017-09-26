@@ -3,6 +3,7 @@ import { NavController, NavParams, AlertController } from 'ionic-angular';
 import { EditListAdmPage } from '../edit-list-adm/edit-list-adm';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { Camera, CameraOptions } from '@ionic-native/camera';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-edit-casa',
@@ -59,7 +60,15 @@ export class EditCasaPage {
   lat;
   lng;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, public db: AngularFireDatabase, private camera: Camera) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public alertCtrl: AlertController,
+    public db: AngularFireDatabase,
+    private camera: Camera,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Editar estabelecimento");
     this.id = navParams.data.id;
   }
 

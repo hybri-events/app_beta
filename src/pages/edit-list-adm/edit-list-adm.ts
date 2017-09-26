@@ -3,6 +3,7 @@ import { Platform, NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { EditLocationCasaPage } from '../edit-location-casa/edit-location-casa';
 import firebase from 'firebase';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-edit-list-adm',
@@ -18,7 +19,14 @@ export class EditListAdmPage {
   pular = true;
   uid = firebase.auth().currentUser.uid;
 
-  constructor(public platform: Platform, public navCtrl: NavController, public navParams: NavParams, public db: AngularFireDatabase) {
+  constructor(
+    public platform: Platform,
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public db: AngularFireDatabase,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Editar lista de administradores");
     this.param = navParams.data;
     this.usuarios = db.list('/usuario/');
     this.updateSearch();

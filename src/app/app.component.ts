@@ -31,6 +31,9 @@ import { SettingsPage } from '../pages/settings/settings';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 import { LocationAccuracy } from '@ionic-native/location-accuracy';
+import { OneSignal } from '@ionic-native/onesignal';
+import { Geofence } from '@ionic-native/geofence';
+import { Mixpanel, MixpanelPeople } from '@ionic-native/mixpanel';
 
 @Component({
   templateUrl: 'app.html'
@@ -77,8 +80,16 @@ export class MyApp {
     public geolocation: Geolocation,
     public http: Http,
 	  public loadingCtrl: LoadingController,
-    private locationAccuracy: LocationAccuracy
+    private locationAccuracy: LocationAccuracy,
+    private oneSignal: OneSignal,
+    private geofence: Geofence,
+    private mixpanel: Mixpanel,
+    private mixpanelPeople: MixpanelPeople
   ) {
+    this.mixpanel.init("f503e64da1470531249d916a5a0800b9")
+    .then(()=>{console.log("Mixpanel ready")})
+    .catch(error=>{console.error("Mixpanel error:",error)});
+
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     let fdata = new Date(Date.now() - tzoffset);
     fdata.setHours(-3);
@@ -100,9 +111,15 @@ export class MyApp {
             if ( val == null ){
               this.nav.push(TutorialPage,null);
               this.storage.set('first',true);
+              this.storage.set('checkqrc', true);
             }
           });
           this.authentic = true;
+          this.mixpanel.init("f503e64da1470531249d916a5a0800b9")
+          .then(()=>{console.log("Mixpanel ready")})
+          .catch(error=>{console.error("Mixpanel error:",error)});
+          this.mixpanelPeople.identify(firebase.auth().currentUser.uid);
+          this.mixpanel.track("Tela principal");
           this.userData.getUser().then( eventListSnap => {
             this.nomeUser = eventListSnap[0].nome;
             this.perfilUser = eventListSnap[0].ft_perfil;
@@ -111,6 +128,9 @@ export class MyApp {
 
             this.storage.set('nomeUsu', this.nomeUser);
             this.storage.set('codcad', eventListSnap[0].codcad);
+
+            this.mixpanelPeople.set({"$email":eventListSnap[0].email,"$name":this.nomeUser});
+
             this.storage.get('casa').then((val) => {
               if ( val != null ){
                 this.casa = this.db.list("casas/"+val+"/");
@@ -149,6 +169,28 @@ export class MyApp {
       }
     });
     platform.ready().then(() => {
+      this.oneSignal.startInit("dc2661ca-a1b7-426a-9504-70cc23728700", "941134234980");
+
+      this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.InAppAlert);
+
+      this.oneSignal.handleNotificationReceived().subscribe(() => {
+        // do something when notification is received
+        console.log('receive notify');
+      });
+
+      this.oneSignal.handleNotificationOpened().subscribe(() => {
+        // do something when a notification is opened
+        console.log('opened notify');
+      });
+
+      geofence.initialize().then(
+        () => console.log('Geofence Plugin Ready'),
+        (err) => console.log(err)
+      );
+      this.addGeofence();
+
+      this.oneSignal.endInit();
+
       if ( platform.is('android') ){
         statusBar.backgroundColorByHexString('#461969');
       } else {
@@ -201,18 +243,64 @@ export class MyApp {
     });
   }
 
+  addGeofence(){
+    this.geofence.removeAll();
+    let k = 0;
+
+    let casas = this.db.list('/casas/');
+    casas.forEach(casa => {
+      casa.forEach(cas => {
+        let ca = this.db.list('casas/'+cas.$key);
+        ca.forEach(c => {
+          for ( let i=0;i<c.length;i++ ){
+            if ( c[i].coins && c[i].valid ){
+              let fence = {
+                id: c[i].$key,
+                latitude:       c[i].lat,
+                longitude:      c[i].lng,
+                radius:         50,
+                transitionType: 1,
+                notification: {
+                    id:             k,
+                    title:          'Você está em '+c[i].nome+'?',
+                    text:           'Não perca tempo e faça já seu check-in.',
+                    openAppOnClick: true,
+                    smallIcon:      "res://ic_stat_onesignal_default",
+                    icon:           c[i].icon,
+                    vibration:      [500,500,500]
+                }
+              }
+
+              this.geofence.addOrUpdate(fence).then(
+                 () => console.log('Geofence added'),
+                 (err) => console.log('Geofence failed to add')
+              );
+              k++;
+            }
+          }
+        });
+      });
+    });
+
+    this.geofence.getWatched().then(function (geofencesJson) {
+      var geofences = JSON.parse(geofencesJson);
+      console.log(geofences);
+    });
+  }
+
   returnProfile() {
-	this.loading = this.loadingCtrl.create({
+    this.mixpanel.track("Trocar perfil",{"for":"usuário"});
+	  this.loading = this.loadingCtrl.create({
       content: "Trocando de perfil, aguarde...",
       dismissOnPageChange: true,
     });
     this.loading.present();
     this.storage.remove('casa');
-	setTimeout(() => {
-	  this.loading.dismiss();
+  	setTimeout(() => {
+  	  this.loading.dismiss();
       this.splashScreen.show();
       window.location.reload();
-	},2000)
+  	},2000)
   }
 
   openMenuPage(i) {

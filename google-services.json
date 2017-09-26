@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "941134234980",
+    "firebase_url": "https://api-4996752536673032512-480980.firebaseio.com",
+    "project_id": "api-4996752536673032512-480980",
+    "storage_bucket": "api-4996752536673032512-480980.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:941134234980:android:cd2e880a1ca27611",
+        "android_client_info": {
+          "package_name": "com.usevou.vou"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "941134234980-oq0af0ok2a1p6t8nfbihjop73qmj73g1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDA7jvXrR5UM0-fPuHJafPTHY2ZTCNxQSs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

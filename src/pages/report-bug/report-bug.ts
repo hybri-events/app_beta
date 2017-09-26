@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { NavController, NavParams, AlertController } from 'ionic-angular';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import firebase from 'firebase';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-report-bug',
@@ -16,7 +17,14 @@ export class ReportBugPage {
 
   report: FirebaseListObservable<any>;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public db: AngularFireDatabase, public alertCtrl: AlertController) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public db: AngularFireDatabase,
+    public alertCtrl: AlertController,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Reportar bug");
     this.report = db.list('/reportBug/')
   }
 

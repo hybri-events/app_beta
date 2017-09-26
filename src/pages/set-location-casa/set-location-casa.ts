@@ -8,6 +8,7 @@ import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 import firebase from 'firebase';
 import { AngularFireDatabase } from 'angularfire2/database';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 declare var google;
 
@@ -26,7 +27,20 @@ export class SetLocationCasaPage {
   param: any;
   public loading:Loading;
 
-  constructor(public navCtrl: NavController, public db: AngularFireDatabase, public navParams: NavParams, public geolocation: Geolocation, private modalCtrl: ModalController, public http: Http, public event: EventoProvider, public err: ErrorProvider, public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
+  constructor(
+    public navCtrl: NavController,
+    public db: AngularFireDatabase,
+    public navParams: NavParams,
+    public geolocation: Geolocation,
+    private modalCtrl: ModalController,
+    public http: Http,
+    public event: EventoProvider,
+    public err: ErrorProvider,
+    public alertCtrl: AlertController,
+    public loadingCtrl: LoadingController,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Definir localização do estabelecimento");
     this.address = {
       place: ''
     };
@@ -61,6 +75,7 @@ export class SetLocationCasaPage {
           this.db.list('/usuario/'+this.param['adms'][i][0]+'/estab/').push({id: firebase.auth().currentUser.uid+'/'+e.key});
         }
         this.loading.dismiss();
+        this.mixpanel.track("Finalização do cadastro do estabelecimento");
         this.navCtrl.pop();
         this.navCtrl.pop();
         this.navCtrl.pop();

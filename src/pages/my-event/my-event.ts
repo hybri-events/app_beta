@@ -4,6 +4,7 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 import { EventDetailPage } from '../event-detail/event-detail';
 import { Storage } from '@ionic/storage';
 import firebase from 'firebase';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-my-event',
@@ -21,7 +22,13 @@ export class MyEventPage {
 
   carregando = true;
 
-  constructor(public navCtrl: NavController, public db: AngularFireDatabase, public navParams: NavParams, private storage: Storage) {
+  constructor(
+    public navCtrl: NavController,
+    public db: AngularFireDatabase,
+    public navParams: NavParams,
+    private storage: Storage,
+    private mixpanel: Mixpanel
+  ) {
     this.conf = db.list("/usuario/"+firebase.auth().currentUser.uid+"/confirmados/");
     this.storage.get('casa').then((val) => {
       if ( val != null ){
@@ -48,6 +55,7 @@ export class MyEventPage {
     let h = 0;
     if ( this.isCasa ){
       if ( this.tabs == 'pro' ){
+        this.mixpanel.track("Meus eventos",{"tab":"Próximos","perfil":"estabelecimento"});
         this.eveCasa.forEach(con => {
           for (let i=0;i<con.length;i++){
             h++;
@@ -80,6 +88,7 @@ export class MyEventPage {
           this.carregando = false;
         }
       } else if ( this.tabs == 'ant' ){
+        this.mixpanel.track("Meus eventos",{"tab":"Anteriores","perfil":"estabelecimento"});
         this.eveCasa.forEach(con => {
           for (let i=0;i<con.length;i++){
             h++;
@@ -114,6 +123,7 @@ export class MyEventPage {
       }
     } else {
       if ( this.tabs == 'pro' ){
+        this.mixpanel.track("Meus eventos",{"tab":"Próximos","perfil":"usuário"});
         this.conf.forEach(con => {
           for (let i=0;i<con.length;i++){
             h++;
@@ -146,6 +156,7 @@ export class MyEventPage {
           this.carregando = false;
         }
       } else if ( this.tabs == 'ant' ){
+        this.mixpanel.track("Meus eventos",{"tab":"Anteriores","perfil":"usuário"});
         this.conf.forEach(con => {
           for (let i=0;i<con.length;i++){
             h++;

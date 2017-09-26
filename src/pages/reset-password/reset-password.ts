@@ -3,6 +3,7 @@ import { NavController, AlertController } from 'ionic-angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthProvider } from '../../providers/auth/auth';
 import { EmailValidator } from '../../validators/email';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-reset-password',
@@ -11,7 +12,14 @@ import { EmailValidator } from '../../validators/email';
 export class ResetPasswordPage {
   public resetPasswordForm:FormGroup;
 
-  constructor(public navCtrl: NavController, public authData: AuthProvider, public formBuilder: FormBuilder, public alertCtrl: AlertController) {
+  constructor(
+    public navCtrl: NavController,
+    public authData: AuthProvider,
+    public formBuilder: FormBuilder,
+    public alertCtrl: AlertController,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Esqueceu a senha");
     this.resetPasswordForm = formBuilder.group({
       email: ['', Validators.compose([Validators.required, EmailValidator.isValid])],
     })

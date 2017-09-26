@@ -6,6 +6,7 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
 import firebase from 'firebase';
 import { Storage } from '@ionic/storage';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-create',
@@ -16,7 +17,17 @@ export class CreatePage {
   allCasas = [];
   public loading:Loading;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public db: AngularFireDatabase, private storage: Storage, public splashScreen: SplashScreen, public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public db: AngularFireDatabase,
+    private storage: Storage,
+    public splashScreen: SplashScreen,
+    public alertCtrl: AlertController,
+    public loadingCtrl: LoadingController,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Tela de estabelecimentos");
     this.list = db.list("/usuario/"+firebase.auth().currentUser.uid+"/estab/");
     this.list.forEach(estab => {
       this.allCasas = [];
@@ -53,17 +64,18 @@ export class CreatePage {
   }
 
   changeProfile(key){
-	this.loading = this.loadingCtrl.create({
-      content: "Trocando de perfil, aguarde...",
-      dismissOnPageChange: true,
-    });
-    this.loading.present();
-    this.storage.set('casa', key);
-	setTimeout(() => {
-	  this.loading.dismiss();
-      this.splashScreen.show();
-      window.location.reload();
-	},2000)
+    this.mixpanel.track("Trocar perfil",{"for":"estabelecimento"});
+  	this.loading = this.loadingCtrl.create({
+        content: "Trocando de perfil, aguarde...",
+        dismissOnPageChange: true,
+      });
+      this.loading.present();
+      this.storage.set('casa', key);
+  	setTimeout(() => {
+  	  this.loading.dismiss();
+        this.splashScreen.show();
+        window.location.reload();
+  	},2000)
   }
 
   editEstab(key){

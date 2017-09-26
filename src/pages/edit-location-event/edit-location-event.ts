@@ -8,6 +8,7 @@ import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 import { Storage } from '@ionic/storage';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 declare var google;
 
@@ -28,7 +29,21 @@ export class EditLocationEventPage {
 
   evento: FirebaseListObservable<any>;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public geolocation: Geolocation, private modalCtrl: ModalController, public http: Http, public event: EventoProvider, public err: ErrorProvider, public alertCtrl: AlertController, public loadingCtrl: LoadingController, private storage: Storage, public db: AngularFireDatabase) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public geolocation: Geolocation,
+    private modalCtrl: ModalController,
+    public http: Http,
+    public event: EventoProvider,
+    public err: ErrorProvider,
+    public alertCtrl: AlertController,
+    public loadingCtrl: LoadingController,
+    private storage: Storage,
+    public db: AngularFireDatabase,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Editar localização do evento");
     this.address = {
       place: ''
     };

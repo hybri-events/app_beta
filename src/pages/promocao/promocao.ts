@@ -4,6 +4,7 @@ import { ListPromoPage } from '../list-promo/list-promo';
 import { Storage } from '@ionic/storage';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import firebase from 'firebase/app';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-promocao',
@@ -14,7 +15,13 @@ export class PromocaoPage {
 
   codigos: FirebaseListObservable<any>;
 
-  constructor(private storage: Storage, public navCtrl: NavController, public db: AngularFireDatabase) {
+  constructor(
+    private storage: Storage,
+    public navCtrl: NavController,
+    public db: AngularFireDatabase,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Códigos promocionais");
     storage.get('codcad').then((val) => {
       this.codcad = val;
     });

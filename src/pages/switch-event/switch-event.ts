@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController, Platform, NavParams, ViewController } from 'ionic-angular';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-switch-event',
@@ -13,7 +14,15 @@ export class SwitchEventPage {
 
   selects = [];
 
-  constructor(public viewCtrl: ViewController, public platform: Platform, public navCtrl: NavController, public navParams: NavParams, public db: AngularFireDatabase) {
+  constructor(
+    public viewCtrl: ViewController,
+    public platform: Platform,
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public db: AngularFireDatabase,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Escolher eventos para alterar");
     this.param = navParams.data;
     this.eventos = this.db.list('/casas/'+this.param['id']+'/eventos/');
     this.eventos.forEach(evento => {

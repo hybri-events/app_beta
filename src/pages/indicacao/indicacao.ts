@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NavController, NavParams, AlertController } from 'ionic-angular';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import firebase from 'firebase';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-indicacao',
@@ -17,7 +18,14 @@ export class IndicacaoPage {
   telefone = '';
   email = '';
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public db: AngularFireDatabase, public alertCtrl: AlertController) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public db: AngularFireDatabase,
+    public alertCtrl: AlertController,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Indicar estabelecimento");
     this.indi = this.db.list('/indEstab/');
     this.cidade = navParams.data.city;
   }

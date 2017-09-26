@@ -9,9 +9,23 @@
 
 <ion-content padding>
   <ion-list>
-      <button ion-item><ion-icon name="icon-bug" item-start></ion-icon>Conta</button>
-      <button ion-item><ion-icon name="icon-bug" item-start></ion-icon>Reportar Bug</button>
-      <button ion-item><ion-icon name="icon-bug" item-start></ion-icon>Ajuda</button>
-      <button ion-item><ion-icon name="icon-bug" item-start></ion-icon>Sobre</button>
+    <ion-item-group>
+      <ion-item-divider>Conta</ion-item-divider>
+      <ion-item>
+        <h2>E-mail</h2>
+        <p>gustavo@usevou.com</p>
+        <ion-icon name="icon-edit" item-end></ion-icon>
+      </ion-item>
+      <ion-item>
+        <h2>Senha</h2>
+        <ion-icon name="icon-edit" item-end></ion-icon>
+      </ion-item>
+    </ion-item-group>
+    <ion-item-group>
+      <ion-item-divider>Ajuda</ion-item-divider>
+      <button (click)="openBug()" ion-item><ion-icon name="icon-bug" item-start></ion-icon>Reportar um bug</button>
+      <button ion-item><ion-icon name="icon-faq" item-start></ion-icon>FAQ</button>
+      <button ion-item><ion-icon name="icon-about" item-start></ion-icon>Sobre</button>
+    </ion-item-group>
   </ion-list>
 </ion-content>

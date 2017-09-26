@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { NavController, NavParams, AlertController } from 'ionic-angular';
 import { ListAdmPage } from '../list-adm/list-adm';
 import { Camera, CameraOptions } from '@ionic-native/camera';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-new-estab',
@@ -51,7 +52,15 @@ export class NewEstabPage {
   sel_faixa: any = 0;
 
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private camera: Camera) {}
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public alertCtrl: AlertController,
+    private camera: Camera,
+    private mixpanel: Mixpanel
+  ) {
+    this.mixpanel.track("Criar estabelecimento");
+  }
 
   validEmail(email): boolean{
     const re = /[a-zA-Z0-9_.]+@[a-zA-Z_.]+?\.[a-zA-Z]{2,3}$/.test(email);

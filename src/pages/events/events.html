@@ -35,9 +35,12 @@
 
 <ion-content>
   <button ion-button block clear style="width:calc(100% - 24px);margin:12px;" (click)="openNewEvent()" *ngIf="isCasa">Criar um evento</button>
-  <button ion-button block clear style="width:calc(100% - 24px);margin:12px;" (click)="readQRC()" *ngIf="!isCasa && authentic">Check-in com QRCode</button>
+  <!--<button ion-button block clear style="width:calc(100% - 24px);margin:12px;" (click)="readQRC()" *ngIf="!isCasa && authentic">Check-in com QRCode</button>-->
   <div [ngSwitch]="maps" class="map">
     <div *ngSwitchCase="'map'" style="width:100%;height:100%;">
+      <div class="breve" *ngIf="carregando" style="width:100%;">
+        <div class="txt_breve" style="width:100%;"><img src="assets/loading.gif" style="width:150px;margin:0px auto;"></div>
+      </div>
       <div #map id="map"></div>
     </div>
     <div *ngSwitchCase="'list'">
@@ -47,11 +50,53 @@
       <div class="breve" padding *ngIf="((events | async)?.length == 0 || (eve.length == 0 && (stTag != null || stFaixa.lower != 0))) && !showCity">
         <div class="txt_breve">Infelizmente não foi encontrado nenhum evento.</div>
       </div>
+      <div *ngFor="let e of eveCoins" class="card-background-page">
+        <ion-card [ngStyle]="{'background-image': 'url('+e.img+')' }" *ngIf="e.priv == '0'" (click)="openEvent(e.$key)">
+          <div class="" [attr.class]="e.coin ? 'coin fundo_card' : 'fundo_card'">
+            <div class="amigos_list" *ngIf="e.coin"><img src="assets/selo.png"></div>
+            <div class="info_list">
+              <div class="icon_list" *ngIf="e.distancia < 1000"><ion-icon name="icon-events"></ion-icon><div>{{e.distancia}} m</div></div>
+              <div class="icon_list" *ngIf="e.distancia >= 1000"><ion-icon name="icon-events"></ion-icon><div>{{(e.distancia/1000).toFixed(1)}} km</div></div>
+              <div class="icon_list"><ion-icon name="icon-coin"></ion-icon><div>{{(e.faixa_ini==0?'Gratuito':'R$'+e.faixa_ini)}}{{(e.faixa_fim==0?'':(e.faixa_fim!=e.faixa_ini?' - R$'+e.faixa_fim:''))}}</div></div>
+              <div class="icon_list">
+                <ion-icon name="icon-estacionamento" *ngIf="e.casa.estac"></ion-icon>
+                <ion-icon name="icon-acessibilidade" *ngIf="e.casa.acess"></ion-icon>
+                <ion-icon name="icon-fumante" *ngIf="e.casa.fum"></ion-icon>
+                <ion-icon name="icon-wifi" *ngIf="e.casa.wifi"></ion-icon>
+                <ion-icon name="icon-comida" *ngIf="e.casa.cozinha"></ion-icon>
+                <ion-icon name="icon-bar" *ngIf="e.casa.bar"></ion-icon>
+              </div>
+              <div class="icon_list">
+                <ion-icon name="icon-cartao" *ngIf="e.casa.cartao"></ion-icon>
+                <ion-icon name="icon-dinheiro" *ngIf="e.casa.dinheiro"></ion-icon>
+                <ion-icon *ngIf="e.coin" name="icon-vous"></ion-icon>
+              </div>
+            </div>
+            <div class="bottom_list">
+              <div style="display:table-cell;vertical-align:bottom;width:80px;">
+                <div class="top"><div class="block"></div><div class="block"></div></div>
+                <div class="date_list">
+                  <div class="mes_list">{{e.mes}}</div>
+                  <div class="dia_list">{{('0'+e.dia).slice(-2)}}</div>
+                  <div class="hr_list">{{e.hr_ini}}</div>
+                </div>
+              </div>
+              <div class="present_list">
+                <div class="name_event">{{e.nome}}</div>
+                <div class="name_create" id="c">{{e.nomeCriador}}</div>
+                <div class="name_locale" id="l">{{e.cidade}}</div>
+              </div>
+            </div>
+          </div>
+        </ion-card>
+      </div>
       <div *ngFor="let e of eve" class="card-background-page">
         <ion-card [ngStyle]="{'background-image': 'url('+e.img+')' }" *ngIf="e.priv == '0'" (click)="openEvent(e.$key)">
           <div class="" [attr.class]="e.coin ? 'coin fundo_card' : 'fundo_card'">
             <div class="amigos_list" *ngIf="e.coin"><img src="assets/selo.png"></div>
             <div class="info_list">
+              <div class="icon_list" *ngIf="e.distancia < 1000"><ion-icon name="icon-events"></ion-icon><div>{{e.distancia}} m</div></div>
+              <div class="icon_list" *ngIf="e.distancia >= 1000"><ion-icon name="icon-events"></ion-icon><div>{{(e.distancia/1000).toFixed(1)}} km</div></div>
               <div class="icon_list"><ion-icon name="icon-coin"></ion-icon><div>{{(e.faixa_ini==0?'Gratuito':'R$'+e.faixa_ini)}}{{(e.faixa_fim==0?'':(e.faixa_fim!=e.faixa_ini?' - R$'+e.faixa_fim:''))}}</div></div>
               <div class="icon_list">
                 <ion-icon name="icon-estacionamento" *ngIf="e.casa.estac"></ion-icon>

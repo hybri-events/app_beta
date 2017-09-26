@@ -190,6 +190,11 @@ ion-content {
   }
 }
 
+@include makeIcon(icon-create-event, $icon-create-event);
+@include makeIcon(icon-check-qrcode, $icon-check-qrcode);
+@include makeIcon(icon-about, $icon-about);
+@include makeIcon(icon-faq, $icon-faq);
+@include makeIcon(icon-home, $icon-home);
 @include makeIcon(icon-select-on, $icon-select-on);
 @include makeIcon(icon-select-off, $icon-select-off);
 @include makeIcon(icon-bug, $icon-bug);
@@ -204,7 +209,6 @@ ion-content {
 @include makeIcon(icon-dinheiro, $icon-dinheiro);
 @include makeIcon(icon-bar, $icon-bar);
 @include makeIcon(icon-promo, $icon-promo);
-@include makeIcon(icon-new-event, $icon-new-event);
 @include makeIcon(icon-feed, $icon-feed);
 @include makeIcon(icon-message, $icon-message);
 @include makeIcon(icon-menu, $icon-menu);
@@ -216,22 +220,13 @@ ion-content {
 @include makeIcon(icon-relac, $icon-relac);
 @include makeIcon(icon-genero, $icon-genero);
 @include makeIcon(icon-conv, $icon-conv);
-@include makeIcon(icon-seg-plus, $icon-seg-plus);
 @include makeIcon(icon-del, $icon-del);
 @include makeIcon(icon-send, $icon-send);
-@include makeIcon(icon-pin-g, $icon-pin-g);
-@include makeIcon(icon-pin-n, $icon-pin-n);
-@include makeIcon(icon-seg, $icon-seg-path1);
 @include makeIcon(icon-saida, $icon-saida);
 @include makeIcon(icon-entrada, $icon-entrada);
-@include makeIcon(icon-location, $icon-location);
-@include makeIcon(icon-check-off, $icon-check-off);
-@include makeIcon(icon-check-on, $icon-check-on);
-@include makeIcon(icon-video, $icon-video);
-@include makeIcon(icon-time-event, $icon-time-event);
 @include makeIcon(icon-one-check, $icon-one-check);
 @include makeIcon(icon-settings, $icon-settings);
-@include makeIcon(icon-see-password, $icon-see-password);
+@include makeIcon(icon-see-password, $icon-see-pass);
 @include makeIcon(icon-search, $icon-search);
 @include makeIcon(icon-publication, $icon-publication);
 @include makeIcon(icon-profile, $icon-profile);
@@ -239,17 +234,14 @@ ion-content {
 @include makeIconIos(arrow-back, $icon-back);
 @include makeIcon(icon-like, $icon-like);
 @include makeIcon(icon-invites, $icon-invites);
-@include makeIcon(icon-home, $icon-home);
 @include makeIcon(icon-gallery, $icon-gallery);
 @include makeIcon(icon-filter, $icon-filter);
 @include makeIcon(icon-cancel, $icon-cancel);
 @include makeIcon(icon-events, $icon-events);
 @include makeIcon(icon-edit, $icon-edit);
-@include makeIcon(icon-date-event, $icon-date-event);
 @include makeIcon(icon-two-check, $icon-confirm);
 @include makeIcon(icon-comment, $icon-comment);
 @include makeIcon(icon-coin, $icon-coin);
 @include makeIcon(icon-camera, $icon-camera);
-@include makeIcon(icon-next, $icon-next);
 @include makeIconMd(arrow-back, $icon-back-page);
 @include makeIcon(icon-agenda, $icon-agenda);
