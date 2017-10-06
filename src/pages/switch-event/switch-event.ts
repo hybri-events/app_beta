@@ -29,12 +29,12 @@ export class SwitchEventPage {
       this.ev = []
       for ( let i=0;i<evento.length;i++ ){
         let e = [];
-        let even = this.db.list('/evento/'+evento[i].evento);
+        let even = this.db.list('/eventos/'+evento[i].id);
         even.forEach(eve => {
           for ( let j=0;j<eve.length;j++ ){
             e[eve[j].$key] = eve[j].$value;
           }
-          e['id'] = evento[i].evento;
+          e['id'] = evento[i].id;
           this.ev.push(e);
         })
       }

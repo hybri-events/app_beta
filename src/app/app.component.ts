@@ -19,6 +19,7 @@ import { TutorialPage } from '../pages/tutorial/tutorial';
 import { CadastroPage } from '../pages/cadastro/cadastro';
 import { LoginPage } from '../pages/login/login';
 
+import { PerfilEstabPage } from '../pages/perfil-estab/perfil-estab';
 import { PerfilPage } from '../pages/perfil/perfil';
 import { MyEventPage } from '../pages/my-event/my-event';
 import { AgendaPage } from '../pages/agenda/agenda';
@@ -86,10 +87,6 @@ export class MyApp {
     private mixpanel: Mixpanel,
     private mixpanelPeople: MixpanelPeople
   ) {
-    this.mixpanel.init("f503e64da1470531249d916a5a0800b9")
-    .then(()=>{console.log("Mixpanel ready")})
-    .catch(error=>{console.error("Mixpanel error:",error)});
-
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     let fdata = new Date(Date.now() - tzoffset);
     fdata.setHours(-3);
@@ -115,11 +112,6 @@ export class MyApp {
             }
           });
           this.authentic = true;
-          this.mixpanel.init("f503e64da1470531249d916a5a0800b9")
-          .then(()=>{console.log("Mixpanel ready")})
-          .catch(error=>{console.error("Mixpanel error:",error)});
-          this.mixpanelPeople.identify(firebase.auth().currentUser.uid);
-          this.mixpanel.track("Tela principal");
           this.userData.getUser().then( eventListSnap => {
             this.nomeUser = eventListSnap[0].nome;
             this.perfilUser = eventListSnap[0].ft_perfil;
@@ -129,17 +121,21 @@ export class MyApp {
             this.storage.set('nomeUsu', this.nomeUser);
             this.storage.set('codcad', eventListSnap[0].codcad);
 
-            this.mixpanelPeople.set({"$email":eventListSnap[0].email,"$name":this.nomeUser});
-
             this.storage.get('casa').then((val) => {
+              this.mixpanelPeople.identify(firebase.auth().currentUser.uid);
+              this.mixpanelPeople.set({"$email":eventListSnap[0].email,"$name":this.nomeUser});
+              this.mixpanel.track("Tela principal");
               if ( val != null ){
                 this.casa = this.db.list("casas/"+val+"/");
                 this.casa.forEach(ca => {
                   ca.forEach(c => {
                     if ( c.$key == 'nome' ){
                       this.nomeUser = c.$value;
+                      this.mixpanelPeople.set({"$name":c.$value});
                     } else if ( c.$key == 'img' ) {
                       this.perfilPrin = c.$value;
+                    } else if ( c.$key == 'email' ) {
+                      this.mixpanelPeople.set({"$email":c.$value});
                     }
                   });
                 });
@@ -169,44 +165,9 @@ export class MyApp {
       }
     });
     platform.ready().then(() => {
-      this.oneSignal.startInit("dc2661ca-a1b7-426a-9504-70cc23728700", "941134234980");
-
-      this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.InAppAlert);
-
-      this.oneSignal.handleNotificationReceived().subscribe(() => {
-        // do something when notification is received
-        console.log('receive notify');
-      });
-
-      this.oneSignal.handleNotificationOpened().subscribe(() => {
-        // do something when a notification is opened
-        console.log('opened notify');
-      });
-
-      geofence.initialize().then(
-        () => console.log('Geofence Plugin Ready'),
-        (err) => console.log(err)
-      );
-      this.addGeofence();
-
-      this.oneSignal.endInit();
-
-      if ( platform.is('android') ){
-        statusBar.backgroundColorByHexString('#461969');
-      } else {
-        statusBar.backgroundColorByHexString('#FFFFFF');
-  	    statusBar.styleDefault();
-      }
-      splashScreen.hide();
-
-      this.locationAccuracy.canRequest().then((canRequest: boolean) => {
-        if(canRequest) {
-          this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(null,null);
-        }
-      });
-
+      console.log("loc");
       this.geolocation.getCurrentPosition().then((position) => {
-
+        console.log("loc2");
         let lat = position.coords.latitude;
         let lng = position.coords.longitude;
         var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng;
@@ -239,6 +200,38 @@ export class MyApp {
 
       }, (err) => {
         console.log(err);
+      });
+
+      this.oneSignal.startInit("dc2661ca-a1b7-426a-9504-70cc23728700", "941134234980");
+      this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.InAppAlert);
+
+      this.oneSignal.handleNotificationReceived().subscribe(() => {
+        console.log('receive notify');
+      });
+      this.oneSignal.handleNotificationOpened().subscribe(() => {
+        console.log('opened notify');
+      });
+
+      this.oneSignal.endInit();
+
+      geofence.initialize().then(
+        () => console.log('Geofence Plugin Ready'),
+        (err) => console.log(err)
+      );
+      this.addGeofence();
+
+      if ( platform.is('android') ){
+        statusBar.backgroundColorByHexString('#461969');
+      } else {
+        statusBar.backgroundColorByHexString('#FFFFFF');
+  	    statusBar.styleDefault();
+      }
+      splashScreen.hide();
+
+      this.locationAccuracy.canRequest().then((canRequest: boolean) => {
+        if(canRequest) {
+          this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(null,null);
+        }
       });
     });
   }
@@ -305,7 +298,11 @@ export class MyApp {
 
   openMenuPage(i) {
     if ( i == 0 ){
-      this.nav.push(PerfilPage, null);
+      if ( this.isCasa ){
+        this.nav.push(PerfilEstabPage, null);
+      } else {
+        this.nav.push(PerfilPage, null);
+      }
     } else if ( i == 1 ){
       this.nav.push(MyEventPage, null);
     } else if ( i == 2 ){
@@ -375,7 +372,7 @@ export class MyApp {
     this.date = fdata.toISOString().slice(0,-1);
 
     this.tag = null;
-    this.faixa = {lower: 0, upper: 1000};
+    this.faixa = {lower: 0, upper: 200};
 
     this.storage.set('dt_filtro', this.date).then(() => {
       this.storage.set('tag', this.tag).then(() => {

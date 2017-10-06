@@ -38,6 +38,7 @@ import { NotifyPage } from '../pages/notify/notify';
 
 import { TabsPage } from '../pages/tabs/tabs';
 
+import { PerfilEstabPage } from '../pages/perfil-estab/perfil-estab';
 import { PerfilPage } from '../pages/perfil/perfil';
 import { MyEventPage } from '../pages/my-event/my-event';
 import { AgendaPage } from '../pages/agenda/agenda';
@@ -129,7 +130,8 @@ const firebaseConfig = {
     ReportBugPage,
     ListAdmPage,
     EditListAdmPage,
-    SwitchEventPage
+    SwitchEventPage,
+    PerfilEstabPage
   ],
   imports: [
     BrowserModule,
@@ -180,7 +182,8 @@ const firebaseConfig = {
     ReportBugPage,
     ListAdmPage,
     EditListAdmPage,
-    SwitchEventPage
+    SwitchEventPage,
+    PerfilEstabPage
   ],
   providers: [
     StatusBar,

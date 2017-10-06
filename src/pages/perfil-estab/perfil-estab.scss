@@ -1,0 +1,99 @@
+page-perfil-estab {
+  .bar-button-default-ios, .toolbar-title-ios, .header-ios ion-navbar ion-icon{
+    color: white !important;
+  }
+  .header-ios .toolbar-ios:last-child .toolbar-background-ios{
+    border: none !important;
+  }
+  .toolbar{
+    background-color: transparent;
+    z-index: 500;
+  }
+  .scroll-content{
+    margin-top: 0px !important;
+  }
+  .content-md .scroll-content .toolbar{
+    background-color: #652C90;
+    z-index: 500;
+  }
+  .content-ios .scroll-content .toolbar{
+    background-color: white;
+    border-bottom: 1px solid #D2D2D2;
+    z-index: 500;
+  }
+  .header:after{background: transparent;}
+  #title{opacity:0;}
+
+  .roxo{
+    float: left;
+    width: 100%;
+    background-color:#652C90;
+  }
+  #fundo{
+    float: left;
+    width: 100%;
+    background-color:white;
+  }
+  .header_af{
+    background-image:linear-gradient(rgba(101,44,144,0.5),rgba(101,44,144,1));
+    padding: 72px 32px 32px 32px;
+    width:100%;
+    display: table;
+  }
+  .conteudo{
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+  }
+  .ft_perfil{
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin: auto;
+    margin-bottom: 16px;
+    background-position: center;
+    background-size: cover;
+    border: 2px solid white;
+  }
+  .name{
+    font-weight: 900;
+    font-size: 2em;
+    color: white;
+    margin-bottom: 16px;
+  }
+  .avaliacao{
+    color: yellow;
+  }
+  .avaliacao ion-icon{
+    padding-bottom: 8px;
+  }
+  .avaliacao span{
+    color: white;
+  }
+  ion-label {
+    white-space: normal;
+  }
+
+  .lab{
+    font-size: 0.9em;
+    color: #652C90;
+  }
+  .cont{
+    padding: 4px 16px;
+  }
+  .dia{
+    float: left;
+    width: 50%;
+    margin-bottom: 8px;
+  }
+  .hora{
+    float: right;
+    text-align: right;
+    width: 50%;
+    color: #666666;
+    margin-bottom: 8px;
+  }
+  .fechado{
+    color: red;
+  }
+}

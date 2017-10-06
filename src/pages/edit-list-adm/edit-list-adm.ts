@@ -69,8 +69,8 @@ export class EditListAdmPage {
     let currentContacts = [];
 
     userSort.forEach((value, index) => {
-      if(value[0].charAt(0) != currentLetter){
-        currentLetter = value[0].charAt(0);
+      if(value[0].charAt(0).toUpperCase() != currentLetter){
+        currentLetter = value[0].charAt(0).toUpperCase();
         let newGroup = {
             letter: currentLetter,
             nomes: []

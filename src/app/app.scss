@@ -190,6 +190,9 @@ ion-content {
   }
 }
 
+@include makeIcon(icon-star-full, $icon-star-full); 
+@include makeIcon(icon-star-half, $icon-star-half);
+@include makeIcon(icon-star-void, $icon-star-void);
 @include makeIcon(icon-create-event, $icon-create-event);
 @include makeIcon(icon-check-qrcode, $icon-check-qrcode);
 @include makeIcon(icon-about, $icon-about);

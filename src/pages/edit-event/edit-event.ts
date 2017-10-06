@@ -92,7 +92,7 @@ export class EditEventPage {
     this.csem = this.tsem[this.data.getDay()] +" "+ this.cf[this.data.getDay()][div-1] +" "+ this.sem[this.data.getDay()];
 
     this.id = navParams.data.id;
-    this.evento = db.list('/evento/'+this.id);
+    this.evento = db.list('/eventos/'+this.id);
 
     this.storage.get('casa').then((val) => {
       if ( val != null ){
@@ -291,9 +291,9 @@ export class EditEventPage {
 
   nextPage(){
     let dti = new Date(this.dt_ini);
-    let datai = new Date(dti.getTime() + this.tzoffset);
+    let datai = new Date(dti.getTime());
     let dtf = new Date(this.dt_fim);
-    let dataf = new Date(dtf.getTime() + this.tzoffset);
+    let dataf = new Date(dtf.getTime());
     let meses = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
     let mes = meses[datai.getMonth()];
     let params = {nome: this.nome,

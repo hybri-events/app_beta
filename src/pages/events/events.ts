@@ -10,7 +10,8 @@ import { ErrorProvider } from '../../providers/error/error';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { Storage } from '@ionic/storage';
 import { Events } from 'ionic-angular';
-import { Mixpanel } from '@ionic-native/mixpanel';
+import { Mixpanel, MixpanelPeople } from '@ionic-native/mixpanel';
+import firebase from 'firebase/app';
 
 declare var google;
 
@@ -19,6 +20,8 @@ declare var google;
   templateUrl: 'events.html'
 })
 export class EventsPage {
+  time = 0;
+
   maps: string = "list";
   search: any = false;
   authentic: any = false;
@@ -32,6 +35,7 @@ export class EventsPage {
   plat: any;
   events: FirebaseListObservable<any>;
 
+  date;
   stDtini;
   stDtfim;
   stTag;
@@ -64,8 +68,12 @@ export class EventsPage {
     public evento: EventoProvider,
     public alertCtrl: AlertController,
     public err: ErrorProvider,
-    private mixpanel: Mixpanel
+    private mixpanel: Mixpanel,
+    private mixpanelPeople: MixpanelPeople
   ) {
+    setInterval(()=>{
+      this.time += 10;
+    },10)
     this.plat = platform;
     const authObserver = afAuth.authState.subscribe( user => {
       if (user) {
@@ -85,6 +93,37 @@ export class EventsPage {
       if ( val != null ){
         this.isCasa = true;
       }
+      if ( firebase.auth().currentUser.uid == "2LPZQZZoiBXWx7uMmdAw6aJKYRk1" || firebase.auth().currentUser.uid == "ckspDANNqcaeoKJ4FSMigwlGmju2" ){
+        this.mixpanel.init("f503e64da1470531249d916a5a0800b9").then(()=>{
+          console.log("Mixpanel ready: Testes (Usuários)");
+        }).catch(error=>{
+          console.error("Mixpanel error:",error)
+        });
+      } else if ( val != null ){
+        if ( firebase.auth().currentUser.uid == "2LPZQZZoiBXWx7uMmdAw6aJKYRk1" ||
+              firebase.auth().currentUser.uid == "ckspDANNqcaeoKJ4FSMigwlGmju2" ||
+              firebase.auth().currentUser.uid == "Y51FCxmbWQPRzh4XL7dzUj6KBQu1" ){
+          this.mixpanel.init("66e05c6d77d15c37e397e5c0873329e6").then(()=>{
+            console.log("Mixpanel ready: Testes (Estabelecimentos)");
+            this.mixpanelPeople.identify(val);
+          }).catch(error=>{
+            console.error("Mixpanel error: Estabelecimentos",error)
+          });
+        } else {
+          this.mixpanel.init("c03dff102df9ec7871ccffca9554470e").then(()=>{
+            console.log("Mixpanel ready");
+            this.mixpanelPeople.identify(val);
+          }).catch(error=>{
+            console.error("Mixpanel error:",error)
+          });
+        }
+      } else {
+        this.mixpanel.init("44fccef498d58de57677f19c3eae0a54").then(()=>{
+          console.log("Mixpanel ready: Usuários");
+        }).catch(error=>{
+          console.error("Mixpanel error:",error)
+        });
+      }
     });
     this.cidades = db.list('/cidades');
   }
@@ -97,9 +136,17 @@ export class EventsPage {
   }
 
   changeTab(){
+    console.log("changeTab: "+this.time)
+    if ( this.maps == "map" ){
+      this.mixpanel.track("Mapa de eventos");
+    } else {
+      this.mixpanel.track("Lista de eventos");
+    }
     this.eve = [];
+    this.eveCoins = [];
     this.carregando = true;
-    this.geolocation.getCurrentPosition({enableHighAccuracy: true}).then((position) => {
+    this.geolocation.getCurrentPosition({maximumAge: 60000}).then((position) => {
+      console.log("localização: "+this.time)
       this.lat = position.coords.latitude;
       this.lng = position.coords.longitude;
       this.accuracy = position.coords.accuracy;
@@ -125,32 +172,18 @@ export class EventsPage {
         });
         this.storage.get('dt_filtro').then((val) => {
           this.stDtini = val;
-          let date = new Date(val);
-          let lastDay = new Date(date.getFullYear(), date.getMonth()+1, 0).getDate();
-          if ( this.plat.is('android') ){
-            date.setDate(new Date(this.stDtini).getDate());
-          } else {
-            date.setDate(date.getDate()+1);
-          }
-          if ( lastDay == date.getDate() ){
-            date.setMonth(new Date(this.stDtini).getMonth());
-          }
-          date.setHours(20);
-          date.setMinutes(59);
-          this.stDtfim = date.toISOString().slice(0,-1);
+          let d = new Date(val);
+          this.date = d.getFullYear()+"/"+("0"+(d.getMonth()+1)).slice(-2)+"/"+("0"+d.getDate()).slice(-2);
           this.storage.get('tag').then((val) => {
             this.stTag = val;
             this.storage.get('faixa').then((val) => {
               this.stFaixa = val;
-              this.events = this.db.list('/evento/'+this.stCity, {
-                query: {
-                  orderByChild: 'dti',
-                  startAt: this.stDtini,
-                  endAt: this.stDtfim
-                }
-              });
+
+              this.events = this.db.list('/eventos/'+this.stCity+"/"+this.date);
               let h = 0;
               this.events.forEach(ev => {
+                let tc = [];
+                let t = [];
                 h++;
                 ev.forEach(e => {
                   let ok = false;
@@ -179,30 +212,31 @@ export class EventsPage {
                       ok = true;
                     }
                   }
-                  if ( this.maps != "map" ){
-                    this.mixpanel.track("Lista de eventos");
-                    this.carregando = false;
-                  }
                   if ( ok ){
+                    e['casa'] = [];
                     e['distancia'] = this.calcDist(this.lat, this.lng, e['lat'], e['lng']);
                     let casa = this.db.list('/casas/'+e.criador);
                     casa.forEach(cas => {
-                      e['casa'] = [];
-                      cas.forEach(ca => {
-                        e['casa'][ca.$key] = ca.$value;
-                      })
+                      for ( let i=0;i<cas.length;i++ ){
+                        e['casa'][cas[i].$key] = cas[i].$value;
+                      }
                     });
                     if ( e.coin ){
-                      this.eveCoins.push(e);
-                      this.boobleSort(this.eveCoins);
+                      tc.push(e);
+                      this.boobleSort(tc);
                     } else {
-                      this.eve.push(e);
-                      this.boobleSort(this.eve);
+                      t.push(e);
+                      this.boobleSort(t);
                     }
                   }
-                  if ( this.maps == "map" ){
-                    this.mixpanel.track("Mapa de eventos");
-                    this.loadMap();
+                  if ( ev.length == (t.length + tc.length) ){
+                    this.eveCoins = tc;
+                    this.eve = t;
+                    if ( this.maps == "map" ){
+                      this.loadMap();
+                    } else {
+                      this.carregando = false;
+                    }
                   }
                 });
               });
@@ -249,118 +283,151 @@ export class EventsPage {
 
     this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
 
+    this.eveCoins.forEach(e => {
+      let casa = this.db.list('/casas/'+e.criador);
+      casa.forEach(cas => {
+        for ( let i=0;i<cas.length;i++ ){
+          e['casa'][cas[i].$key] = cas[i].$value;
+        }
+        this.addPoint(e);
+      });
+    });
     this.eve.forEach(e => {
       let casa = this.db.list('/casas/'+e.criador);
       casa.forEach(cas => {
-        e['casa'] = [];
-        cas.forEach(ca => {
-          e['casa'][ca.$key] = ca.$value;
-        })
+        for ( let i=0;i<cas.length;i++ ){
+          e['casa'][cas[i].$key] = cas[i].$value;
+        }
+        this.addPoint(e);
       });
+    });
+  }
 
-      let iconS = {
-        url: 'assets/ic_pin_n.png',
-        size: new google.maps.Size(36, 36)
-      };
-      let iconL = {
-        url: 'assets/ic_pin_g.png',
-        size: new google.maps.Size(48, 48)
-      };
-      let marker = new google.maps.Marker({
-        map: this.map,
-        animation: google.maps.Animation.DROP,
-        position: new google.maps.LatLng(e.lat, e.lng),
-        icon: (e.coin?iconL:iconS)
-      });
+  addPoint(e){
+    let iconS = {
+      url: 'assets/ic_pin_n.png',
+      size: new google.maps.Size(36, 36)
+    };
+    let iconL = {
+      url: 'assets/ic_pin_g.png',
+      size: new google.maps.Size(48, 48)
+    };
+    let marker = new google.maps.Marker({
+      map: this.map,
+      animation: google.maps.Animation.DROP,
+      position: new google.maps.LatLng(e.lat, e.lng),
+      icon: (e.coin?iconL:iconS)
+    });
 
-      this.carregando = false;
+    this.carregando = false;
 
-      let content = '<div class="card-background-page-map" id="'+e.$key+'">'+
-                      '<div style="background-image:url('+e.img+')" class="card">'+
-                        '<div class="fundo_card ';
-              if ( e.coin ){
-                content += 'coin"><div class="amigos_list"><img src="assets/selo.png"></div>';
-              } else {
-                content += '">';
-              }
-                content += '<div class="info_list">'+
-                              '<div class="icon_list"><ion-icon class="icon-coin"></ion-icon><div>'+(e.faixa_ini==0?'Gratuito':'R$'+e.faixa_ini)+''+(e.faixa_fim==0?'':(e.faixa_fim!=e.faixa_ini?' - R$'+e.faixa_fim:''))+'</div></div>';
-                content += '<div class="icon_list">'+
-                                (e.casa.bar?'<ion-icon class="icon-bar"></ion-icon>':'')+
-                                (e.casa.cozinha?'<ion-icon class="icon-comida"></ion-icon>':'')+
-                                (e.casa.wifi?'<ion-icon class="icon-wifi"></ion-icon>':'')+
-                                (e.casa.fum?'<ion-icon class="icon-fumante"></ion-icon>':'')+
-                                (e.casa.estac?'<ion-icon class="icon-estacionamento"></ion-icon>':'')+
-                                (e.casa.acess?'<ion-icon class="icon-acessibilidade"></ion-icon>':'')+
-                              '</div>'+
-                              '<div class="icon_list">'+
-                                (e.coin?'<ion-icon class="icon-vous"></ion-icon>':'')+
-                                (e.casa.dinheiro?'<ion-icon class="icon-dinheiro"></ion-icon>':'')+
-                                (e.casa.cartao?'<ion-icon class="icon-cartao"></ion-icon>':'')+
-                              '</div>';
-              content += '</div>'+
-                           '<div class="bottom_list">'+
-                             '<div style="display:table-cell;vertical-align:bottom;width:50px;">'+
-                               '<div class="top"><div class="block"></div><div class="block"></div></div>'+
-                               '<div class="date_list">'+
-                                 '<div class="mes_list">'+e.mes+'</div>'+
-                                 '<div class="dia_list">'+('0'+e.dia).slice(-2)+'</div>'+
-                                 '<div class="hr_list">'+e.hr_ini+'</div>'+
-                               '</div>'+
-                             '</div>'+
-                             '<div class="present_list">'+
-                               '<div class="name_event">'+e.nome+'</div>'+
-                               '<div class="name_create" id="c">'+e.nomeCriador+'</div>'+
-                               '<div class="name_locale" id="l">'+e.cidade+'</div>'+
+    let content = '<div class="card-background-page-map" id="'+e.$key+'">'+
+                    '<div style="background-image:url('+e.img+')" class="card">'+
+                      '<div class="fundo_card ';
+            if ( e.coin ){
+              content += 'coin"><div class="amigos_list"><img src="assets/selo.png"></div>';
+            } else {
+              content += '">';
+            }
+              content += '<div class="info_list">'+
+                            '<div class="icon_list"><ion-icon class="icon-coin"></ion-icon><div>'+(e.faixa_ini==0?'Gratuito':'R$'+e.faixa_ini)+''+(e.faixa_fim==0?'':(e.faixa_fim!=e.faixa_ini?' - R$'+e.faixa_fim:''))+'</div></div>';
+              content += '<div class="icon_list">'+
+                              (e.casa.bar?'<ion-icon class="icon-bar"></ion-icon>':'')+
+                              (e.casa.cozinha?'<ion-icon class="icon-comida"></ion-icon>':'')+
+                              (e.casa.wifi?'<ion-icon class="icon-wifi"></ion-icon>':'')+
+                              (e.casa.fum?'<ion-icon class="icon-fumante"></ion-icon>':'')+
+                              (e.casa.estac?'<ion-icon class="icon-estacionamento"></ion-icon>':'')+
+                              (e.casa.acess?'<ion-icon class="icon-acessibilidade"></ion-icon>':'')+
+                            '</div>'+
+                            '<div class="icon_list">'+
+                              (e.coin?'<ion-icon class="icon-vous"></ion-icon>':'')+
+                              (e.casa.dinheiro?'<ion-icon class="icon-dinheiro"></ion-icon>':'')+
+                              (e.casa.cartao?'<ion-icon class="icon-cartao"></ion-icon>':'')+
+                            '</div>';
+            content += '</div>'+
+                         '<div class="bottom_list">'+
+                           '<div style="display:table-cell;vertical-align:bottom;width:50px;">'+
+                             '<div class="top"><div class="block"></div><div class="block"></div></div>'+
+                             '<div class="date_list">'+
+                               '<div class="mes_list">'+e.mes+'</div>'+
+                               '<div class="dia_list">'+('0'+e.dia).slice(-2)+'</div>'+
+                               '<div class="hr_list">'+e.hr_ini+'</div>'+
                              '</div>'+
                            '</div>'+
-                        '</div>'+
+                           '<div class="present_list">'+
+                             '<div class="name_event">'+e.nome+'</div>'+
+                             '<div class="name_create" id="c">'+e.nomeCriador+'</div>'+
+                             '<div class="name_locale" id="l">'+e.cidade+'</div>'+
+                           '</div>'+
+                         '</div>'+
                       '</div>'+
-                    '</div>';
+                    '</div>'+
+                  '</div>';
 
-      let infoWindow = new google.maps.InfoWindow({
-        content: content,
-      });
+    let infoWindow = new google.maps.InfoWindow({
+      content: content,
+    });
 
-      google.maps.event.addListener(infoWindow, 'domready', () => {
-        let gw = document.getElementsByClassName('gm-style-iw');
-        for ( let i=0; i<gw.length; i++ ){
-          gw[i].parentElement.setAttribute('class','prim');
-          let lp = gw[i].parentElement.style.left;
-          let lpi = parseInt(lp.substr(0,lp.length-2));
-          gw[i].parentElement.style.left = lpi + 26 +'px';
+    google.maps.event.addListener(infoWindow, 'domready', () => {
+      let gw = document.getElementsByClassName('gm-style-iw');
+      for ( let i=0; i<gw.length; i++ ){
+        gw[i].parentElement.setAttribute('class','prim');
+        let lp = gw[i].parentElement.style.left;
+        let hp = gw[i].parentElement.style.height;
+        let tp = gw[i].parentElement.style.top;
+        let lpi = parseInt(lp.substr(0,lp.length-2));
+        let hpi = parseInt(hp.substr(0,hp.length-2));
+        let tpi = parseInt(tp.substr(0,tp.length-2));
+        gw[i].parentElement.style.left = lpi + 26 +'px';
+        gw[i].parentElement.style.height = hpi - 18 +'px';
+        gw[i].parentElement.style.top = tpi + 18 +'px';
 
-          let ls = gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[0].style.left;
-          let lsi = parseInt(ls.substr(0,ls.length-2));
-          gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[0].style.left = lsi - 26 +'px';
+        let ls = gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[0].style.left;
+        let ts = gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[0].style.top;
+        let lsi = parseInt(ls.substr(0,ls.length-2));
+        let tsi = parseInt(ts.substr(0,ts.length-2));
+        gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[0].style.left = lsi - 26 +'px';
+        gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[0].style.top = tsi - 18 +'px';
 
-          let lt = gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[3].style.left;
-          let lti = parseInt(lt.substr(0,lt.length-2));
-          gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[3].style.left = lti - 26 +'px';
+        let lt = gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[3].style.left;
+        let tt = gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[3].style.top;
+        let lti = parseInt(lt.substr(0,lt.length-2));
+        let tti = parseInt(tt.substr(0,tt.length-2));
+        gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[3].style.left = lti - 26 +'px';
+        gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[3].style.top = tti - 18 +'px';
 
-          let lq = gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[5].style.left;
-          let lqi = parseInt(lq.substr(0,lq.length-2));
-          gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[5].style.left = lqi - 26 +'px';
+        let lq = gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[5].style.left;
+        let tq = gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[5].style.top;
+        let lqi = parseInt(lq.substr(0,lq.length-2));
+        let tqi = parseInt(tq.substr(0,tq.length-2));
+        gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[5].style.left = lqi - 26 +'px';
+        gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[5].style.top = tqi - 18 +'px';
 
-          gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[1].setAttribute('class','prim');
-          gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[7].setAttribute('class','prim');
-        }
+        gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[1].setAttribute('class','prim');
+        let hr = gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[1].style.height;
+        let hri = parseInt(hr.substr(0,hr.length-2));
+        gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[1].style.height = hri - 18 + 'px';
 
-        if ( this.click[e.$key] == undefined ){
-          document.getElementById(e.$key).addEventListener('click', () => {
-            this.closeLastInfo();
-            this.openEvent(e.$key);
-            this.lastOpenedInfoWindow = null;
-          });
-          this.click[e.$key] = true;
-        }
-      });
+        gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[7].setAttribute('class','prim');
+        let hu = gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[7].style.height;
+        let hui = parseInt(hu.substr(0,hu.length-2));
+        gw[i].parentElement.getElementsByTagName('div')[0].getElementsByTagName('div')[7].style.height = hui - 18 + 'px';
+      }
 
-      google.maps.event.addListener(marker, 'click', () => {
-        this.closeLastInfo();
-        infoWindow.open(this.map, marker);
-        this.lastOpenedInfoWindow = infoWindow;
-      });
+      if ( this.click[e.$key] == undefined ){
+        document.getElementById(e.$key).addEventListener('click', () => {
+          this.closeLastInfo();
+          this.openEvent(e.$key);
+          this.lastOpenedInfoWindow = null;
+        });
+        this.click[e.$key] = true;
+      }
+    });
+
+    google.maps.event.addListener(marker, 'click', () => {
+      this.closeLastInfo();
+      infoWindow.open(this.map, marker);
+      this.lastOpenedInfoWindow = infoWindow;
     });
   }
 
@@ -372,7 +439,7 @@ export class EventsPage {
 
   openEvent(id){
     if ( this.authentic ){
-      this.navCtrl.push(EventDetailPage, {id: this.stCity+'/'+id});
+      this.navCtrl.push(EventDetailPage, {id: this.stCity+'/'+this.date+'/'+id});
     } else {
       let alert = this.alertCtrl.create({
         title: "Você precisa estar logado!",
@@ -418,9 +485,6 @@ export class EventsPage {
     let a = ( Math.pow(Math.sin(difLat/2),2) + Math.cos(radLat1) ) * Math.cos(radLat2) * Math.pow(Math.sin(difLng/2),2);
     let c = 2 * Math.atan(Math.sqrt(a) / Math.sqrt(1 - a));
     let d = 6371 * c;
-
-    console.log(d * 1000);
-    console.log(parseInt(''+(d * 1000))+' metros');
 
     return parseInt(''+(d * 1000));
   }

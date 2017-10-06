@@ -85,19 +85,6 @@ export class CriarEventoPage {
       div++;
     }
     this.csem = this.tsem[this.data.getDay()] +" "+ this.cf[this.data.getDay()][div-1] +" "+ this.sem[this.data.getDay()];
-
-    this.storage.get('casa').then((val) => {
-      if ( val != null ){
-        this.casa = this.db.list("casas/"+val+"/");
-        this.casa.forEach(ca => {
-          ca.forEach(c => {
-            if ( c.$key == 'coins' ){
-              this.coinsCasa = c.$value;
-            }
-          });
-        });
-      }
-    });
   }
 
   updateDt(){
@@ -117,6 +104,29 @@ export class CriarEventoPage {
   ngAfterViewInit(){
     this.txtArea = this.ionTxtArea._elementRef.nativeElement.children[0];
     this.txtArea.style.height = this.lineHeight + "px";
+    
+    this.storage.get('casa').then((val) => {
+      if ( val != null ){
+        this.casa = this.db.list("casas/"+val+"/");
+        this.casa.forEach(ca => {
+          ca.forEach(c => {
+            if ( c.$key == 'coins' ){
+              this.coinsCasa = c.$value;
+            } else if ( c.$key == 'desc' ){
+              this.desc = c.$value;
+            } else if ( c.$key == 'faixa' ){
+              this.faixa = c;
+            } else if ( c.$key == 'img' && c.$value != "assets/estab_default.png" ){
+              this.img = c.$value;
+              document.getElementById("foto_evento").style.backgroundImage = "url("+this.img+")";
+              document.getElementById("button").innerHTML = "Trocar imagem";
+            } else if ( c.$key == 'tags' ){
+              this.tags = c;
+            }
+          });
+        });
+      }
+    });
   }
 
   onChange(newValue){

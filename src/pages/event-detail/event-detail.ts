@@ -57,6 +57,7 @@ export class EventDetailPage {
 
   ukey = null;
   ekey = null;
+  tzoffset;
 
   constructor(
     public platform: Platform,
@@ -77,11 +78,11 @@ export class EventDetailPage {
     this.id = navParams.data.id;
     this.mixpanel.track("Detalhe do evento",{"id":this.id});
     console.log(this.id);
-    let tzoffset = (new Date()).getTimezoneOffset() * 60000;
-    this.data = new Date(Date.now() - tzoffset).toISOString().slice(0,-1);
+    this.tzoffset = (new Date()).getTimezoneOffset() * 60000;
+    this.data = new Date(Date.now() - this.tzoffset).toISOString().slice(0,-1);
 
-    this.event = db.list('/evento/'+this.id+'/');
-    this.eventoConf = db.list('/evento/'+this.id+'/confirmados/');
+    this.event = db.list('/eventos/'+this.id+'/');
+    this.eventoConf = db.list('/eventos/'+this.id+'/confirmados/');
     this.userConf = db.list('/usuario/'+this.uid+'/confirmados/');
 
     this.storage.get('casa').then((val) => {
@@ -295,9 +296,10 @@ export class EventDetailPage {
             });
             if ( lastCheck != null ){
               let d = new Date(lastCheck);
+              d = new Date(d.getTime() - this.tzoffset);
               d.setHours(d.getHours()+1);
               console.log(d.toISOString().slice(0,-1))
-              console.log(this.data)
+              console.log(this.data);
               if ( this.data >= d.toISOString().slice(0,-1) ){
                 this.backgroundCheck();
               } else {
@@ -376,8 +378,6 @@ export class EventDetailPage {
         this.userConf.update(this.ukey,{date: new Date(Date.now() - tzoffset).toISOString().slice(0,-1)});
       }
     }
-
-    this.loading.dismiss();
 
     this.confirmCheck();
 
@@ -534,43 +534,101 @@ export class EventDetailPage {
       }
       console.log('check value')
       let index = this.e['criador'].indexOf('/');
-      let link = 'http://usevou.com/api/transaction.php';
-      let send = JSON.stringify({
-        de: this.e['criador'].slice(index+1,this.e['criador'].length),
-        para: firebase.auth().currentUser.uid,
-        valor: valor,
-        check: true,
-        nEvent: this.e['nome'],
-        vezes: (cont+1)
-      });
 
-      this.http.post(link, send).subscribe(data => {
-        if ( data['_body'] == 1 ){
-          let alert = this.alertCtrl.create({
-            title: 'Check-in realizado com sucesso!',
-            subTitle: 'O check-in neste evento foi realizado com sucesso, agora vamos nos divertir.',
-            buttons: ['OK']
+      this.timeout = setTimeout(() => {
+        this.loading.dismiss();
+        this.mixpanel.track("Check-in não realizado",{"motivo":"Sem conexão com a internet"});
+        let al = this.alertCtrl.create({
+          title: "Problemas de conexão!",
+          message: "Verifique sua conexão com a internet e tente novamente.",
+          buttons: [{
+            text: "Ok",
+            handler: d => {
+              clearTimeout(this.timeout);
+            }
+          }]
+        });
+        al.present();
+      },7000);
+
+      let de = this.e['criador'].slice(index+1,this.e['criador'].length);
+      let para = firebase.auth().currentUser.uid;
+      let vezes = cont + 1;
+
+      let date = new Date(Date.now());
+
+      this.contaData.getSaldo(para).then((value) => {
+        console.log(value)
+        let keyPara = value[0].id;
+        let saldoPara = value[0].saldo;
+        this.contaData.getSaldo(de).then((value) => {
+          let keyDe = value[0].id;
+          let saldoDe = value[0].saldo;
+          let trans1 = this.db.list("/conta/"+para+"/transacao");
+          let trans2 = this.db.list("/conta/"+de+"/transacao");
+          let push2 = trans2.push({});
+          let push1 = trans1.push({});
+          let key1 = push1.key;
+          let key2 = push2.key;
+          let update = {};
+          update[para+"/transacao/"+key1] = {
+            ano: date.getFullYear(),
+            classe: "entrada",
+            descricao: "Check-in no evento \""+this.e['nome']+"\". "+vezes+"ª vez neste estabelecimento.",
+            dia: date.getDate(),
+            dt_hr: date.toISOString().slice(0,-1),
+            hora: date.getHours(),
+            mes: date.getMonth()+1,
+            min: date.getMinutes(),
+            operador: "+",
+            tipo: "Entrada",
+            valor: valor
+          };
+          update[de+"/transacao/"+key2] = {
+            ano: date.getFullYear(),
+            classe: "saida",
+            descricao: "Check-in no seu evento \""+this.e['nome']+"\".",
+            dia: date.getDate(),
+            dt_hr: date.toISOString().slice(0,-1),
+            hora: date.getHours(),
+            mes: date.getMonth()+1,
+            min: date.getMinutes(),
+            operador: "-",
+            tipo: "Saída",
+            valor: valor
+          };
+          update[para+"/"+keyPara] = {saldo: (saldoPara + valor)}
+          update[de+"/"+keyDe] = {saldo: (saldoDe - valor)}
+          let trans = this.db.list('/');
+          trans.update('conta',update).then(value => {
+            this.loading.dismiss();
+            let alert = this.alertCtrl.create({
+              title: 'Check-in realizado com sucesso!',
+              subTitle: 'O check-in neste evento foi realizado com sucesso, agora vamos nos divertir.',
+              buttons: [{
+                text: "Ok",
+                handler: d => {
+                  clearTimeout(this.timeout);
+                }
+              }]
+            });
+            alert.present();
+            this.mixpanel.track("Check-in realizado com sucesso");
           });
-          alert.present();
-          this.mixpanel.track("Check-in realizado com sucesso");
-        } else {
-          let al = this.alertCtrl.create({
-            title: "Problemas de conexão!",
-            message: "Verifique sua conexão com a internet e tente novamente.",
-            buttons: ["Ok"]
-          });
-          al.present();
-          this.mixpanel.track("Check-in não realizado",{"motivo":"Sem conexão com a internet"});
-        }
-      }, error => {
-          console.log(error);
+        });
       });
       console.log('finish')
     } else {
+      this.loading.dismiss();
       let alert = this.alertCtrl.create({
         title: 'Check-in realizado com sucesso!',
         subTitle: 'O check-in neste evento foi realizado com sucesso, agora vamos nos divertir.',
-        buttons: ['OK']
+        buttons: [{
+          text: "Ok",
+          handler: d => {
+            clearTimeout(this.timeout);
+          }
+        }]
       });
       alert.present();
       this.mixpanel.track("Check-in realizado com sucesso");
@@ -587,12 +645,12 @@ export class EventDetailPage {
       title: 'Excluir evento',
       subTitle: 'Tem certeza que você deseja excluir este evento?',
       buttons: [{text: 'Não', handler: () => {}},{text: 'Sim', handler: () => {
-        let list = this.db.list('/evento/');
+        let list = this.db.list('/eventos/');
         list.remove(this.id);
         let casa = this.db.list('/casas/'+this.keyCasa+'/eventos');
         casa.forEach(cas => {
           for (let i=0;i<cas.length;i++){
-            if ( cas[i].evento == this.id ){
+            if ( cas[i].id == this.id ){
               casa.remove(cas[i].$key);
             }
           }

@@ -14,6 +14,7 @@ import firebase from 'firebase';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/toPromise';
+import { Mixpanel } from '@ionic-native/mixpanel';
 
 @Component({
   selector: 'page-tabs',
@@ -46,6 +47,8 @@ export class TabsPage {
 
   ukey = null;
   ekey = null;
+  timeout;
+  tzoffset;
 
   constructor(
     public platform: Platform,
@@ -58,10 +61,11 @@ export class TabsPage {
     public alertCtrl: AlertController,
     public contaData: ContaProvider,
     public geolocation: Geolocation,
-    public http: Http
+    public http: Http,
+    private mixpanel: Mixpanel
   ) {
-    let tzoffset = (new Date()).getTimezoneOffset() * 60000;
-    this.data = new Date(Date.now() - tzoffset).toISOString().slice(0,-1);
+    this.tzoffset = (new Date()).getTimezoneOffset() * 60000;
+    this.data = new Date(Date.now() - this.tzoffset).toISOString().slice(0,-1);
     const authObserver = afAuth.authState.subscribe( user => {
       if (user) {
         if (!user.isAnonymous){
@@ -84,7 +88,7 @@ export class TabsPage {
             this.checkqrc = false;
             setTimeout(() => {
               document.getElementById('cont').style.filter = 'blur(5px)';
-              document.getElementById('fundo').style.opacity = '1';
+              document.getElementById('fundo_tabs').style.opacity = '1';
             },500);
           }
         });
@@ -107,7 +111,7 @@ export class TabsPage {
 
   closeCheckqrc(){
     document.getElementById('cont').style.filter = 'blur(0px)';
-    document.getElementById('fundo').style.opacity = '0';
+    document.getElementById('fundo_tabs').style.opacity = '0';
     setTimeout(() => {
       this.checkqrc = true;
       this.storage.set('checkqrc', true);
@@ -116,6 +120,7 @@ export class TabsPage {
 
   readQRC(){
     if ( this.authentic ){
+      this.mixpanel.track("Check-in com QR-Code");
       this.e = [];
       this.id = null;
       this.confirm = null;
@@ -143,13 +148,13 @@ export class TabsPage {
             for(let i=0;i<evento.length;i++){
               if ( currentDt == null || currentDt < evento[i].dt ){
                 currentDt = evento[i].dt;
-                this.id = evento[i].evento;
+                this.id = evento[i].id;
               }
             }
-            this.eventoConf = this.db.list('/evento/'+this.id+'/confirmados/');
+            this.eventoConf = this.db.list('/eventos/'+this.id+'/confirmados/');
             this.userConf = this.db.list('/usuario/'+firebase.auth().currentUser.uid+'/confirmados/');
             this.checkConf();
-            let eve = this.db.list('evento/'+this.id);
+            let eve = this.db.list('eventos/'+this.id);
             eve.forEach(even => {
               even.forEach(ev => {
                 this.e[ev.$key] = ev.$value;
@@ -257,6 +262,7 @@ export class TabsPage {
                   buttons: ['OK']
                 });
                 alert.present();
+                this.mixpanel.track("Check-in não realizado",{"motivo":"Já fez check-in em menos de uma hora"});
               }
             } else {
               this.backgroundCheck();
@@ -269,6 +275,7 @@ export class TabsPage {
               buttons: ['OK']
             });
             alert.present();
+            this.mixpanel.track("Check-in não realizado",{"motivo":"Não está próximo o suficiente"});
           }
         }, (err) => {
           this.loading.dismiss();
@@ -282,6 +289,7 @@ export class TabsPage {
           buttons: ['OK']
         });
         alert.present();
+        this.mixpanel.track("Check-in não realizado",{"motivo":"Já fez check-in neste evento"});
       }
     } else {
       this.loading.dismiss();
@@ -291,6 +299,7 @@ export class TabsPage {
         buttons: ['OK']
       });
       alert.present();
+      this.mixpanel.track("Check-in não realizado",{"motivo":"É administrador do estabelecimento"});
     }
   }
 
@@ -328,8 +337,8 @@ export class TabsPage {
   }
 
   confirmCheck(){
-    this.eventoConf.update(this.ekey,{check: true, mode: 'button'});
-    this.userConf.update(this.ukey,{check: true, mode: 'button'});
+    this.eventoConf.update(this.ekey,{check: true, mode: 'qr-code'});
+    this.userConf.update(this.ukey,{check: true, mode: 'qr-code'});
     if ( this.e['coin'] ){
       let cont = 0;
       this.userConf.forEach(us => {
@@ -350,34 +359,88 @@ export class TabsPage {
       }
       console.log('check value')
       let index = this.e['criador'].indexOf('/');
-      let link = 'http://usevou.com/api/transaction.php';
-      let send = JSON.stringify({
-        de: this.e['criador'].slice(index+1,this.e['criador'].length),
-        para: firebase.auth().currentUser.uid,
-        valor: valor,
-        check: true,
-        nEvent: this.e['nome'],
-        vezes: (cont+1)
-      });
 
-      this.http.post(link, send).subscribe(data => {
-        if ( data['_body'] == 1 ){
-          let alert = this.alertCtrl.create({
-            title: 'Check-in realizado com sucesso!',
-            subTitle: 'O check-in neste evento foi realizado com sucesso, agora vamos nos divertir.',
-            buttons: ['OK']
+      this.timeout = setTimeout(() => {
+        this.loading.dismiss();
+        this.mixpanel.track("Check-in não realizado",{"motivo":"Sem conexão com a internet"});
+        let al = this.alertCtrl.create({
+          title: "Problemas de conexão!",
+          message: "Verifique sua conexão com a internet e tente novamente.",
+          buttons: [{
+            text: "Ok",
+            handler: d => {
+              clearTimeout(this.timeout);
+            }
+          }]
+        });
+        al.present();
+      },7000);
+
+      let de = this.e['criador'].slice(index+1,this.e['criador'].length);
+      let para = firebase.auth().currentUser.uid;
+      let vezes = cont + 1;
+
+      let date = new Date(Date.now());
+
+      this.contaData.getSaldo(para).then((value) => {
+        console.log(value)
+        let keyPara = value[0].id;
+        let saldoPara = value[0].saldo;
+        this.contaData.getSaldo(de).then((value) => {
+          let keyDe = value[0].id;
+          let saldoDe = value[0].saldo;
+          let trans1 = this.db.list("/conta/"+para+"/transacao");
+          let trans2 = this.db.list("/conta/"+de+"/transacao");
+          let push2 = trans2.push({});
+          let push1 = trans1.push({});
+          let key1 = push1.key;
+          let key2 = push2.key;
+          let update = {};
+          update[para+"/transacao/"+key1] = {
+            ano: date.getFullYear(),
+            classe: "entrada",
+            descricao: "Check-in no evento \""+this.e['nome']+"\". "+vezes+"ª vez neste estabelecimento.",
+            dia: date.getDate(),
+            dt_hr: date.toISOString().slice(0,-1),
+            hora: date.getHours(),
+            mes: date.getMonth()+1,
+            min: date.getMinutes(),
+            operador: "+",
+            tipo: "Entrada",
+            valor: valor
+          };
+          update[de+"/transacao/"+key2] = {
+            ano: date.getFullYear(),
+            classe: "saida",
+            descricao: "Check-in no seu evento \""+this.e['nome']+"\".",
+            dia: date.getDate(),
+            dt_hr: date.toISOString().slice(0,-1),
+            hora: date.getHours(),
+            mes: date.getMonth()+1,
+            min: date.getMinutes(),
+            operador: "-",
+            tipo: "Saída",
+            valor: valor
+          };
+          update[para+"/"+keyPara] = {saldo: (saldoPara + valor)}
+          update[de+"/"+keyDe] = {saldo: (saldoDe - valor)}
+          let trans = this.db.list('/');
+          trans.update('conta',update).then(value => {
+            this.loading.dismiss();
+            let alert = this.alertCtrl.create({
+              title: 'Check-in realizado com sucesso!',
+              subTitle: 'O check-in neste evento foi realizado com sucesso, agora vamos nos divertir.',
+              buttons: [{
+                text: "Ok",
+                handler: d => {
+                  clearTimeout(this.timeout);
+                }
+              }]
+            });
+            alert.present();
+            this.mixpanel.track("Check-in realizado com sucesso");
           });
-          alert.present();
-        } else {
-          let al = this.alertCtrl.create({
-            title: "Problemas de conexão!",
-            message: "Verifique sua conexão com a internet e tente novamente.",
-            buttons: ["Ok"]
-          });
-          al.present();
-        }
-      }, error => {
-          console.log(error);
+        });
       });
       console.log('finish')
     } else {
@@ -387,6 +450,7 @@ export class TabsPage {
         buttons: ['OK']
       });
       alert.present();
+      this.mixpanel.track("Check-in realizado com sucesso");
     }
   }
 }

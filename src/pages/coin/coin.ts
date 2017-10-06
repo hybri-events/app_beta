@@ -26,6 +26,7 @@ export class CoinPage {
   coins: string = "home";
   date1: string;
   date2: string;
+  tzoffset;
   authentic: any = false;
   transacoes: FirebaseListObservable<any>;
 
@@ -69,10 +70,10 @@ export class CoinPage {
     public http: Http,
     private mixpanel: Mixpanel
   ) {
-    let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+    this.tzoffset = (new Date()).getTimezoneOffset() * 60000;
     this.plat = platform;
-    let fdata = new Date(Date.now() - tzoffset);
-    let sdata = new Date(Date.now() - tzoffset);
+    let fdata = new Date(Date.now() - this.tzoffset);
+    let sdata = new Date(Date.now() - this.tzoffset);
     sdata.setDate(sdata.getDate()-30);
     fdata.setHours(20);
     fdata.setMinutes(59);
@@ -239,7 +240,9 @@ export class CoinPage {
         this.nome = this.dataQRC.nome;
         this.vous = 'V$ '+this.dataQRC.vous;
         this.equiv = 'R$ '+(this.dataQRC.vous * 0.04).toFixed(2);
+        clearTimeout(this.timeout);
         this.timeout = setTimeout(() => {
+          this.loading.dismiss();
           let alert = this.alertCtrl.create({
             title: "Transferência expirada!",
             message: "Você tem 1 minuto para confirmar a transferência, caso contrário, a operação é cancelada. Tente novamente.",
@@ -265,72 +268,114 @@ export class CoinPage {
     });
     this.loading.present();
 
-    let link = 'http://usevou.com/api/transaction.php';
-    let send;
+    this.timeout = setTimeout(() => {
+      this.loading.dismiss();
+      this.mixpanel.track("Transferência não realizada",{"motivo":"Problemas de conexão"});
+      let al = this.alertCtrl.create({
+        title: "Problemas de conexão!",
+        message: "Verifique sua conexão com a internet e tente novamente.",
+        buttons: [{
+          text: "Ok",
+          handler: d => {
+            clearTimeout(this.timeout);
+            this.coins = 'home';
+            this.changeTabs();
+          }
+        }]
+      });
+      al.present();
+    },7000);
+
+    let de = this.dataQRC.uid;
+    let valor = this.dataQRC.vous;
+    let para;
     if ( this.isCasa ){
-      send = JSON.stringify({
-        de: this.dataQRC.uid,
-        para: this.keyCasa,
-        valor: this.dataQRC.vous,
-        check: false
-      });
+      para = this.keyCasa;
     } else {
-      send = JSON.stringify({
-        de: this.dataQRC.uid,
-        para: firebase.auth().currentUser.uid,
-        valor: this.dataQRC.vous,
-        check: false
-      });
+      para = firebase.auth().currentUser.uid;
     }
 
-    this.http.post(link, send).subscribe(data => {
-      if ( data['_body'] == 1 ){
-        this.loading.dismiss();
-        let al = this.alertCtrl.create({
-          title: "Tranferência executada com sucesso!",
-          message: "Sua transferência foi executada com sucesso. Muito obrigado!",
-          buttons: [{
-            text: "Ok",
-            handler: data => {
-              clearTimeout(this.timeout);
-              this.coins = 'home';
-              this.changeTabs();
-            }
-          }]
-        });
-        al.present();
-      } else if ( data['_body'] == 0 ){
-        this.loading.dismiss();
-        let al = this.alertCtrl.create({
-          title: "Saldo insuficiente!",
-          message: this.dataQRC.nome+" não tem saldo suficiente para completar a tranferência.",
-          buttons: [{
-            text: "Ok",
-            handler: data => {
-              clearTimeout(this.timeout);
-              this.coins = 'home';
-              this.changeTabs();
-            }
-          }]
-        });
-        al.present();
-      } else {
-        this.loading.dismiss();
-        let al = this.alertCtrl.create({
-          title: "Problemas de conexão!",
-          message: "Verifique sua conexão com a internet e tente novamente.",
-          buttons: [{
-            text: "Ok",
-            handler: d => {
-              this.coins = 'home';
-              this.changeTabs();
-            }
-          }]
-        });
-        al.present();
-      }
-    }, error => {
-        console.log(error);
+    let date = new Date(Date.now());
+
+    this.contaData.getSaldo(para).then((value) => {
+      let keyPara = value[0].id;
+      let saldoPara = value[0].saldo;
+      this.contaData.getSaldo(de).then((value) => {
+        let keyDe = value[0].id;
+        let saldoDe = value[0].saldo;
+        if ( (saldoDe - valor) >= 0 ){
+          let trans1 = this.db.list("/conta/"+para+"/transacao");
+          let trans2 = this.db.list("/conta/"+de+"/transacao");
+          let push2 = trans2.push({});
+          let push1 = trans1.push({});
+          let key1 = push1.key;
+          let key2 = push2.key;
+          let update = {};
+          update[para+"/transacao/"+key1] = {
+            ano: date.getFullYear(),
+            classe: "entrada",
+            descricao: "Pagamento recebido de "+this.dataQRC.nome,
+            dia: date.getDate(),
+            dt_hr: date.toISOString().slice(0,-1),
+            hora: date.getHours(),
+            mes: date.getMonth()+1,
+            min: date.getMinutes(),
+            operador: "+",
+            tipo: "Entrada",
+            valor: (valor * 0.8)
+          };
+          update[de+"/transacao/"+key2] = {
+            ano: date.getFullYear(),
+            classe: "saida",
+            descricao: "Pagamento recebido de "+this.myname,
+            dia: date.getDate(),
+            dt_hr: date.toISOString().slice(0,-1),
+            hora: date.getHours(),
+            mes: date.getMonth()+1,
+            min: date.getMinutes(),
+            operador: "-",
+            tipo: "Saída",
+            valor: valor
+          };
+          update[para+"/"+keyPara] = {saldo: (saldoPara + (valor * 0.8))}
+          update[de+"/"+keyDe] = {saldo: (saldoDe - valor)}
+          let trans = this.db.list('/');
+          trans.update('conta',update).then(value => {
+            console.log(value);
+            this.loading.dismiss();
+            this.mixpanel.track("Transferência realizada com sucesso");
+            let al = this.alertCtrl.create({
+              title: "Tranferência executada com sucesso!",
+              message: "Sua transferência foi executada com sucesso. Muito obrigado!",
+              buttons: [{
+                text: "Ok",
+                handler: data => {
+                  clearTimeout(this.timeout);
+                  this.coins = 'home';
+                  this.changeTabs();
+                }
+              }]
+            });
+            al.present();
+          });
+        } else {
+          this.loading.dismiss();
+          this.mixpanel.track("Transferência não realizada",{"motivo":"Saldo insuficiente"});
+          let al = this.alertCtrl.create({
+            title: "Saldo insuficiente!",
+            message: this.dataQRC.nome+" não tem saldo suficiente para completar a tranferência.",
+            buttons: [{
+              text: "Ok",
+              handler: data => {
+                clearTimeout(this.timeout);
+                this.coins = 'home';
+                this.changeTabs();
+              }
+            }]
+          });
+          al.present();
+        }
+      });
     });
   }
 

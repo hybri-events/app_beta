@@ -86,10 +86,29 @@
           "valor" => $valor
       );
 
-      $firebase->push(DEFAULT_PATH .$de. '/transacao', $trans1);
-      $firebase->push(DEFAULT_PATH .$para. '/transacao', $trans2);
-      $firebase->set(DEFAULT_PATH . $de .'/'. $key1, array("saldo" => ($saldo1 - $valor)));
-      $firebase->set(DEFAULT_PATH . $para .'/'. $key2, array("saldo" => ($saldo2 + $valor)));
+      $path1 = DEFAULT_PATH .$de. '/transacao';
+      $path2 = DEFAULT_PATH .$de. '/transacao';
+      $path3 = DEFAULT_PATH . $de .'/'. $key1;
+      $path4 = DEFAULT_PATH . $para .'/'. $key2;
+
+      $firebase->push($path1, array());
+      $pos1 = strpos($push1,'":"');
+      $pos2 =  strpos($push1,'"}');
+      $key1 = substr($push1,($pos1 + 3),($pos2 - ($pos1 + 3)));
+
+      $firebase->push($path2, array());
+      $pos1 = strpos($push2,'":"');
+      $pos2 =  strpos($push2,'"}');
+      $key2 = substr($push2,($pos1 + 3),($pos2 - ($pos1 + 3)));
+
+      $update = array(
+        $path1 => array($key1 => $trans1),
+        $path2 => array($key2 => $trans2),
+        $path3 => array("saldo" => ($saldo1 - $valor)),
+        $path4 => array("saldo" => ($saldo2 + $valor))
+      );
+
+      $firebase->set('/teste/', $update);
 
       echo "1";
     } else {
@@ -122,10 +141,29 @@
       );
 
       if ( ($saldo1 - $valor) >= 0 ){
-        $firebase->push(DEFAULT_PATH .$de. '/transacao', $trans1);
-        $firebase->push(DEFAULT_PATH .$para. '/transacao', $trans2);
-        $firebase->set(DEFAULT_PATH . $de .'/'. $key1, array("saldo" => ($saldo1 - $valor)));
-        $firebase->set(DEFAULT_PATH . $para .'/'. $key2, array("saldo" => ($saldo2 + ($valor * 0.8))));
+        $path1 = $de.'/transacao';
+        $path2 = $de.'/transacao';
+        $path3 = $de.'/'.$key1;
+        $path4 = $para.'/'.$key2;
+
+        $push1 = $firebase->push($path1, array());
+        $pos1 = strpos($push1,'":"');
+        $pos2 =  strpos($push1,'"}');
+        $key1 = substr($push1,($pos1 + 3),($pos2 - ($pos1 + 3)));
+
+        $push2 = $firebase->push($path2, array());
+        $pos1 = strpos($push2,'":"');
+        $pos2 =  strpos($push2,'"}');
+        $key2 = substr($push2,($pos1 + 3),($pos2 - ($pos1 + 3)));
+
+        $update = array(
+          $path1 => array($key1 => $trans1),
+          $path2 => array($key2 => $trans2),
+          $path3 => array("saldo" => ($saldo1 - $valor)),
+          $path4 => array("saldo" => ($saldo2 + ($valor * 0.8)))
+        );
+
+        $firebase->set('/teste/', $update);
 
         echo "1";
       } else {

@@ -61,7 +61,7 @@ export class EditLocationEventPage {
           }
         }
       }
-      this.evento = this.db.list('/evento/');
+      this.evento = this.db.list('/eventos/');
       this.param['lat'] = this.lat;
       this.param['lng'] = this.lng;
       this.param['cidade'] = cidade;

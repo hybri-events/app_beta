@@ -27,7 +27,7 @@
       <div class="breve" padding *ngIf="events.length == 0 && isCasa && !carregando"><div class="txt_breve">Não há eventos futuros criados.</div></div>
       <div *ngFor="let e of events">
         <ion-card [ngStyle]="{'background-image': 'url('+e.img+')' }" *ngIf="e.priv == '0'" (click)="openEvent(e.key)">
-          <div class="fundo_card">
+          <div [attr.class]="e.coin ? 'coin fundo_card' : 'fundo_card'">
             <div class="amigos_list" *ngIf="e.coin"><img src="assets/selo.png"></div>
             <div class="info_list">
               <div class="icon_list"><ion-icon name="icon-coin"></ion-icon><div>{{(e.faixa_ini==0?'Gratuito':'R$'+e.faixa_ini)}}{{(e.faixa_fim==0?'':(e.faixa_fim!=e.faixa_ini?' - R$'+e.faixa_fim:''))}}</div></div>
@@ -73,7 +73,7 @@
       <div class="breve" padding *ngIf="events.length == 0 && isCasa && !carregando"><div class="txt_breve">Não há eventos criados anteriormente.</div></div>
       <div *ngFor="let e of events">
         <ion-card [ngStyle]="{'background-image': 'url('+e.img+')' }" *ngIf="e.priv == '0'" (click)="openEvent(e.key)">
-          <div class="fundo_card">
+          <div [attr.class]="e.coin ? 'coin fundo_card' : 'fundo_card'">
             <div class="amigos_list" *ngIf="e.coin"><img src="assets/selo.png"></div>
             <div class="info_list">
               <div class="icon_list"><ion-icon name="icon-coin"></ion-icon><div>{{(e.faixa_ini==0?'Gratuito':'R$'+e.faixa_ini)}}{{(e.faixa_fim==0?'':(e.faixa_fim!=e.faixa_ini?' - R$'+e.faixa_fim:''))}}</div></div>

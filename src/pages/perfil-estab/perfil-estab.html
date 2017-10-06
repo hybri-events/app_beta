@@ -1,0 +1,119 @@
+<ion-header id="tool">
+
+  <ion-navbar>
+    <ion-title id="title">{{details.nome}}</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+  <div class="roxo">
+    <div id="fundo" style="background-color:white;">
+      <div class="header_af">
+        <div class="conteudo">
+          <div class="ft_perfil" [ngStyle]="{'background-image': 'url('+details.img+')' }"></div>
+          <div class="name">{{details.nome}}</div>
+          <div class="avaliacao">
+            <ion-icon name="icon-star-full"></ion-icon>
+            <ion-icon name="icon-star-full"></ion-icon>
+            <ion-icon name="icon-star-full"></ion-icon>
+            <ion-icon name="icon-star-half"></ion-icon>
+            <ion-icon name="icon-star-void"></ion-icon>
+            <br>
+            <span>500 avaliações</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ion-toolbar class="tab_top" no-border-top style="padding:0px;" id="tabs">
+    <ion-segment [(ngModel)]="tab" (ionChange)="changeTabs()">
+      <ion-segment-button value="eventos">
+        Eventos
+      </ion-segment-button>
+      <ion-segment-button value="sobre">
+        Sobre
+      </ion-segment-button>
+      <ion-segment-button value="comentarios">
+        Comentários
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+  <div [ngSwitch]="tab">
+    <div *ngSwitchCase="'eventos'">
+      <ion-list>
+        <ion-list-header>Próximos</ion-list-header>
+        <ion-item id="list" style="padding-top:8px;">
+          
+        </ion-item>
+      </ion-list>
+    </div>
+    <div *ngSwitchCase="'sobre'">
+      <ion-list>
+        <ion-item id="list" *ngIf="details.desc != ''" style="padding-top:8px;">
+          <div class="lab"><ion-icon name="icon-desc" item-start></ion-icon>Descrição</div>
+          <pre class="cont" style="white-space:pre-line;font-family:'Lato', sans-serif;font-weight: 300;">{{details.desc}}</pre>
+        </ion-item>
+        <ion-item [attr.id]="details.desc == '' ? 'list' : ''">
+          <div class="lab"><ion-icon name="icon-events" item-start></ion-icon>Local</div>
+          <div class="cont"><div #map id="map" style="width:100%;height:150px;" (click)="startExternalMap()"></div></div>
+        </ion-item>
+        <ion-item>
+          <div class="lab"><ion-icon name="icon-agenda" item-start></ion-icon>Funcionamento</div>
+          <div class="cont">
+            <div class="dia">Domingo</div>
+            <div [attr.class]="details.dias.dom ? 'hora' : 'hora fechado'">{{(details.dias.dom?details.hora.dom.ini+' - '+details.hora.dom.fim:"Fechado")}}</div>
+
+            <div class="dia">Segunda-feira</div>
+            <div [attr.class]="details.dias.seg ? 'hora' : 'hora fechado'">{{(details.dias.seg?details.hora.seg.ini+' - '+details.hora.seg.fim:"Fechado")}}</div>
+
+            <div class="dia">Terça-feira</div>
+            <div [attr.class]="details.dias.ter ? 'hora' : 'hora fechado'">{{(details.dias.ter?details.hora.ter.ini+' - '+details.hora.ter.fim:"Fechado")}}</div>
+
+            <div class="dia">Quarta-feira</div>
+            <div [attr.class]="details.dias.qua ? 'hora' : 'hora fechado'">{{(details.dias.qua?details.hora.qua.ini+' - '+details.hora.qua.fim:"Fechado")}}</div>
+
+            <div class="dia">Quinta-feira</div>
+            <div [attr.class]="details.dias.qui ? 'hora' : 'hora fechado'">{{(details.dias.qui?details.hora.qui.ini+' - '+details.hora.qui.fim:"Fechado")}}</div>
+
+            <div class="dia">Sexta-feira</div>
+            <div [attr.class]="details.dias.sex ? 'hora' : 'hora fechado'">{{(details.dias.sex?details.hora.sex.ini+' - '+details.hora.sex.fim:"Fechado")}}</div>
+
+            <div class="dia">Sábado</div>
+            <div [attr.class]="details.dias.sab ? 'hora' : 'hora fechado'">{{(details.dias.sab?details.hora.sab.ini+' - '+details.hora.sab.fim:"Fechado")}}</div>
+          </div>
+        </ion-item>
+        <ion-item>
+          <div class="lab"><ion-icon name="icon-events" item-start></ion-icon>Check-ins no estabelecimento</div>
+          <div class="cont" style="padding:8px 0px;">
+            <canvas #canvas></canvas>
+          </div>
+        </ion-item>
+        <ion-item>
+          <div class="lab"><ion-icon name="icon-home" item-start></ion-icon>Características do local</div>
+          <div class="cont">
+            <div *ngIf="details.bar"><ion-icon name="icon-bar" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Bebidas</div>
+            <div *ngIf="details.cozinha"><ion-icon name="icon-comida" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Comidas</div>
+            <div *ngIf="details.wifi"><ion-icon name="icon-wifi" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Wi-Fi</div>
+            <div *ngIf="details.fum"><ion-icon name="icon-fumante" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Área para fumantes</div>
+            <div *ngIf="details.estac"><ion-icon name="icon-estacionamento" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Estacionamento</div>
+            <div *ngIf="details.acess"><ion-icon name="icon-acessibilidade" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Acessibilidade</div>
+          </div>
+        </ion-item>
+        <ion-item>
+          <div class="lab"><ion-icon name="icon-coin" item-start></ion-icon>Formas de pagamento</div>
+          <div class="cont">
+            <div *ngIf="details.cartao"><ion-icon name="icon-cartao" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Cartão</div>
+            <div *ngIf="details.dinheiro"><ion-icon name="icon-dinheiro" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Dinheiro</div>
+            <div *ngIf="details.coins"><ion-icon name="icon-vous" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Vous</div>
+          </div>
+        </ion-item>
+        <ion-item *ngIf="details.tags != undefined">
+          <div class="lab"><ion-icon name="icon-tag" item-start></ion-icon>Tags</div>
+          <div class="cont"><div class="tag" *ngFor="let t of details.tags">#{{t.nome}}</div></div>
+        </ion-item>
+      </ion-list>
+    </div>
+  </div>
+</ion-content>

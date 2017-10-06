@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.usevou.vou" version="1.18.22" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:gap="http://phonegap.com/ns/1.0">
+<widget id="com.usevou.vou" version="2.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:gap="http://phonegap.com/ns/1.0">
     <name>Vou</name>
     <description>An awesome Ionic/Cordova app.</description>
     <author email="gustavo@usevou.com" href="http://usevou.com/">Gustavo Oldenburg</author>
@@ -93,7 +93,6 @@
         <variable name="APP_ID" value="380223525703372" />
         <variable name="APP_NAME" value="Vou" />
     </plugin>
-    <plugin name="cordova-plugin-geolocation" spec="^2.4.3" />
     <plugin name="cordova-plugin-mauron85-background-geolocation" spec="^2.2.5">
         <variable name="ACCOUNT_TYPE" value="$PACKAGE_NAME.account" />
         <variable name="CONTENT_AUTHORITY" value="$PACKAGE_NAME" />
@@ -122,4 +121,7 @@
         <variable name="GEOFENCE_ALWAYS_USAGE_DESCRIPTION" value="For intelligent notification" />
     </plugin>
     <plugin name="cordova-plugin-mixpanel" spec="~4.0.0" />
+    <plugin name="cordova-plugin-geolocation" spec="~2.4.3">
+        <variable name="GEOLOCATION_USAGE_DESCRIPTION" value=" " />
+    </plugin>
 </widget>

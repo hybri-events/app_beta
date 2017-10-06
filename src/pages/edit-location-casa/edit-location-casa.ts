@@ -88,8 +88,8 @@ export class EditLocationCasaPage {
           let casa = this.db.list('/casas/'+this.param['id']+'/eventos/');
           casa.forEach(cas => {
             for ( let i=0;i<cas.length;i++ ){
-              let eventos = this.db.list('/evento/');
-              eventos.update(cas[i].evento,{
+              let eventos = this.db.list('/eventos/');
+              eventos.update(cas[i].id,{
                 cidade: this.param['cidade'],
                 desc: this.param['desc'],
                 faixa_fim: this.param['faixa']['upper'],
@@ -126,7 +126,7 @@ export class EditLocationCasaPage {
     modal.onDidDismiss(data => {
       console.log(data);
       for ( let i=0;i<data.sel.length;i++ ){
-        let eventos = this.db.list('/evento/');
+        let eventos = this.db.list('/eventos/');
         eventos.update(data.sel[i],{
           cidade: this.param['cidade'],
           desc: this.param['desc'],

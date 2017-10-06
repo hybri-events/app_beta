@@ -5,7 +5,7 @@ import 'rxjs/add/operator/map';
 
 @Injectable()
 export class EventoProvider {
-  offset = (new Date()).getTimezoneOffset() * 60000;
+  tzoffset = (new Date()).getTimezoneOffset() * 60000;
 
   constructor(public http: Http) {}
 
@@ -14,12 +14,12 @@ export class EventoProvider {
       this.cadTags(params[0].tags[i].nome);
     }
     let dti = new Date(params[0].dt_ini);
-    let datai = new Date(dti.getTime() + this.offset);
+    let datai = new Date(dti.getTime());
     let dtf = new Date(params[0].dt_fim);
-    let dataf = new Date(dtf.getTime() + this.offset);
+    let dataf = new Date(dtf.getTime());
     let meses = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
     let mes = meses[datai.getMonth()];
-    return firebase.database().ref('evento/'+params[1].cidade).push({
+    return firebase.database().ref('eventos/'+params[1].cidade+"/"+dti.getFullYear()+"/"+("0"+(dti.getMonth()+1)).slice(-2)+"/"+("0"+dti.getDate()).slice(-2)).push({
       nome: params[0].nome,
       criador: uid,
       nomeCriador: params[2].nomeCriador,
@@ -55,7 +55,7 @@ export class EventoProvider {
 
   saveImg(key,img){
     firebase.storage().ref('/ft_evento/').child(key+'.png').putString(img, 'base64', {contentType: 'image/png'}).then((savedPicture) => {
-      firebase.database().ref(`evento`).child(key).child('img').set(savedPicture.downloadURL);
+      firebase.database().ref(`eventos`).child(key).child('img').set(savedPicture.downloadURL);
     });
   }
 
