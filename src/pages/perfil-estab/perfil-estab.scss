@@ -96,4 +96,41 @@ page-perfil-estab {
   .fechado{
     color: red;
   }
+  .label_ava{
+    text-align: center;
+    width: 100%;
+    font-size: 1.3em;
+  }
+  .cont_star{
+    width: 100%;
+    margin-top: 28px;
+    margin-bottom: 16px;
+  }
+  .stars{
+    display: table;
+    margin: auto;
+    font-size: 2em;
+  }
+  .stars ion-icon{
+    margin: 4px;
+    color: #652C90;
+  }
+  .btnAvaliar{
+    float: right;
+    margin-top: -32px;
+    z-index: 10;
+  }
+  ion-slide{
+    padding-bottom: 36px;
+  }
+  .swiper-pagination-bullet-active{
+    background: #652C90;
+  }
+  .swiper-pagination{
+    display: none;
+  }
+  .nivel{
+    font-size: 0.9em;
+    margin-top: 16px;
+  }
 }

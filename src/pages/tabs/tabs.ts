@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { NavController, Platform, AlertController, LoadingController, Loading } from 'ionic-angular';
 import { EventsPage } from '../events/events';
 import { HomePage } from '../home/home';
@@ -15,6 +15,9 @@ import { Http } from '@angular/http';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/toPromise';
 import { Mixpanel } from '@ionic-native/mixpanel';
+import { CriarEventoPage } from '../criar-evento/criar-evento';
+import { BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationResponse } from '@ionic-native/background-geolocation';
+import { LocalNotifications } from '@ionic-native/local-notifications';
 
 @Component({
   selector: 'page-tabs',
@@ -42,6 +45,9 @@ export class TabsPage {
 
   uid = null;
   data;
+  dt;
+  dtNoti = null;
+  contNoti = 0;
 
   permanencia: number = 0;
 
@@ -62,9 +68,13 @@ export class TabsPage {
     public contaData: ContaProvider,
     public geolocation: Geolocation,
     public http: Http,
-    private mixpanel: Mixpanel
+    private mixpanel: Mixpanel,
+    private backgroundGeolocation: BackgroundGeolocation,
+    private zone: NgZone,
+    private localNotifications: LocalNotifications
   ) {
     this.tzoffset = (new Date()).getTimezoneOffset() * 60000;
+    this.dt = new Date(Date.now() - this.tzoffset);
     this.data = new Date(Date.now() - this.tzoffset).toISOString().slice(0,-1);
     const authObserver = afAuth.authState.subscribe( user => {
       if (user) {
@@ -78,6 +88,95 @@ export class TabsPage {
         authObserver.unsubscribe();
       }
     });
+    this.storage.get('dtNoti').then((val) => {
+      this.dtNoti = val;
+    });
+    this.storage.get('contNoti').then((val) => {
+      if ( val != null ){
+        this.contNoti = val;
+      }
+    });
+  }
+
+  addGeofence(){
+    const config: BackgroundGeolocationConfig = {
+            desiredAccuracy: 10,
+            stationaryRadius: 50,
+            distanceFilter: 50,
+            debug: false, //  enable this hear sounds for background-geolocation life-cycle.
+            stopOnTerminate: false, // enable this to clear background location settings when the app terminates
+    };
+
+    this.backgroundGeolocation.configure(config).subscribe((location: BackgroundGeolocationResponse) => {
+      console.log(location);
+      this.zone.run(() => {
+        let lat = location.latitude;
+        let lng = location.longitude;
+
+        this.dt = new Date(Date.now() - this.tzoffset);
+
+        let casas = this.db.list('/casas/');
+        casas.forEach(casa => {
+          casa.forEach(cas => {
+            let ca = this.db.list('casas/'+cas.$key);
+            ca.forEach(c => {
+              for ( let i=0;i<c.length;i++ ){
+                if ( c[i].valid && c[i].coins ){
+                  if ( (this.calcDist(lat,lng,c[i].lat,c[i].lng) + location.accuracy) <= 50 ){
+                    let eventos = this.db.list('eventos/'+c[i].cidade+"/"+this.dt.getFullYear()+'/'+("0"+(this.dt.getMonth()+1)).slice(-2)+"/"+("0"+this.dt.getDate()).slice(-2)+"/");
+                    eventos.forEach(evento => {
+                      for (let j=0;j<evento.length;j++){
+                        if ( evento[j].criador == (cas.$key+"/"+c[i].$key) ){
+                          let date = new Date(new Date(evento[j].dti).getTime() - this.tzoffset);
+                          console.log(date)
+                          console.log(this.dt);
+                          if ( date <= this.dt ){
+                            date = new Date(Date.now() - this.tzoffset);
+                            if ( this.contNoti <= 3 ){
+                              this.contNoti++;
+                              this.storage.set('contNoti',this.contNoti);
+                              date.setMinutes(date.getMinutes()+60);
+                              console.log(this.dtNoti);
+                              if ( this.dtNoti == null || this.dtNoti <= this.dt ){
+                                this.storage.get('notiCheckin').then((val) => {
+                                  let d = this.dt;
+                                  if ( val != null ){
+                                    d = new Date(val);
+                                    d.setHours(d.getHours() + 12);
+                                  }
+                                  if ( d <= this.dt ){
+                                    this.localNotifications.schedule({
+                                      id: 500,
+                                      title: 'Você está em '+c[i].nome+'?',
+                                      text: 'Não perca tempo e faça já seu check-in.',
+                                      led: '652C90',
+                                      icon: "res://ic_stat_onesignal_default",
+                                      color: '652C90'
+                                    });
+                                  }
+                                });
+                                this.dtNoti = date;
+                                this.storage.set('dtNoti',date);
+                              }
+                            }
+                          }
+                        }
+                      }
+                    });
+                  }
+                }
+              }
+            });
+          });
+        });
+      });
+
+      //this.backgroundGeolocation.finish();
+    });
+
+    this.backgroundGeolocation.start();
+
+    //this.backgroundGeolocation.stop();
   }
 
   ionViewDidLoad(){
@@ -98,8 +197,9 @@ export class TabsPage {
     this.storage.get('casa').then((val) => {
       if ( val != null ){
         this.isCasa = true;
-        document.getElementById('tab-t0-1').style.display = 'none';
       }
+
+      this.addGeofence();
     });
 
     if ( this.platform.is('android') ){
@@ -434,6 +534,7 @@ export class TabsPage {
                 text: "Ok",
                 handler: d => {
                   clearTimeout(this.timeout);
+                  this.storage.set('notiCheckin',date.toISOString());
                 }
               }]
             });
@@ -451,6 +552,22 @@ export class TabsPage {
       });
       alert.present();
       this.mixpanel.track("Check-in realizado com sucesso");
+    }
+  }
+
+  openNewEvent(){
+    if ( this.authentic ){
+      this.nav.push(CriarEventoPage, null);
+    } else {
+      let alert = this.alertCtrl.create({
+        title: "Você precisa estar logado!",
+        message: "Faça seu cadastro ou login para poder criar seus próprios eventos.",
+        buttons: [{
+          text: "Ok",
+          role: 'cancel'
+        }]
+      });
+      alert.present();
     }
   }
 }

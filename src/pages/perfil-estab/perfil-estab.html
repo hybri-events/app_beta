@@ -45,13 +45,13 @@
       <ion-list>
         <ion-list-header>Próximos</ion-list-header>
         <ion-item id="list" style="padding-top:8px;">
-          
+
         </ion-item>
       </ion-list>
     </div>
     <div *ngSwitchCase="'sobre'">
       <ion-list>
-        <ion-item id="list" *ngIf="details.desc != ''" style="padding-top:8px;">
+        <ion-item id="list" *ngIf="details.desc != ''" style="margin-top:10px;display:inline-block;">
           <div class="lab"><ion-icon name="icon-desc" item-start></ion-icon>Descrição</div>
           <pre class="cont" style="white-space:pre-line;font-family:'Lato', sans-serif;font-weight: 300;">{{details.desc}}</pre>
         </ion-item>
@@ -85,13 +85,13 @@
           </div>
         </ion-item>
         <ion-item>
-          <div class="lab"><ion-icon name="icon-events" item-start></ion-icon>Check-ins no estabelecimento</div>
-          <div class="cont" style="padding:8px 0px;">
+          <div class="lab"><ion-icon name="icon-events" item-start></ion-icon>Movimento do estabelecimento</div>
+          <div class="cont" style="padding:16px 8px 0px 8px;margin-left:-16px;">
             <canvas #canvas></canvas>
           </div>
         </ion-item>
         <ion-item>
-          <div class="lab"><ion-icon name="icon-home" item-start></ion-icon>Características do local</div>
+          <div class="lab"><ion-icon name="icon-home" item-start></ion-icon>Características do estabelecimento</div>
           <div class="cont">
             <div *ngIf="details.bar"><ion-icon name="icon-bar" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Bebidas</div>
             <div *ngIf="details.cozinha"><ion-icon name="icon-comida" style="margin-right:8px;margin-bottom:8px;"></ion-icon> Comidas</div>
@@ -112,6 +112,104 @@
         <ion-item *ngIf="details.tags != undefined">
           <div class="lab"><ion-icon name="icon-tag" item-start></ion-icon>Tags</div>
           <div class="cont"><div class="tag" *ngFor="let t of details.tags">#{{t.nome}}</div></div>
+        </ion-item>
+      </ion-list>
+    </div>
+    <div *ngSwitchCase="'comentarios'">
+      <ion-card id="list" padding style="display:inline-block;" *ngIf="!avaliado">
+        <div class="label_ava">Deixe sua avaliação</div>
+        <ion-slides pager (swipeleft)="swipeLeft()" (swiperight)="swipeRight()">
+          <ion-slide>
+            <div class="cont_star">
+              <div class="stars">
+                <ion-icon name="icon-star-void" id="star1" (click)="setStars(1)"></ion-icon>
+                <ion-icon name="icon-star-void" id="star2" (click)="setStars(2)"></ion-icon>
+                <ion-icon name="icon-star-void" id="star3" (click)="setStars(3)"></ion-icon>
+                <ion-icon name="icon-star-void" id="star4" (click)="setStars(4)"></ion-icon>
+                <ion-icon name="icon-star-void" id="star5" (click)="setStars(5)"></ion-icon>
+              </div>
+              <div class="nivel">{{nivel[stars]}}</div>
+            </div>
+          </ion-slide>
+
+          <ion-slide>
+            <ion-list>
+              <ion-item style="margin-left: 16px;margin-top:8px;padding-left:0px;">
+                <ion-label floating>Comentário</ion-label>
+                <div item-content style="width:100%;">
+                  <ion-textarea #ionTxtArea [(ngModel)]="desc" (ngModelChange)='onChange($event)'></ion-textarea>
+                </div>
+              </ion-item>
+            </ion-list>
+          </ion-slide>
+        </ion-slides>
+        <button ion-button clear class="btnAvaliar" (click)="sendAva()" [disabled]="stars == 0">{{txtBtnAva}}</button>
+      </ion-card>
+      <ion-card id="list" padding style="display:inline-block;" *ngIf="avaliado">
+        <div class="label_ava">Sua avaliação</div>
+        <ion-slides pager (swipeleft)="swipeLeft()" (swiperight)="swipeRight()">
+          <ion-slide>
+            <div class="cont_star">
+              <div class="stars">
+                <ion-icon name="icon-star-void" id="star1" (click)="setStars(1)"></ion-icon>
+                <ion-icon name="icon-star-void" id="star2" (click)="setStars(2)"></ion-icon>
+                <ion-icon name="icon-star-void" id="star3" (click)="setStars(3)"></ion-icon>
+                <ion-icon name="icon-star-void" id="star4" (click)="setStars(4)"></ion-icon>
+                <ion-icon name="icon-star-void" id="star5" (click)="setStars(5)"></ion-icon>
+              </div>
+              <div class="nivel">{{nivel[stars]}}</div>
+            </div>
+          </ion-slide>
+
+          <ion-slide>
+            <ion-list>
+              <ion-item style="margin-left: 16px;margin-top:8px;padding-left:0px;">
+                <ion-label floating>Comentário</ion-label>
+                <div item-content style="width:100%;">
+                  <ion-textarea #ionTxtArea [(ngModel)]="desc" (ngModelChange)='onChange($event)'></ion-textarea>
+                </div>
+              </ion-item>
+            </ion-list>
+          </ion-slide>
+        </ion-slides>
+      </ion-card>
+      <ion-list>
+        <ion-item>
+          <div class="lab"><ion-icon name="icon-comment" item-start></ion-icon>Comentários</div>
+          <div class="cont">
+            <ion-list>
+              <ion-item>
+                Teste
+              </ion-item>
+              <ion-item>
+                Teste
+              </ion-item>
+              <ion-item>
+                Teste
+              </ion-item>
+              <ion-item>
+                Teste
+              </ion-item>
+              <ion-item>
+                Teste
+              </ion-item>
+              <ion-item>
+                Teste
+              </ion-item>
+              <ion-item>
+                Teste
+              </ion-item>
+              <ion-item>
+                Teste
+              </ion-item>
+              <ion-item>
+                Teste
+              </ion-item>
+              <ion-item>
+                Teste
+              </ion-item>
+            </ion-list>
+          </div>
         </ion-item>
       </ion-list>
     </div>

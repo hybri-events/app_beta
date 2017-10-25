@@ -79,8 +79,9 @@ import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
 import { LocationAccuracy } from '@ionic-native/location-accuracy';
 import { SocialSharing } from '@ionic-native/social-sharing';
 import { OneSignal } from '@ionic-native/onesignal';
-import { Geofence } from '@ionic-native/geofence';
 import { Mixpanel, MixpanelPeople } from '@ionic-native/mixpanel';
+import { LocalNotifications } from '@ionic-native/local-notifications';
+import { Market } from '@ionic-native/market';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDddpec8MwZts4DyXIRvR9t9kAtEU3Bgh0",
@@ -203,9 +204,10 @@ const firebaseConfig = {
     LocationAccuracy,
     SocialSharing,
     OneSignal,
-    Geofence,
     Mixpanel,
-    MixpanelPeople
+    MixpanelPeople,
+    LocalNotifications,
+    Market
   ]
 })
 export class AppModule {}

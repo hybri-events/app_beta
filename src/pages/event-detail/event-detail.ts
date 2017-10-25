@@ -609,6 +609,7 @@ export class EventDetailPage {
                 text: "Ok",
                 handler: d => {
                   clearTimeout(this.timeout);
+                  this.storage.set('notiCheckin',date.toISOString());
                 }
               }]
             });

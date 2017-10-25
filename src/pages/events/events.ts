@@ -1,7 +1,6 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { NavController, Platform, AlertController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
-import { CriarEventoPage } from '../criar-evento/criar-evento';
 import { EventDetailPage } from '../event-detail/event-detail';
 import { IndicacaoPage } from '../indicacao/indicacao';
 import { AngularFireAuth } from 'angularfire2/auth';
@@ -444,22 +443,6 @@ export class EventsPage {
       let alert = this.alertCtrl.create({
         title: "Você precisa estar logado!",
         message: "Faça seu cadastro ou login para poder acessar mais informações dos eventos.",
-        buttons: [{
-          text: "Ok",
-          role: 'cancel'
-        }]
-      });
-      alert.present();
-    }
-  }
-
-  openNewEvent(){
-    if ( this.authentic ){
-      this.navCtrl.push(CriarEventoPage, null);
-    } else {
-      let alert = this.alertCtrl.create({
-        title: "Você precisa estar logado!",
-        message: "Faça seu cadastro ou login para poder criar seus próprios eventos.",
         buttons: [{
           text: "Ok",
           role: 'cancel'

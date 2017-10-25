@@ -1,4 +1,5 @@
 <button ion-button icon-only id="button-qrcode" *ngIf="!isCasa" (click)="readQRC()"><ion-icon name="icon-check-qrcode"></ion-icon></button>
+<button ion-button icon-only id="button-qrcode" *ngIf="isCasa" (click)="openNewEvent()"><ion-icon name="icon-create-event"></ion-icon></button>
 <div id="fundo_tabs" *ngIf="!checkqrc">
   <div class="prin">
     <h2>Agora ficou mais fácil de fazer seu check-in!</h2>

@@ -33,8 +33,8 @@ import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 import { LocationAccuracy } from '@ionic-native/location-accuracy';
 import { OneSignal } from '@ionic-native/onesignal';
-import { Geofence } from '@ionic-native/geofence';
 import { Mixpanel, MixpanelPeople } from '@ionic-native/mixpanel';
+import { Market } from '@ionic-native/market';
 
 @Component({
   templateUrl: 'app.html'
@@ -45,6 +45,7 @@ export class MyApp {
   authentic: any = false;
 
   date: string;
+  dt;
   tag: string;
   tags: FirebaseListObservable<any>;
   teste: FirebaseListObservable<any>;
@@ -58,6 +59,8 @@ export class MyApp {
   perfilUser;
   capaUser;
   perfilPrin;
+
+  dtNoti = null;
 
   isCasa = false;
   casa: FirebaseListObservable<any>;
@@ -83,15 +86,13 @@ export class MyApp {
 	  public loadingCtrl: LoadingController,
     private locationAccuracy: LocationAccuracy,
     private oneSignal: OneSignal,
-    private geofence: Geofence,
     private mixpanel: Mixpanel,
-    private mixpanelPeople: MixpanelPeople
+    private mixpanelPeople: MixpanelPeople,
+    private market: Market
   ) {
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
-    let fdata = new Date(Date.now() - tzoffset);
-    fdata.setHours(-3);
-    fdata.setMinutes(0);
-    this.date = fdata.toISOString().slice(0,-1);
+    this.dt = new Date(Date.now() - tzoffset);
+    this.date = this.dt.toISOString().slice(0,-1);
     console.log(this.date);
 
     this.storage.set('dt_filtro', this.date);
@@ -165,6 +166,34 @@ export class MyApp {
       }
     });
     platform.ready().then(() => {
+      let att = db.list("versao");
+      let cont = 0;
+      att.forEach(a => {
+        if ( cont == 0 ){
+          this.storage.get("atualizacao").then((val) => {
+            console.log(val)
+            if (a[1].$value != "2.3.2" && val == null){
+              att.update('/',{'show':(a[2].$value+1)});
+              let alert = this.alertCtrl.create({
+                title: "Atualização disponível!",
+                message: "Percebemos que você está com uma versão antiga do aplicativo? Não perde tempo e atualize já pra aproveitar novas funções e vários bug's corrigidos!",
+                buttons: [{text: 'Depois, obrigado!', handler: () => {
+                  this.storage.set("atualizacao",true);
+                }},{text: 'Atualizar agora!', handler: () => {
+                  att.update('/',{'cliques':(a[0].$value+1)});
+                  this.storage.set("atualizacao",true);
+                  this.market.open('com.usevou.vou');
+                }}]
+              });
+              alert.present();
+            } else if ( a[1].$value == "2.3.2" ){
+              this.storage.remove("atualizacao");
+            }
+          });
+          cont++;
+        }
+      });
+
       console.log("loc");
       this.geolocation.getCurrentPosition().then((position) => {
         console.log("loc2");
@@ -172,6 +201,7 @@ export class MyApp {
         let lng = position.coords.longitude;
         var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng;
         this.http.get(url).map(res => res.json()).subscribe(data => {
+          console.log(data)
           for ( let j=0;j<data.results[0].address_components.length;j++ ){
             for ( let k=0;k<data.results[0].address_components[j].types.length;k++ ){
               if ( data.results[0].address_components[j].types[k] == 'locality' ){
@@ -203,6 +233,7 @@ export class MyApp {
       });
 
       this.oneSignal.startInit("dc2661ca-a1b7-426a-9504-70cc23728700", "941134234980");
+      this.oneSignal.sendTags({uid: firebase.auth().currentUser.uid});
       this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.InAppAlert);
 
       this.oneSignal.handleNotificationReceived().subscribe(() => {
@@ -213,12 +244,6 @@ export class MyApp {
       });
 
       this.oneSignal.endInit();
-
-      geofence.initialize().then(
-        () => console.log('Geofence Plugin Ready'),
-        (err) => console.log(err)
-      );
-      this.addGeofence();
 
       if ( platform.is('android') ){
         statusBar.backgroundColorByHexString('#461969');
@@ -233,51 +258,6 @@ export class MyApp {
           this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(null,null);
         }
       });
-    });
-  }
-
-  addGeofence(){
-    this.geofence.removeAll();
-    let k = 0;
-
-    let casas = this.db.list('/casas/');
-    casas.forEach(casa => {
-      casa.forEach(cas => {
-        let ca = this.db.list('casas/'+cas.$key);
-        ca.forEach(c => {
-          for ( let i=0;i<c.length;i++ ){
-            if ( c[i].coins && c[i].valid ){
-              let fence = {
-                id: c[i].$key,
-                latitude:       c[i].lat,
-                longitude:      c[i].lng,
-                radius:         50,
-                transitionType: 1,
-                notification: {
-                    id:             k,
-                    title:          'Você está em '+c[i].nome+'?',
-                    text:           'Não perca tempo e faça já seu check-in.',
-                    openAppOnClick: true,
-                    smallIcon:      "res://ic_stat_onesignal_default",
-                    icon:           c[i].icon,
-                    vibration:      [500,500,500]
-                }
-              }
-
-              this.geofence.addOrUpdate(fence).then(
-                 () => console.log('Geofence added'),
-                 (err) => console.log('Geofence failed to add')
-              );
-              k++;
-            }
-          }
-        });
-      });
-    });
-
-    this.geofence.getWatched().then(function (geofencesJson) {
-      var geofences = JSON.parse(geofencesJson);
-      console.log(geofences);
     });
   }
 
