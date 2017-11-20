@@ -81,6 +81,12 @@ export class EditLocationCasaPage {
           firebase.database().ref('/casas/'+firebase.auth().currentUser.uid+'/').child(this.param['id'].slice(index+1,this.param['id'].length)).child('img').set(savedPicture.downloadURL);
         });
       }
+      if ( this.param.capa != 'assets/estab_default.png' && this.param.capa[0] != 'h' ){
+        this.event.saveCapaEstab(this.param['id'].slice(index+1,this.param['id'].length),this.param.capa).then((savedPicture) => {
+          this.url = savedPicture.downloadURL;
+          firebase.database().ref('/casas/'+firebase.auth().currentUser.uid+'/').child(this.param['id'].slice(index+1,this.param['id'].length)).child('capa').set(savedPicture.downloadURL);
+        });
+      }
       let al = this.alertCtrl.create({
         title: 'Alterar eventos',
         subTitle: 'Deseja aplicar essas alterações em seus eventos?',

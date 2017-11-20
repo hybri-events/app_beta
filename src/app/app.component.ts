@@ -60,6 +60,8 @@ export class MyApp {
   capaUser;
   perfilPrin;
 
+  keyCasa;
+
   dtNoti = null;
 
   isCasa = false;
@@ -92,7 +94,7 @@ export class MyApp {
   ) {
     let tzoffset = (new Date()).getTimezoneOffset() * 60000;
     this.dt = new Date(Date.now() - tzoffset);
-    this.date = this.dt.toISOString().slice(0,-1);
+    this.date = this.dt.toISOString();
     console.log(this.date);
 
     this.storage.set('dt_filtro', this.date);
@@ -101,6 +103,8 @@ export class MyApp {
     this.cidades = db.list('/cidades');
 
     this.tags = db.list('/tags');
+
+    this.storage.set('contNoti',0);
 
     const authObserver = afAuth.authState.subscribe( user => {
       if (user) {
@@ -118,12 +122,29 @@ export class MyApp {
             this.perfilUser = eventListSnap[0].ft_perfil;
             this.perfilPrin = this.perfilUser;
             this.capaUser = eventListSnap[0].ft_capa;
+            let token = eventListSnap[0].token;
+            console.log(user);
+            if ( token != undefined ){
+              const facebookCredential = firebase.auth.FacebookAuthProvider.credential(token);
+              let me = this;
+              firebase.auth().signInWithCredential(facebookCredential).then((success) => {
+                console.log(success)
+                let uid = success.uid;
+                let usuario = me.db.list("usuario/"+uid);
+                usuario.forEach(u => {
+                  me.userData.update(u[0].$key,"https://graph.facebook.com/"+success["providerData"][0]["uid"]+"/picture?type=large&access_token="+token,token);
+                })
+              })
+            }
 
             this.storage.set('nomeUsu', this.nomeUser);
+            this.storage.set('fotoUsu', this.perfilUser);
             this.storage.set('codcad', eventListSnap[0].codcad);
 
             this.storage.get('casa').then((val) => {
+              this.keyCasa = val;
               this.mixpanelPeople.identify(firebase.auth().currentUser.uid);
+
               this.mixpanelPeople.set({"$email":eventListSnap[0].email,"$name":this.nomeUser});
               this.mixpanel.track("Tela principal");
               if ( val != null ){
@@ -176,7 +197,7 @@ export class MyApp {
               att.update('/',{'show':(a[2].$value+1)});
               let alert = this.alertCtrl.create({
                 title: "Atualização disponível!",
-                message: "Percebemos que você está com uma versão antiga do aplicativo? Não perde tempo e atualize já pra aproveitar novas funções e vários bug's corrigidos!",
+                message: "Percebemos que você está com uma versão antiga do aplicativo. Não perde tempo e atualize já pra aproveitar novas funções e vários bug's corrigidos!",
                 buttons: [{text: 'Depois, obrigado!', handler: () => {
                   this.storage.set("atualizacao",true);
                 }},{text: 'Atualizar agora!', handler: () => {
@@ -279,7 +300,7 @@ export class MyApp {
   openMenuPage(i) {
     if ( i == 0 ){
       if ( this.isCasa ){
-        this.nav.push(PerfilEstabPage, null);
+        this.nav.push(PerfilEstabPage, {id: this.keyCasa});
       } else {
         this.nav.push(PerfilPage, null);
       }

@@ -73,6 +73,8 @@ export class EditEventPage {
   evento: FirebaseListObservable<any>;
   lat;
   lng;
+  keyCasa;
+  nomeCriador;
 
   constructor(
     public navCtrl: NavController,
@@ -96,6 +98,7 @@ export class EditEventPage {
 
     this.storage.get('casa').then((val) => {
       if ( val != null ){
+        this.keyCasa = val;
 
         this.casa = this.db.list("casas/"+val+"/");
         this.casa.forEach(ca => {
@@ -155,6 +158,10 @@ export class EditEventPage {
         if ( e.$key == 'coin' ){
           this.coin = e.$value;
         }
+        if ( e.$key == 'nomeCriador' ){
+          this.nomeCriador = e.$value;
+        }
+
       });
     });
   }
@@ -291,9 +298,9 @@ export class EditEventPage {
 
   nextPage(){
     let dti = new Date(this.dt_ini);
-    let datai = new Date(dti.getTime());
+    let datai = new Date(dti.getTime() + this.tzoffset);
     let dtf = new Date(this.dt_fim);
-    let dataf = new Date(dtf.getTime());
+    let dataf = new Date(dtf.getTime() + this.tzoffset);
     let meses = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
     let mes = meses[datai.getMonth()];
     let params = {nome: this.nome,
@@ -317,7 +324,9 @@ export class EditEventPage {
                     img: this.img,
                     lat: this.lat,
                     lng: this.lng,
-                    id: this.id};
+                    id: this.id,
+                    criador: this.keyCasa,
+                    nomeCriador: this.nomeCriador};
     this.navCtrl.push(EditLocationEventPage, params);
   }
 

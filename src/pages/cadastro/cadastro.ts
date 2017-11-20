@@ -94,6 +94,7 @@ export class CadastroPage {
     let me = this;
     user.delete().then(function() {
       me.facebook.login(['email','public_profile']).then( (response) => {
+        let token = response.authResponse.accessToken;
         const facebookCredential = firebase.auth.FacebookAuthProvider.credential(response.authResponse.accessToken);
 
         firebase.auth().signInWithCredential(facebookCredential).then((success) => {
@@ -108,14 +109,18 @@ export class CadastroPage {
                 }
               }
               if ( create ){
-                me.userData.cadUser(success['displayName'], null, success['email'], success['photoURL']);
+                me.userData.cadUserFace(success['displayName'], null, success['email'], success['photoURL'],token);
                 me.cont++;
                 me.splashScreen.show();
                 window.location.reload();
               } else {
-                me.cont++;
-                me.splashScreen.show();
-                window.location.reload();
+                let usuario = me.db.list("usuario/"+uid);
+                usuario.forEach(u => {
+                  me.userData.update(u[0].$key,"https://graph.facebook.com/"+success["providerData"][0]["uid"]+"/picture?type=large&access_token="+token,token);
+                  me.cont++;
+                  me.splashScreen.show();
+                  window.location.reload();
+                })
               }
             }
           });

@@ -54,13 +54,21 @@ export class EventoProvider {
   }
 
   saveImg(key,img){
-    firebase.storage().ref('/ft_evento/').child(key+'.png').putString(img, 'base64', {contentType: 'image/png'}).then((savedPicture) => {
-      firebase.database().ref(`eventos`).child(key).child('img').set(savedPicture.downloadURL);
-    });
+    if ( img[0] == 'h' ){
+      firebase.database().ref(`eventos`).child(key).child('img').set(img);
+    } else {
+      firebase.storage().ref('/ft_evento/').child(key+'.png').putString(img, 'base64', {contentType: 'image/png'}).then((savedPicture) => {
+        firebase.database().ref(`eventos`).child(key).child('img').set(savedPicture.downloadURL);
+      });
+    }
   }
 
   saveImgEstab(key,img): firebase.Promise<any>{
     return firebase.storage().ref('/ft_estab/').child(key+'.png').putString(img, 'base64', {contentType: 'image/png'});
+  }
+
+  saveCapaEstab(key,img): firebase.Promise<any>{
+    return firebase.storage().ref('/capa_estab/').child(key+'.png').putString(img, 'base64', {contentType: 'image/png'});
   }
 
   cadTags(nome){

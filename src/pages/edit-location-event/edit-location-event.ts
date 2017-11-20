@@ -65,7 +65,26 @@ export class EditLocationEventPage {
       this.param['lat'] = this.lat;
       this.param['lng'] = this.lng;
       this.param['cidade'] = cidade;
-      this.evento.update(this.param.id,this.param);
+      this.evento.remove(this.param.id);
+      let d = new Date(this.param['dti']);
+      let index = 0;
+      let pos = 0
+      while (pos >= 0){
+        index = pos;
+        pos = this.param.id.indexOf("/",index+1);
+      }
+      let id = cidade+'/'+d.getFullYear()+'/'+("0"+(d.getMonth()+1)).slice(-2)+"/"+("0"+d.getDate()).slice(-2)+'/'+this.param.id.slice(index+1,this.param.id.length);
+      this.evento.update(id,this.param);
+
+      let casa = this.db.list('/casas/'+this.param.criador+'/eventos');
+      casa.subscribe(c => {
+        for ( let i=0;i<c.length;i++ ){
+          if ( c[i].id == this.param.id ){
+            casa.update(c[i].$key,{id:id,dt:this.param['dti']});
+          }
+        }
+      })
+
       for ( let i=0;i<this.param.tags.length;i++ ){
         this.event.cadTags(this.param.tags[i].nome);
       }
@@ -73,6 +92,7 @@ export class EditLocationEventPage {
       if ( this.param.img != 'assets/event_default.png' && this.param.img[0] != 'h' ){
         this.event.saveImg(this.param.id,this.param.img);
       }
+      this.navCtrl.pop();
       this.navCtrl.pop();
       this.navCtrl.pop();
     });

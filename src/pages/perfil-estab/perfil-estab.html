@@ -1,7 +1,12 @@
-<ion-header id="tool">
+<ion-header id="tool_estab">
 
   <ion-navbar>
-    <ion-title id="title">{{details.nome}}</ion-title>
+    <ion-title id="title_estab">{{details.nome}}</ion-title>
+    <ion-buttons end *ngIf="myEstab" (click)="editEstab()">
+      <button ion-button icon-only color="primary" class="btn_search">
+        <ion-icon name="icon-edit"></ion-icon>
+      </button>
+    </ion-buttons>
   </ion-navbar>
 
 </ion-header>
@@ -9,44 +14,92 @@
 
 <ion-content>
   <div class="roxo">
-    <div id="fundo" style="background-color:white;">
-      <div class="header_af">
-        <div class="conteudo">
+    <div id="fundo" [ngStyle]="{'background-image': 'url('+details.capa+')' }">
+      <div id="header_af">
+        <div id="conteudo_af">
           <div class="ft_perfil" [ngStyle]="{'background-image': 'url('+details.img+')' }"></div>
           <div class="name">{{details.nome}}</div>
           <div class="avaliacao">
-            <ion-icon name="icon-star-full"></ion-icon>
-            <ion-icon name="icon-star-full"></ion-icon>
-            <ion-icon name="icon-star-full"></ion-icon>
-            <ion-icon name="icon-star-half"></ion-icon>
-            <ion-icon name="icon-star-void"></ion-icon>
+            {{showMedia}}&nbsp;&nbsp;|&nbsp;
+            <ion-icon name="icon-star-void" id="star_perfil_1"></ion-icon>
+            <ion-icon name="icon-star-void" id="star_perfil_2"></ion-icon>
+            <ion-icon name="icon-star-void" id="star_perfil_3"></ion-icon>
+            <ion-icon name="icon-star-void" id="star_perfil_4"></ion-icon>
+            <ion-icon name="icon-star-void" id="star_perfil_5"></ion-icon>
             <br>
-            <span>500 avaliações</span>
+            <span *ngIf="numava != 1">{{numava}} avaliações</span>
+            <span *ngIf="numava == 1">{{numava}} avaliação</span>
           </div>
         </div>
       </div>
+      <ion-toolbar class="tab_top" no-border-top style="padding:0px;" id="tabs_estab">
+        <ion-segment [(ngModel)]="tab" (ionChange)="changeTabs()">
+          <ion-segment-button value="comentarios">
+            Avaliações
+          </ion-segment-button>
+          <ion-segment-button value="sobre">
+            Sobre
+          </ion-segment-button>
+          <ion-segment-button value="eventos">
+            Eventos
+          </ion-segment-button>
+        </ion-segment>
+      </ion-toolbar>
     </div>
   </div>
-  <ion-toolbar class="tab_top" no-border-top style="padding:0px;" id="tabs">
-    <ion-segment [(ngModel)]="tab" (ionChange)="changeTabs()">
-      <ion-segment-button value="eventos">
-        Eventos
-      </ion-segment-button>
-      <ion-segment-button value="sobre">
-        Sobre
-      </ion-segment-button>
-      <ion-segment-button value="comentarios">
-        Comentários
-      </ion-segment-button>
-    </ion-segment>
-  </ion-toolbar>
   <div [ngSwitch]="tab">
     <div *ngSwitchCase="'eventos'">
-      <ion-list>
-        <ion-list-header>Próximos</ion-list-header>
-        <ion-item id="list" style="padding-top:8px;">
-
-        </ion-item>
+      <ion-list id="list">
+        <ion-item-group>
+          <ion-item-divider>Próximos</ion-item-divider>
+          <div class="card-background-page" *ngFor="let e of eventNext">
+            <ion-card [ngStyle]="{'background-image': 'url('+e.img+')' }" *ngIf="e.priv == '0'" (click)="openEvent(e.id)">
+              <div [attr.class]="e.coin ? 'coin fundo_card' : 'fundo_card'">
+                <div class="amigos_list" *ngIf="e.coin"><img src="assets/selo.png"></div>
+                <div class="more_list">Ver mais <ion-icon name="arrow-back" style="transform:rotate(180deg)"></ion-icon></div>
+                <div class="bottom_list">
+                  <div style="display:table-cell;vertical-align:bottom;width:80px;">
+                    <div class="top"><div class="block"></div><div class="block"></div></div>
+                    <div class="date_list">
+                      <div class="mes_list">{{e.mes}}</div>
+                      <div class="dia_list">{{('0'+e.dia).slice(-2)}}</div>
+                      <div class="hr_list">{{e.hr_ini}}</div>
+                    </div>
+                  </div>
+                  <div class="present_list">
+                    <div class="name_event">{{e.nome}}</div>
+                  </div>
+                </div>
+              </div>
+            </ion-card>
+          </div>
+          <button ion-button block clear (click)="loadEventsNext()">Ver mais eventos...</button>
+        </ion-item-group>
+        <ion-item-group>
+          <ion-item-divider>Anteriores</ion-item-divider>
+          <div class="card-background-page" *ngFor="let e of eventPrev">
+            <ion-card [ngStyle]="{'background-image': 'url('+e.img+')' }" *ngIf="e.priv == '0'" (click)="openEvent(e.id)">
+              <div [attr.class]="e.coin ? 'coin fundo_card' : 'fundo_card'">
+                <div class="amigos_list" *ngIf="e.coin"><img src="assets/selo.png"></div>
+                <div class="more_list">Ver mais <ion-icon name="arrow-back" style="transform:rotate(180deg)"></ion-icon></div>
+                <div class="bottom_list">
+                  <div style="display:table-cell;vertical-align:bottom;width:80px;">
+                    <div class="top"><div class="block"></div><div class="block"></div></div>
+                    <div class="date_list">
+                      <div class="mes_list">{{e.mes}}</div>
+                      <div class="dia_list">{{('0'+e.dia).slice(-2)}}</div>
+                      <div class="hr_list">{{e.hr_ini}}</div>
+                    </div>
+                  </div>
+                  <div class="present_list">
+                    <div class="name_event">{{e.nome}}</div>
+                  </div>
+                </div>
+              </div>
+            </ion-card>
+          </div>
+          <button ion-button block clear (click)="loadEventsPrev()">Ver mais eventos...</button>
+        </ion-item-group>
       </ion-list>
     </div>
     <div *ngSwitchCase="'sobre'">
@@ -117,7 +170,8 @@
     </div>
     <div *ngSwitchCase="'comentarios'">
       <ion-card id="list" padding style="display:inline-block;" *ngIf="!avaliado">
-        <div class="label_ava">Deixe sua avaliação</div>
+        <div class="label_ava" *ngIf="!reava">Deixe sua avaliação</div>
+        <div class="label_ava" *ngIf="reava">Sua avaliação</div>
         <ion-slides pager (swipeleft)="swipeLeft()" (swiperight)="swipeRight()">
           <ion-slide>
             <div class="cont_star">
@@ -134,10 +188,75 @@
 
           <ion-slide>
             <ion-list>
-              <ion-item style="margin-left: 16px;margin-top:8px;padding-left:0px;">
-                <ion-label floating>Comentário</ion-label>
+              <ion-item style="margin-left: 16px;margin-top:8px;padding-left:0px;width:calc(100% - 16px);position:initial">
+                <ion-label floating>Deixe aqui seu comentário</ion-label>
                 <div item-content style="width:100%;">
-                  <ion-textarea #ionTxtArea [(ngModel)]="desc" (ngModelChange)='onChange($event)'></ion-textarea>
+                  <ion-textarea #ionTxtArea [(ngModel)]="desc" (ngModelChange)='onChange($event)' (focus)="clickDesc()"></ion-textarea>
+                </div>
+              </ion-item>
+            </ion-list>
+          </ion-slide>
+
+          <ion-slide *ngIf="avaOther">
+            <ion-list style="margin-top:16px;">
+              <ion-item>
+                <ion-icon name="icon-home" item-start></ion-icon>Ambiente
+                <div class="cont_star_other">
+                  <div class="stars">
+                    <ion-icon name="icon-star-void" id="star_amb_1" (click)="setStarsOther('amb',1)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_amb_2" (click)="setStarsOther('amb',2)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_amb_3" (click)="setStarsOther('amb',3)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_amb_4" (click)="setStarsOther('amb',4)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_amb_5" (click)="setStarsOther('amb',5)"></ion-icon>
+                  </div>
+                </div>
+              </ion-item>
+              <ion-item>
+                <ion-icon name="icon-profile" item-start></ion-icon>Atendimento
+                <div class="cont_star_other">
+                  <div class="stars">
+                    <ion-icon name="icon-star-void" id="star_ate_1" (click)="setStarsOther('ate',1)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_ate_2" (click)="setStarsOther('ate',2)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_ate_3" (click)="setStarsOther('ate',3)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_ate_4" (click)="setStarsOther('ate',4)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_ate_5" (click)="setStarsOther('ate',5)"></ion-icon>
+                  </div>
+                </div>
+              </ion-item>
+              <ion-item *ngIf="details.bar">
+                <ion-icon name="icon-bar" item-start></ion-icon>Bar
+                <div class="cont_star_other">
+                  <div class="stars">
+                    <ion-icon name="icon-star-void" id="star_bar_1" (click)="setStarsOther('bar',1)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_bar_2" (click)="setStarsOther('bar',2)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_bar_3" (click)="setStarsOther('bar',3)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_bar_4" (click)="setStarsOther('bar',4)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_bar_5" (click)="setStarsOther('bar',5)"></ion-icon>
+                  </div>
+                </div>
+              </ion-item>
+              <ion-item *ngIf="details.cozinha">
+                <ion-icon name="icon-comida" item-start></ion-icon>Cozinha
+                <div class="cont_star_other">
+                  <div class="stars">
+                    <ion-icon name="icon-star-void" id="star_coz_1" (click)="setStarsOther('coz',1)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_coz_2" (click)="setStarsOther('coz',2)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_coz_3" (click)="setStarsOther('coz',3)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_coz_4" (click)="setStarsOther('coz',4)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_coz_5" (click)="setStarsOther('coz',5)"></ion-icon>
+                  </div>
+                </div>
+              </ion-item>
+              <ion-item>
+                <ion-icon name="icon-coin" item-start></ion-icon>Preços
+                <div class="cont_star_other">
+                  <div class="stars">
+                    <ion-icon name="icon-star-void" id="star_pre_1" (click)="setStarsOther('pre',1)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_pre_2" (click)="setStarsOther('pre',2)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_pre_3" (click)="setStarsOther('pre',3)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_pre_4" (click)="setStarsOther('pre',4)"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_pre_5" (click)="setStarsOther('pre',5)"></ion-icon>
+                  </div>
                 </div>
               </ion-item>
             </ion-list>
@@ -145,68 +264,236 @@
         </ion-slides>
         <button ion-button clear class="btnAvaliar" (click)="sendAva()" [disabled]="stars == 0">{{txtBtnAva}}</button>
       </ion-card>
+
       <ion-card id="list" padding style="display:inline-block;" *ngIf="avaliado">
         <div class="label_ava">Sua avaliação</div>
         <ion-slides pager (swipeleft)="swipeLeft()" (swiperight)="swipeRight()">
           <ion-slide>
+            <div class="perfil_ava">
+              <div class="ft_perfil_ava" [ngStyle]="{'background-image': 'url('+foto+')' }"></div>
+              <div class="nome_ava">{{nome}}</div>
+            </div>
             <div class="cont_star">
-              <div class="stars">
-                <ion-icon name="icon-star-void" id="star1" (click)="setStars(1)"></ion-icon>
-                <ion-icon name="icon-star-void" id="star2" (click)="setStars(2)"></ion-icon>
-                <ion-icon name="icon-star-void" id="star3" (click)="setStars(3)"></ion-icon>
-                <ion-icon name="icon-star-void" id="star4" (click)="setStars(4)"></ion-icon>
-                <ion-icon name="icon-star-void" id="star5" (click)="setStars(5)"></ion-icon>
+              <div class="stars avaliado">
+                <ion-icon name="icon-star-void" id="star1"></ion-icon>
+                <ion-icon name="icon-star-void" id="star2"></ion-icon>
+                <ion-icon name="icon-star-void" id="star3"></ion-icon>
+                <ion-icon name="icon-star-void" id="star4"></ion-icon>
+                <ion-icon name="icon-star-void" id="star5"></ion-icon>
               </div>
               <div class="nivel">{{nivel[stars]}}</div>
             </div>
+            <div class="comentario_ava" *ngIf="desc != '' && desc != undefined && desc != null">
+              <div class="txt_coment">{{desc}}</div>
+            </div>
           </ion-slide>
 
-          <ion-slide>
-            <ion-list>
-              <ion-item style="margin-left: 16px;margin-top:8px;padding-left:0px;">
-                <ion-label floating>Comentário</ion-label>
-                <div item-content style="width:100%;">
-                  <ion-textarea #ionTxtArea [(ngModel)]="desc" (ngModelChange)='onChange($event)'></ion-textarea>
+          <ion-slide *ngIf="this.starsOther['amb'] != undefined">
+            <ion-list style="margin-top:16px;">
+              <ion-item>
+                <ion-icon name="icon-home" item-start></ion-icon>Ambiente
+                <div class="cont_star_other">
+                  <div class="stars">
+                    <ion-icon name="icon-star-void" id="star_amb_1"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_amb_2"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_amb_3"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_amb_4"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_amb_5"></ion-icon>
+                  </div>
+                </div>
+              </ion-item>
+              <ion-item>
+                <ion-icon name="icon-profile" item-start></ion-icon>Atendimento
+                <div class="cont_star_other">
+                  <div class="stars">
+                    <ion-icon name="icon-star-void" id="star_ate_1"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_ate_2"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_ate_3"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_ate_4"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_ate_5"></ion-icon>
+                  </div>
+                </div>
+              </ion-item>
+              <ion-item *ngIf="details.bar">
+                <ion-icon name="icon-bar" item-start></ion-icon>Bar
+                <div class="cont_star_other">
+                  <div class="stars">
+                    <ion-icon name="icon-star-void" id="star_bar_1"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_bar_2"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_bar_3"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_bar_4"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_bar_5"></ion-icon>
+                  </div>
+                </div>
+              </ion-item>
+              <ion-item *ngIf="details.cozinha">
+                <ion-icon name="icon-comida" item-start></ion-icon>Cozinha
+                <div class="cont_star_other">
+                  <div class="stars">
+                    <ion-icon name="icon-star-void" id="star_coz_1"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_coz_2"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_coz_3"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_coz_4"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_coz_5"></ion-icon>
+                  </div>
+                </div>
+              </ion-item>
+              <ion-item>
+                <ion-icon name="icon-coin" item-start></ion-icon>Preços
+                <div class="cont_star_other">
+                  <div class="stars">
+                    <ion-icon name="icon-star-void" id="star_pre_1"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_pre_2"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_pre_3"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_pre_4"></ion-icon>
+                    <ion-icon name="icon-star-void" id="star_pre_5"></ion-icon>
+                  </div>
                 </div>
               </ion-item>
             </ion-list>
           </ion-slide>
         </ion-slides>
+        <button ion-button clear class="btnAvaliar" (click)="reAva()">Reavaliar</button>
       </ion-card>
       <ion-list>
         <ion-item>
+          <div class="lab"><ion-icon name="icon-star-void" item-start></ion-icon>Avaliações</div>
+          <div class="cont" style="text-align:center;padding-top:16px;padding-bottom:16px;" *ngIf="numava == 0">
+            Este estabelecimento ainda não foi avaliado.
+          </div>
+          <div class="cont" *ngIf="numava > 0">
+            <div class="nota_ava">
+              <div class="num_nota">{{showMedia}}</div>
+              <div class="stars">
+                <ion-icon name="icon-star-void" id="star_grafico_1"></ion-icon>
+                <ion-icon name="icon-star-void" id="star_grafico_2"></ion-icon>
+                <ion-icon name="icon-star-void" id="star_grafico_3"></ion-icon>
+                <ion-icon name="icon-star-void" id="star_grafico_4"></ion-icon>
+                <ion-icon name="icon-star-void" id="star_grafico_5"></ion-icon>
+              </div>
+              <div class="num_ava" *ngIf="numava != 1">{{numava}} avaliações</div>
+              <div class="num_ava" *ngIf="numava == 1">{{numava}} avaliação</div>
+            </div>
+            <div id="grafico_ava">
+              <canvas #avaliacoes style="margin-left:16px;"></canvas>
+            </div>
+          </div>
+        </ion-item>
+        <ion-item>
+          <div class="lab"><ion-icon name="icon-desc" item-start></ion-icon>Detalhes</div>
+          <div class="cont" style="text-align:center;padding-top:16px;padding-bottom:16px;" *ngIf="numdeta[0] == 0">
+            Este estabelecimento ainda não foi avaliado com mais detalhes.
+          </div>
+          <div class="cont" style="text-align:center;padding-left:0px;padding-right:0px;" *ngIf="numdeta[0] > 0">
+            <div class="detalhe">
+              <div class="icon_detalhe"><ion-icon name="icon-home"></ion-icon></div>
+              <div class="radial-progress" [attr.data-progress]="( mediadeta[0] == parseInt(mediadeta[0]) ? mediadeta[0] : mediadeta[0].toFixed(1) )">
+              	<div class="circle">
+              		<div class="mask full">
+              			<div class="fill"></div>
+              		</div>
+              		<div class="mask half">
+              			<div class="fill"></div>
+              			<div class="fill fix"></div>
+              		</div>
+              	</div>
+              	<div class="inset">
+                  <div class="nota_detalhe">{{( mediadeta[0] == parseInt(mediadeta[0]) ? mediadeta[0] : mediadeta[0].toFixed(1) )}}<ion-icon name="icon-star-full"></ion-icon></div>
+              	</div>
+              </div>
+              <div class="nome_detalhe">Ambiente</div>
+            </div>
+
+            <div class="detalhe">
+              <div class="icon_detalhe"><ion-icon name="icon-profile"></ion-icon></div>
+              <div class="radial-progress" [attr.data-progress]="( mediadeta[1] == parseInt(mediadeta[1]) ? mediadeta[1] : mediadeta[1].toFixed(1) )">
+              	<div class="circle">
+              		<div class="mask full">
+              			<div class="fill"></div>
+              		</div>
+              		<div class="mask half">
+              			<div class="fill"></div>
+              			<div class="fill fix"></div>
+              		</div>
+              	</div>
+              	<div class="inset">
+                  <div class="nota_detalhe">{{( mediadeta[1] == parseInt(mediadeta[1]) ? mediadeta[1] : mediadeta[1].toFixed(1) )}}<ion-icon name="icon-star-full"></ion-icon></div>
+              	</div>
+              </div>
+              <div class="nome_detalhe">Atendimento</div>
+            </div>
+            <br>
+            <div class="detalhe" *ngIf="details.bar">
+              <div class="icon_detalhe"><ion-icon name="icon-bar"></ion-icon></div>
+              <div class="radial-progress" [attr.data-progress]="( mediadeta[2] == parseInt(mediadeta[2]) ? mediadeta[2] : mediadeta[2].toFixed(1) )">
+              	<div class="circle">
+              		<div class="mask full">
+              			<div class="fill"></div>
+              		</div>
+              		<div class="mask half">
+              			<div class="fill"></div>
+              			<div class="fill fix"></div>
+              		</div>
+              	</div>
+              	<div class="inset">
+                  <div class="nota_detalhe">{{( mediadeta[2] == parseInt(mediadeta[2]) ? mediadeta[2] : mediadeta[2].toFixed(1) )}}<ion-icon name="icon-star-full"></ion-icon></div>
+              	</div>
+              </div>
+              <div class="nome_detalhe">Bar</div>
+            </div>
+
+            <div class="detalhe" *ngIf="details.cozinha">
+              <div class="icon_detalhe"><ion-icon name="icon-comida"></ion-icon></div>
+              <div class="radial-progress" [attr.data-progress]="( mediadeta[3] == parseInt(mediadeta[3]) ? mediadeta[3] : mediadeta[3].toFixed(1) )">
+              	<div class="circle">
+              		<div class="mask full">
+              			<div class="fill"></div>
+              		</div>
+              		<div class="mask half">
+              			<div class="fill"></div>
+              			<div class="fill fix"></div>
+              		</div>
+              	</div>
+              	<div class="inset">
+                  <div class="nota_detalhe">{{( mediadeta[3] == parseInt(mediadeta[3]) ? mediadeta[3] : mediadeta[3].toFixed(1) )}}<ion-icon name="icon-star-full"></ion-icon></div>
+              	</div>
+              </div>
+              <div class="nome_detalhe">Cozinha</div>
+            </div>
+
+            <div class="detalhe">
+              <div class="icon_detalhe"><ion-icon name="icon-coin"></ion-icon></div>
+              <div class="radial-progress" [attr.data-progress]="( mediadeta[4] == parseInt(mediadeta[4]) ? mediadeta[4] : mediadeta[4].toFixed(1) )">
+              	<div class="circle">
+              		<div class="mask full">
+              			<div class="fill"></div>
+              		</div>
+              		<div class="mask half">
+              			<div class="fill"></div>
+              			<div class="fill fix"></div>
+              		</div>
+              	</div>
+              	<div class="inset">
+                  <div class="nota_detalhe">{{( mediadeta[4] == parseInt(mediadeta[4]) ? mediadeta[4] : mediadeta[4].toFixed(1) )}}<ion-icon name="icon-star-full"></ion-icon></div>
+              	</div>
+              </div>
+              <div class="nome_detalhe">Preço</div>
+            </div>
+          </div>
+        </ion-item>
+        <ion-item>
           <div class="lab"><ion-icon name="icon-comment" item-start></ion-icon>Comentários</div>
-          <div class="cont">
+          <div class="cont" style="text-align:center;padding-top:16px;padding-bottom:16px;" *ngIf="comentarios.length == 0">
+            Este estabelecimento ainda não teve avaliações com comentários.
+          </div>
+          <div class="cont" *ngIf="numava > 0">
             <ion-list>
-              <ion-item>
-                Teste
-              </ion-item>
-              <ion-item>
-                Teste
-              </ion-item>
-              <ion-item>
-                Teste
-              </ion-item>
-              <ion-item>
-                Teste
-              </ion-item>
-              <ion-item>
-                Teste
-              </ion-item>
-              <ion-item>
-                Teste
-              </ion-item>
-              <ion-item>
-                Teste
-              </ion-item>
-              <ion-item>
-                Teste
-              </ion-item>
-              <ion-item>
-                Teste
-              </ion-item>
-              <ion-item>
-                Teste
+              <ion-item *ngFor="let c of comentarios" style="padding:0px;align-items:flex-start;">
+                <ion-avatar item-start>
+                  <img [attr.src]="c.ft_perfil">
+                </ion-avatar>
+                <h2>{{c.nome}}</h2>
+                <p style="margin-top:16px;">{{c.comentario}}</p>
               </ion-item>
             </ion-list>
           </div>

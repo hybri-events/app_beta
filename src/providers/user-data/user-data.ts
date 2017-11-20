@@ -20,6 +20,23 @@ export class UserDataProvider {
     });
   }
 
+  cadUserFace(nome, dt_nasc, email, ft_perfil, token): firebase.Promise<any> {
+    this.c.cadConta(0);
+    this.authData.sendEmailVerification();
+    let promo = this.db.list('/promocoes/convite/');
+    let cod = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
+    promo.push({cod: cod, uid: firebase.auth().currentUser.uid});
+    return firebase.database().ref(`usuario/${firebase.auth().currentUser.uid}`).push({
+        nome, dt_nasc, email, ft_perfil, ft_capa: "http://usevou.com/profile/ft_capa/padrao.png", codcad: false, token
+    });
+  }
+
+  update(path, ft_perfil, token): firebase.Promise<any> {
+    return firebase.database().ref(`usuario/${firebase.auth().currentUser.uid}/${path}`).update({
+        ft_perfil, token
+    });
+  }
+
   getUser(): Promise<any> {
     return new Promise( (resolve, reject) => {
       firebase.database().ref(`usuario/${firebase.auth().currentUser.uid}`).on('value', snapshot => {
@@ -32,7 +49,8 @@ export class UserDataProvider {
             email: snap.val().email,
             ft_perfil: snap.val().ft_perfil,
             ft_capa: snap.val().ft_capa,
-            codcad: snap.val().codcad
+            codcad: snap.val().codcad,
+            token: snap.val().token
           });
         return false;
         });

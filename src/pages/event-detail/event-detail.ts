@@ -12,6 +12,8 @@ import { Http } from '@angular/http';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/toPromise';
 import { Mixpanel } from '@ionic-native/mixpanel';
+import { PerfilEstabPage } from '../perfil-estab/perfil-estab';
+import { LocalNotifications } from '@ionic-native/local-notifications';
 
 declare var google;
 
@@ -58,6 +60,10 @@ export class EventDetailPage {
   ukey = null;
   ekey = null;
   tzoffset;
+  mediadeta = [0,0,0,0,0];
+  isAvaliado = false;
+
+  numdeta = false;
 
   constructor(
     public platform: Platform,
@@ -73,7 +79,8 @@ export class EventDetailPage {
     /*private backgroundGeolocation: BackgroundGeolocation,*/
     private zone: NgZone,
     public http: Http,
-    private mixpanel: Mixpanel
+    private mixpanel: Mixpanel,
+    private localNotifications: LocalNotifications
   ) {
     this.id = navParams.data.id;
     this.mixpanel.track("Detalhe do evento",{"id":this.id});
@@ -127,9 +134,69 @@ export class EventDetailPage {
             let casa = this.db.list('/casas/'+eve.$value);
             casa.forEach(cas => {
               this.e['casa'] = [];
-              cas.forEach(ca => {
-                this.e['casa'][ca.$key] = ca.$value;
-              })
+              for ( let i=0;i<cas.length;i++ ){
+                this.e['casa'][cas[i].$key] = cas[i].$value;
+              }
+            });
+            this.e['nota'] = 0;
+            this.e['otherNota'] = [0,0,0,0,0];
+            let total = [0,0,0,0,0];
+            let ava = this.db.list('/avaliacao/'+eve.$value);
+            ava.forEach(a => {
+              for ( let i=0;i<a.length;i++ ){
+                if ( a[i].uid == firebase.auth().currentUser.uid ){
+                  this.isAvaliado = true;
+                }
+                this.e['nota'] += a[i].nota;
+                if ( a[i].other != {teste:'teste'} && a[i].other != undefined ){
+                  if ( a[i].other['amb'] != undefined ){
+                    this.e['otherNota'][0] += a[i].other['amb'];
+                    total[0]++;
+                    this.numdeta = true;
+                  }
+                  if ( a[i].other['ate'] != undefined ){
+                    this.e['otherNota'][1] += a[i].other['ate'];
+                    total[1]++;
+                    this.numdeta = true;
+                  }
+                  if ( a[i].other['bar'] != undefined ){
+                    this.e['otherNota'][2] += a[i].other['bar'];
+                    total[2]++;
+                    this.numdeta = true;
+                  }
+                  if ( a[i].other['coz'] != undefined ){
+                    this.e['otherNota'][3] += a[i].other['coz'];
+                    total[3]++;
+                    this.numdeta = true;
+                  }
+                  if ( a[i].other['pre'] != undefined ){
+                    this.e['otherNota'][4] += a[i].other['pre'];
+                    total[4]++;
+                    this.numdeta = true;
+                  }
+                }
+              }
+              if ( a.length > 0 ){
+                this.e['nota'] /= a.length;
+                if ( this.e['otherNota'][0] != 0 ){
+                  this.mediadeta[0] = this.e['otherNota'][0] / total[0];
+                }
+                if (this.e['otherNota'][1] != 0 ){
+                  this.mediadeta[1] = this.e['otherNota'][1] / total[1];
+                }
+                if ( this.e['otherNota'][2] != 0 ){
+                  this.mediadeta[2] = this.e['otherNota'][2] / total[2];
+                }
+                if ( this.e['otherNota'][3] != 0 ){
+                  this.mediadeta[3] = this.e['otherNota'][3] / total[3];
+                }
+                if ( this.e['otherNota'][4] != 0 ){
+                  this.mediadeta[4] = this.e['otherNota'][4] / total[4];
+                }
+              } else {
+                this.e['nota'] = null;
+              }
+              console.log(this.e['nota'])
             });
           }
           this.e[eve.$key] = eve.$value;
@@ -141,6 +208,14 @@ export class EventDetailPage {
         statusBar.styleLightContent();
       }
     });
+  }
+
+  openPerfilEstab(key){
+    this.navCtrl.push(PerfilEstabPage, {id: key});
+  }
+
+  parseInt(valor){
+    return parseInt(valor);
   }
 
   ngAfterViewInit() {
@@ -633,6 +708,21 @@ export class EventDetailPage {
       });
       alert.present();
       this.mixpanel.track("Check-in realizado com sucesso");
+    }
+    if ( !this.isAvaliado ){
+      let dtNoti = new Date(Date.now());
+      //dtNoti.setDate(dtNoti.getDate()+1);
+      dtNoti.setMinutes(dtNoti.getMinutes()+1);
+      console.log(dtNoti)
+      this.localNotifications.schedule({
+        id: 65290,
+        title: '',
+        text: 'Se divertiu muito ontem em '+this.e['nomeCriador']+'? 🎉 Então avalie o local e ajude outras pessoas a se divertirem também! 😀',
+        at: dtNoti,
+        led: '652C90',
+        icon: "res://ic_stat_onesignal_default",
+        color: '652C90'
+      });
     }
   }
 

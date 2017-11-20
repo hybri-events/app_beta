@@ -128,16 +128,13 @@ export class TabsPage {
                       for (let j=0;j<evento.length;j++){
                         if ( evento[j].criador == (cas.$key+"/"+c[i].$key) ){
                           let date = new Date(new Date(evento[j].dti).getTime() - this.tzoffset);
-                          console.log(date)
-                          console.log(this.dt);
                           if ( date <= this.dt ){
                             date = new Date(Date.now() - this.tzoffset);
                             if ( this.contNoti <= 3 ){
                               this.contNoti++;
                               this.storage.set('contNoti',this.contNoti);
                               date.setMinutes(date.getMinutes()+60);
-                              console.log(this.dtNoti);
-                              if ( this.dtNoti == null || this.dtNoti <= this.dt ){
+                              if ( this.dtNoti == null || this.dtNoti <= this.dt.toISOString() ){
                                 this.storage.get('notiCheckin').then((val) => {
                                   let d = this.dt;
                                   if ( val != null ){
@@ -148,7 +145,7 @@ export class TabsPage {
                                     this.localNotifications.schedule({
                                       id: 500,
                                       title: 'Você está em '+c[i].nome+'?',
-                                      text: 'Não perca tempo e faça já seu check-in.',
+                                      text: 'Não perca tempo e garanta já seu desconto. 💰',
                                       led: '652C90',
                                       icon: "res://ic_stat_onesignal_default",
                                       color: '652C90'

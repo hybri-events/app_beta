@@ -36,7 +36,6 @@
           </div>
           <div class="present_list">
             <div class="name_event">{{e.nome}}</div>
-            <div class="name_create" id="c">{{e.nomeCriador}}</div>
             <div class="name_locale" id="l">{{e.cidade}}</div>
           </div>
         </div>
@@ -76,8 +75,139 @@
       </button>
     </div>
   </div>
+  <div class="estab_perfil" (click)="openPerfilEstab(e.criador)" id="list">
+    <div class="info_estab">
+      <div class="ft_perfil_estab" [ngStyle]="{'background-image': 'url('+e.casa.img+')' }"></div>
+      <div class="name_estab">{{e.nomeCriador}}</div>
+    </div>
+    <div class="ava_estab">
+      <ion-icon name="icon-star-void" *ngIf="(e.nota < 0.5 && e.nota >= 0) || e.nota == null"></ion-icon>
+      <ion-icon name="icon-star-half" *ngIf="e.nota < 1 && e.nota >= 0.5"></ion-icon>
+      <ion-icon name="icon-star-full" *ngIf="e.nota >= 1"></ion-icon>
+
+      <ion-icon name="icon-star-void" *ngIf="e.nota < 1.5 && e.nota >= 1 || e.nota == null"></ion-icon>
+      <ion-icon name="icon-star-half" *ngIf="e.nota < 2 && e.nota >= 1.5"></ion-icon>
+      <ion-icon name="icon-star-full" *ngIf="e.nota >= 2"></ion-icon>
+
+      <ion-icon name="icon-star-void" *ngIf="e.nota < 2.5 && e.nota >= 2 || e.nota == null"></ion-icon>
+      <ion-icon name="icon-star-half" *ngIf="e.nota < 3 && e.nota >= 2.5"></ion-icon>
+      <ion-icon name="icon-star-full" *ngIf="e.nota >= 3"></ion-icon>
+
+      <ion-icon name="icon-star-void" *ngIf="e.nota < 3.5 && e.nota >= 3 || e.nota == null"></ion-icon>
+      <ion-icon name="icon-star-half" *ngIf="e.nota < 4 && e.nota >= 3.5"></ion-icon>
+      <ion-icon name="icon-star-full" *ngIf="e.nota >= 4"></ion-icon>
+
+      <ion-icon name="icon-star-void" *ngIf="e.nota < 4.5 && e.nota >= 4 || e.nota == null"></ion-icon>
+      <ion-icon name="icon-star-half" *ngIf="e.nota < 5 && e.nota >= 4.5"></ion-icon>
+      <ion-icon name="icon-star-full" *ngIf="e.nota >= 5"></ion-icon>
+    </div>
+    <div class="deta">
+      <div class="cont" style="text-align:center;padding-top:16px;padding-bottom:16px;" *ngIf="!numdeta">
+        Este estabelecimento ainda não foi avaliado com mais detalhes.
+      </div>
+      <div class="cont" style="text-align:center;padding-left:0px;padding-right:0px;" *ngIf="numdeta">
+        <div class="detalhe">
+          <div class="icon_detalhe"><ion-icon name="icon-home"></ion-icon></div>
+          <div class="radial-progress" [attr.data-progress]="( mediadeta[0] == parseInt(mediadeta[0]) ? mediadeta[0] : mediadeta[0].toFixed(1) )">
+            <div class="circle">
+              <div class="mask full">
+                <div class="fill"></div>
+              </div>
+              <div class="mask half">
+                <div class="fill"></div>
+                <div class="fill fix"></div>
+              </div>
+            </div>
+            <div class="inset">
+              <div class="nota_detalhe">{{( mediadeta[0] == parseInt(mediadeta[0]) ? mediadeta[0] : mediadeta[0].toFixed(1) )}}<ion-icon name="icon-star-full"></ion-icon></div>
+            </div>
+          </div>
+          <div class="nome_detalhe">Ambiente</div>
+        </div>
+
+        <div class="detalhe">
+          <div class="icon_detalhe"><ion-icon name="icon-profile"></ion-icon></div>
+          <div class="radial-progress" [attr.data-progress]="( mediadeta[1] == parseInt(mediadeta[1]) ? mediadeta[1] : mediadeta[1].toFixed(1) )">
+            <div class="circle">
+              <div class="mask full">
+                <div class="fill"></div>
+              </div>
+              <div class="mask half">
+                <div class="fill"></div>
+                <div class="fill fix"></div>
+              </div>
+            </div>
+            <div class="inset">
+              <div class="nota_detalhe">{{( mediadeta[1] == parseInt(mediadeta[1]) ? mediadeta[1] : mediadeta[1].toFixed(1) )}}<ion-icon name="icon-star-full"></ion-icon></div>
+            </div>
+          </div>
+          <div class="nome_detalhe">Atendimento</div>
+        </div>
+        
+        <div class="detalhe" *ngIf="e.casa.bar">
+          <div class="icon_detalhe"><ion-icon name="icon-bar"></ion-icon></div>
+          <div class="radial-progress" [attr.data-progress]="( mediadeta[2] == parseInt(mediadeta[2]) ? mediadeta[2] : mediadeta[2].toFixed(1) )">
+            <div class="circle">
+              <div class="mask full">
+                <div class="fill"></div>
+              </div>
+              <div class="mask half">
+                <div class="fill"></div>
+                <div class="fill fix"></div>
+              </div>
+            </div>
+            <div class="inset">
+              <div class="nota_detalhe">{{( mediadeta[2] == parseInt(mediadeta[2]) ? mediadeta[2] : mediadeta[2].toFixed(1) )}}<ion-icon name="icon-star-full"></ion-icon></div>
+            </div>
+          </div>
+          <div class="nome_detalhe">Bar</div>
+        </div>
+
+        <div class="detalhe" *ngIf="e.casa.cozinha">
+          <div class="icon_detalhe"><ion-icon name="icon-comida"></ion-icon></div>
+          <div class="radial-progress" [attr.data-progress]="( mediadeta[3] == parseInt(mediadeta[3]) ? mediadeta[3] : mediadeta[3].toFixed(1) )">
+            <div class="circle">
+              <div class="mask full">
+                <div class="fill"></div>
+              </div>
+              <div class="mask half">
+                <div class="fill"></div>
+                <div class="fill fix"></div>
+              </div>
+            </div>
+            <div class="inset">
+              <div class="nota_detalhe">{{( mediadeta[3] == parseInt(mediadeta[3]) ? mediadeta[3] : mediadeta[3].toFixed(1) )}}<ion-icon name="icon-star-full"></ion-icon></div>
+            </div>
+          </div>
+          <div class="nome_detalhe">Cozinha</div>
+        </div>
+
+        <div class="detalhe">
+          <div class="icon_detalhe"><ion-icon name="icon-coin"></ion-icon></div>
+          <div class="radial-progress" [attr.data-progress]="( mediadeta[4] == parseInt(mediadeta[4]) ? mediadeta[4] : mediadeta[4].toFixed(1) )">
+            <div class="circle">
+              <div class="mask full">
+                <div class="fill"></div>
+              </div>
+              <div class="mask half">
+                <div class="fill"></div>
+                <div class="fill fix"></div>
+              </div>
+            </div>
+            <div class="inset">
+              <div class="nota_detalhe">{{( mediadeta[4] == parseInt(mediadeta[4]) ? mediadeta[4] : mediadeta[4].toFixed(1) )}}<ion-icon name="icon-star-full"></ion-icon></div>
+            </div>
+          </div>
+          <div class="nome_detalhe">Preço</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
   <ion-list>
-    <ion-item id="list" *ngIf="e.desc != ''" style="padding-top:8px;">
+    <ion-item *ngIf="e.desc != ''" style="padding-top:8px;">
       <div class="lab"><ion-icon name="icon-desc" item-start></ion-icon>Descrição</div>
       <pre class="cont" style="white-space:pre-line;font-family:'Lato', sans-serif;font-weight: 300;">{{e.desc}}</pre>
     </ion-item>

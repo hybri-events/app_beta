@@ -10,17 +10,6 @@ page-event-detail {
   #title{opacity:0;}
 
   .header:after{background: transparent;}
-  .header_af:after{
-    left: 0;
-    bottom: -5px;
-    position: absolute;
-    width: 100%;
-    height: 5px;
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAHBAMAAADzDtBxAAAAD1BMVEUAAAAAAAAAAAAAAAAAAABPDueNAAAABXRSTlMUCS0gBIh/TXEAAAAaSURBVAjXYxCEAgY4UIICBmMogMsgFLtAAQCNSwXZKOdPxgAAAABJRU5ErkJggg==);
-    background-repeat: repeat-x;
-    background-position: 0 -2px;
-    content: "";
-  }
 
   .button-inner{
     font-family: 'Lato', sans-serif;
@@ -49,6 +38,13 @@ page-event-detail {
   .fundo_card .bottom_list .present_list .name_event{float:left;font-size:1.7em;line-height:1.2em;font-family:'Lato', sans-serif;font-weight:400;}
   .fundo_card .bottom_list .present_list .name_create{float:left;clear:both;font-size:1.2em;line-height:1.5em;}
   .fundo_card .bottom_list .present_list .name_locale{float:left;clear:both;font-size:1em;line-height:1.5em;}
+
+  .estab_perfil{float:left;width:100%;padding:8px;border-bottom: 1px solid #D2D2D2;}
+  .estab_perfil .info_estab{float:left;display:table;max-width:calc(100% - 120px);}
+  .estab_perfil .info_estab .ft_perfil_estab{display:table-cell;vertical-align:middle;width:30px;height:30px;border-radius:50%;background-position:center;background-size:cover;}
+  .estab_perfil .info_estab .name_estab{display:table-cell;vertical-align:middle;padding-left:8px;font-size:1.2em;}
+  .estab_perfil .ava_estab{float:right;display:table;height:30px;}
+  .estab_perfil .ava_estab ion-icon{display:table-cell;vertical-align:middle;padding:2px;color:#DFCA23;}
 
   .tabs_event{
     float: left;
@@ -92,5 +88,116 @@ page-event-detail {
   }
   .cont{
     padding: 4px 16px;
+  }
+
+  .deta{
+    float: left;
+    width: 100%;
+    margin-top: 16px;
+  }
+  .detalhe{
+    display: inline-block;
+    margin: 4px;
+  }
+  .tamanho_nota{
+    position: absolute;
+    margin: -2px;
+    background-color: rgba(101,44,144,0.5);
+    border-radius: 50%;
+  }
+  .icon_detalhe{
+    position: absolute;
+    margin-top: 8px;
+    z-index: 5;
+    margin-left: 20px;
+    font-size: 0.7em;
+  }
+  .nome_detalhe{
+    margin-top: 4px;
+    margin-bottom: 16px;
+    font-size: 0.8em;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 50px;
+  }
+  .nota_detalhe{
+    font-size: 1em;
+    display: table-cell;
+    vertical-align: middle;
+    padding-top: 12px;
+  }
+  .nota_detalhe ion-icon{
+    font-size: 0.7em;
+    margin-left: 4px;
+  }
+
+  .radial-progress {
+  	$circle-size: 50px;
+  	$circle-background: rgba(101,44,144,0.2);
+  	$circle-color: rgba(101,44,144,1);
+  	$inset-size: 46px;
+  	$inset-color: #FFF;
+  	$transition-length: 1s;
+
+  	width:  $circle-size;
+  	height: $circle-size;
+
+  	background-color: $circle-background;
+  	border-radius: 50%;
+  	.circle {
+  		.mask, .fill, .shadow {
+  			width:    $circle-size;
+  			height:   $circle-size;
+  			position: absolute;
+  			border-radius: 50%;
+  		}
+  		.mask, .fill {
+  			-webkit-backface-visibility: hidden;
+  			transition: -webkit-transform $transition-length;
+  			transition: -ms-transform $transition-length;
+  			transition: transform $transition-length;
+  			border-radius: 50%;
+  		}
+  		.mask {
+  			clip: rect(0px, $circle-size+5, $circle-size+5, $circle-size/2);
+  			.fill {
+  				clip: rect(0px, ($circle-size/2)+5, $circle-size, 0px);
+  				background-color: $circle-color;
+  			}
+  		}
+  	}
+  	.inset {
+      display: table;
+  		width:       $inset-size;
+  		height:      $inset-size;
+  		position:    absolute;
+  		margin-left: ($circle-size - $inset-size)/2;
+  		margin-top:  ($circle-size - $inset-size)/2;
+
+  		background-color: $inset-color;
+  		border-radius: 50%;
+  	}
+
+  	$increment: 180deg / 5;
+    $i : 0;
+  	@while $i < 5 {
+      &[data-progress="#{$i}"]{
+        .circle {
+          .mask.full, .fill {
+            -webkit-transform: rotate($increment * $i);
+            -ms-transform: rotate($increment * $i);
+            transform: rotate($increment * $i);
+          }
+          .fill.fix {
+            -webkit-transform: rotate($increment * $i * 2);
+            -ms-transform: rotate($increment * $i * 2);
+            transform: rotate($increment * $i * 2);
+          }
+        }
+      }
+      $i : $i + 0.1;
+  	}
   }
 }

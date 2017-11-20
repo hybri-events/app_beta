@@ -11,7 +11,7 @@ import { Mixpanel } from '@ionic-native/mixpanel';
 })
 export class EditCasaPage {
   //image
-  img = 'assets/estab_default.png';
+  img = {'capa':'', 'perfil': 'assets/estab_default.png'};
   id;
   casa: FirebaseListObservable<any>;
 
@@ -126,10 +126,10 @@ export class EditCasaPage {
         } else if ( ca[i].$key == 'adms' ){
           this.adms = ca[i];
         } else if ( ca[i].$key == 'img' ){
-          this.img = ca[i].$value;
-          if ( this.img[0] == 'h' ){
-            document.getElementById("foto_evento").style.backgroundImage = "url("+this.img+")";
-            document.getElementById("button").innerHTML = "Trocar imagem";
+          this.img['perfil'] = ca[i].$value;
+          if ( this.img['perfil'][0] == 'h' ){
+            document.getElementById("foto_perfil_evento").style.backgroundImage = "url("+this.img['perfil']+")";
+            document.getElementById("button_perfil").innerHTML = "Trocar imagem de perfil";
           }
         } else if ( ca[i].$key == 'desc' ){
           this.desc = ca[i].$value;
@@ -137,6 +137,12 @@ export class EditCasaPage {
           this.faixa = ca[i];
         } else if ( ca[i].$key == 'tags' ){
           this.tags = ca[i];
+        } else if ( ca[i].$key == 'capa' ){
+          this.img['capa'] = ca[i].$value;
+          if ( this.img['capa'][0] == 'h' ){
+            document.getElementById("foto_capa_evento").style.backgroundImage = "url("+this.img['capa']+")";
+            document.getElementById("button_capa").innerHTML = "Trocar imagem de capa";
+          }
         }
       }
     })
@@ -218,7 +224,8 @@ export class EditCasaPage {
                   lng: this.lng,
                   id: this.id,
                   adms: this.adms,
-                  img: this.img,
+                  img: this.img['perfil'],
+                  capa: this.img['capa'],
                   desc: this.desc,
                   tags: this.tags,
                   faixa: this.faixa};
@@ -239,7 +246,7 @@ export class EditCasaPage {
     }
   }
 
-  openGallery(){
+  openGallery(local){
     const options: CameraOptions = {
       quality: 100,
       destinationType: this.camera.DestinationType.DATA_URL,
@@ -250,9 +257,9 @@ export class EditCasaPage {
 
     this.camera.getPicture(options).then((imageData) => {
       let base64Image = 'data:image/jpeg;base64,' + imageData;
-      this.img = imageData;
-      document.getElementById("foto_evento").style.backgroundImage = "url("+base64Image+")";
-      document.getElementById("button").innerHTML = "Trocar imagem";
+      this.img[local] = imageData;
+      document.getElementById("foto_"+local+"_evento").style.backgroundImage = "url("+base64Image+")";
+      document.getElementById("button_"+local).innerHTML = "Trocar imagem de "+local;
     }, (err) => {
 
     });

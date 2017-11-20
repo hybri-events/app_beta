@@ -83,6 +83,7 @@ export class SetLocationEventPage {
             let d = new Date(this.param[0]['dt_ini']);
             let id = cidade+'/'+d.getFullYear()+'/'+("0"+(d.getMonth()+1)).slice(-2)+"/"+("0"+d.getDate()).slice(-2)+'/'+e.key;
             casa.push({id:id,dt:this.param[0]['dt_ini']});
+            console.log(this.param[0].img)
             if ( this.param[0].img != 'assets/event_default.png' ){
               this.event.saveImg(id,this.param[0].img);
             }

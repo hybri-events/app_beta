@@ -11,6 +11,7 @@ import { Storage } from '@ionic/storage';
 import { Events } from 'ionic-angular';
 import { Mixpanel, MixpanelPeople } from '@ionic-native/mixpanel';
 import firebase from 'firebase/app';
+import { PerfilEstabPage } from '../perfil-estab/perfil-estab';
 
 declare var google;
 
@@ -172,6 +173,13 @@ export class EventsPage {
         this.storage.get('dt_filtro').then((val) => {
           this.stDtini = val;
           let d = new Date(val);
+          let tzoffset = (new Date()).getTimezoneOffset() * 60000;
+          let e = new Date(Date.now() - tzoffset);
+          console.log(d.getHours());
+          if ( d.getDate() == e.getDate() && d.getMonth() == e.getMonth() && d.getFullYear() == e.getFullYear() ){
+            d.setHours(d.getHours()-3); 
+          }
+          console.log(d.getHours());
           this.date = d.getFullYear()+"/"+("0"+(d.getMonth()+1)).slice(-2)+"/"+("0"+d.getDate()).slice(-2);
           this.storage.get('tag').then((val) => {
             this.stTag = val;
@@ -220,6 +228,19 @@ export class EventsPage {
                         e['casa'][cas[i].$key] = cas[i].$value;
                       }
                     });
+                    e['nota'] = 0;
+                    let ava = this.db.list('/avaliacao/'+e.criador);
+                    ava.forEach(a => {
+                      for ( let i=0;i<a.length;i++ ){
+                        e['nota'] += a[i].nota;
+                      }
+                      if ( a.length > 0 ){
+                        e['nota'] /= a.length;
+                      } else {
+                        e['nota'] = null;
+                      }
+                      console.log(e['nota'])
+                    });
                     if ( e.coin ){
                       tc.push(e);
                       this.boobleSort(tc);
@@ -264,6 +285,22 @@ export class EventsPage {
           troca = true;
         }
       }
+    }
+  }
+
+  openPerfilEstab(key){
+    if ( this.authentic ){
+      this.navCtrl.push(PerfilEstabPage, {id: key});
+    } else {
+      let alert = this.alertCtrl.create({
+        title: "Você precisa estar logado!",
+        message: "Faça seu cadastro ou login para poder acessar mais informações dos Estabelecimentos.",
+        buttons: [{
+          text: "Ok",
+          role: 'cancel'
+        }]
+      });
+      alert.present();
     }
   }
 

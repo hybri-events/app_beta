@@ -1,4 +1,13 @@
 page-perfil-estab {
+  .segment-ios .segment-button.segment-activated{
+    color: #652C90;
+    background-color: white;
+  }
+  .segment-ios .segment-button{
+    color: white;
+    border-color: white;
+  }
+
   .bar-button-default-ios, .toolbar-title-ios, .header-ios ion-navbar ion-icon{
     color: white !important;
   }
@@ -22,7 +31,7 @@ page-perfil-estab {
     z-index: 500;
   }
   .header:after{background: transparent;}
-  #title{opacity:0;}
+  #title_estab{opacity:0;}
 
   .roxo{
     float: left;
@@ -33,21 +42,27 @@ page-perfil-estab {
     float: left;
     width: 100%;
     background-color:white;
+    background-position: center;
+    background-size: cover;
   }
-  .header_af{
-    background-image:linear-gradient(rgba(101,44,144,0.5),rgba(101,44,144,1));
-    padding: 72px 32px 32px 32px;
+  #header_af{
+    background-image:linear-gradient(rgba(101,44,144,0.2),rgba(101,44,144,0.8));
+    padding: 64px 32px 16px 32px;
     width:100%;
     display: table;
   }
-  .conteudo{
+  #tabs_estab{
+    background-image: linear-gradient(rgba(101,44,144,0.8),rgba(101,44,144,1));
+    background-color: transparent;
+  }
+  #conteudo_af{
     display: table-cell;
     vertical-align: middle;
     text-align: center;
   }
   .ft_perfil{
-    width: 150px;
-    height: 150px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     margin: auto;
     margin-bottom: 16px;
@@ -72,6 +87,27 @@ page-perfil-estab {
   }
   ion-label {
     white-space: normal;
+  }
+
+  #list{
+    display: inline-block;
+  }
+
+  .card-background-page {
+    .fundo_card{background-image:linear-gradient(rgba(109,95,119,0.7),rgba(109,95,119,0.9));padding:16px;}
+    .fundo_card .amigos_list{position:absolute;width:32px;right:24px;}
+    .fundo_card .more_list{position:absolute;right:24px;margin-top:80px;}
+    .fundo_card .more_list ion-icon{font-size:0.9em;margin-left:2px;}
+    .fundo_card .bottom_list{margin-top:0px;}
+    .fundo_card .bottom_list .top {width:70px;}
+    .fundo_card .bottom_list .top .block:last-child{float:left;margin-left:34px;}
+    .fundo_card .bottom_list .date_list{width:70px;}
+    .fundo_card .bottom_list .date_list .mes_list{font-size:1em;line-height:1em;padding:6px;}
+    .fundo_card .bottom_list .date_list .dia_list{font-size:1.8em;line-height:1em;margin-left:8px;margin-right:8px;padding:4px;}
+    .fundo_card .bottom_list .date_list .hr_list{line-height:1em;padding:6px;}
+    .fundo_card .bottom_list .present_list{padding-left:8px;}
+    .fundo_card .bottom_list .present_list .name_event{font-size:1.55em;line-height:1.2em;margin-right:32px;}
+    .coin{border: 3px solid #C58E30}
   }
 
   .lab{
@@ -106,14 +142,27 @@ page-perfil-estab {
     margin-top: 28px;
     margin-bottom: 16px;
   }
+  .cont_star_other{
+    margin-top: 8px;
+  }
   .stars{
     display: table;
     margin: auto;
     font-size: 2em;
   }
+  .stars.avaliado{
+    font-size: 1.5em;
+  }
   .stars ion-icon{
     margin: 4px;
     color: #652C90;
+  }
+  .cont_star_other .stars{
+    font-size: 1em;
+    display: block;
+  }
+  .cont_star_other .stars ion-icon:first-child{
+    margin-left: 0px;
   }
   .btnAvaliar{
     float: right;
@@ -130,7 +179,165 @@ page-perfil-estab {
     display: none;
   }
   .nivel{
-    font-size: 0.9em;
+    margin-top: 8px;
+    font-weight: 400;
+  }
+
+  .perfil_ava{
+    width: 100%;
+    text-align: center;
+    margin-top: 32px;
+  }
+  .ft_perfil_ava{
+    display: block;
+    width: 70px;
+    height: 70px;
+    margin: auto;
+    border-radius: 50%;
+    background-position: center;
+    background-size: cover;
+    border: 2px solid #652C90;
+  }
+  .nome_ava{
     margin-top: 16px;
+    margin-bottom: -16px;
+    font-size: 1.1em;
+    font-weight: 500;
+  }
+  .comentario_ava{
+    width: 100%;
+    margin-top: 16px;
+    text-align: center;
+  }
+
+  .nota_ava{
+    float: left;
+    width: 35%;
+    text-align: center;
+  }
+  .nota_ava .num_nota{
+    font-size: 3em;
+  }
+  .nota_ava .stars{
+    font-size: 0.8em;
+  }
+  .nota_ava .stars ion-icon{
+    margin: 0px;
+  }
+  .num_ava{
+    font-weight: 500;
+  }
+  #grafico_ava{
+    float: left;
+    width: 65%;
+  }
+
+  .item-md{
+    padding-right: 16px;
+  }
+
+  .item-md.item-block .item-inner{
+    padding-right: 0px;
+  }
+
+  .detalhe{
+    display: inline-grid;
+    margin: 4px;
+  }
+  .tamanho_nota{
+    position: absolute;
+    margin: -2px;
+    background-color: rgba(101,44,144,0.5);
+    width: calc(33% - 34px);
+    border-radius: 50%;
+  }
+  .icon_detalhe{
+    position: absolute;
+    margin-top: 12px;
+    z-index: 5;
+    margin-left: 37px;
+  }
+  .nome_detalhe{
+    float: left;
+    margin-top: 4px;
+    margin-bottom: 16px;
+  }
+  .nota_detalhe{
+    font-size: 1.8em;
+    display: table-cell;
+    vertical-align: middle;
+    padding-top: 12px;
+  }
+  .nota_detalhe ion-icon{
+    font-size: 0.7em;
+    margin-left: 4px;
+  }
+
+  .radial-progress {
+  	$circle-size: 90px;
+  	$circle-background: rgba(101,44,144,0.2);
+  	$circle-color: rgba(101,44,144,1);
+  	$inset-size: 80px;
+  	$inset-color: #FFF;
+  	$transition-length: 1s;
+
+  	width:  $circle-size;
+  	height: $circle-size;
+
+  	background-color: $circle-background;
+  	border-radius: 50%;
+  	.circle {
+  		.mask, .fill, .shadow {
+  			width:    $circle-size;
+  			height:   $circle-size;
+  			position: absolute;
+  			border-radius: 50%;
+  		}
+  		.mask, .fill {
+  			-webkit-backface-visibility: hidden;
+  			transition: -webkit-transform $transition-length;
+  			transition: -ms-transform $transition-length;
+  			transition: transform $transition-length;
+  			border-radius: 50%;
+  		}
+  		.mask {
+  			clip: rect(0px, $circle-size+5, $circle-size+5, $circle-size/2);
+  			.fill {
+  				clip: rect(0px, ($circle-size/2)+5, $circle-size, 0px);
+  				background-color: $circle-color;
+  			}
+  		}
+  	}
+  	.inset {
+      display: table;
+  		width:       $inset-size;
+  		height:      $inset-size;
+  		position:    absolute;
+  		margin-left: ($circle-size - $inset-size)/2;
+  		margin-top:  ($circle-size - $inset-size)/2;
+
+  		background-color: $inset-color;
+  		border-radius: 50%;
+  	}
+
+  	$increment: 180deg / 5;
+    $i : 0;
+  	@while $i < 5 {
+      &[data-progress="#{$i}"]{
+        .circle {
+          .mask.full, .fill {
+            -webkit-transform: rotate($increment * $i);
+            -ms-transform: rotate($increment * $i);
+            transform: rotate($increment * $i);
+          }
+          .fill.fix {
+            -webkit-transform: rotate($increment * $i * 2);
+            -ms-transform: rotate($increment * $i * 2);
+            transform: rotate($increment * $i * 2);
+          }
+        }
+      }
+      $i : $i + 0.1;
+  	}
   }
 }

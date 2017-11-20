@@ -11,8 +11,11 @@
 
 
 <ion-content>
-  <div id="foto_evento">
-    <label padding for="input" id="button" (click)="openGallery()">Selecionar a logo do estabelecimento</label>
+  <div id="foto_capa_evento">
+    <label padding for="input" id="button_capa" (click)="openGallery('capa')"><ion-icon name="icon-gallery"></ion-icon></label>
+    <div id="foto_perfil_evento">
+      <label padding for="input" id="button_perfil" (click)="openGallery('perfil')"><ion-icon name="icon-gallery"></ion-icon></label>
+    </div>
   </div>
   <ion-list padding>
     <ion-item>

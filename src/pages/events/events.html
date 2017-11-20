@@ -51,8 +51,8 @@
         <div class="txt_breve">Infelizmente não foi encontrado nenhum evento.</div>
       </div>
       <div *ngFor="let e of eveCoins" class="card-background-page">
-        <ion-card [ngStyle]="{'background-image': 'url('+e.img+')' }" *ngIf="e.priv == '0'" (click)="openEvent(e.$key)">
-          <div [attr.class]="e.coin ? 'coin fundo_card' : 'fundo_card'">
+        <ion-card [ngStyle]="{'background-image': 'url('+e.img+')' }" [attr.class]="plat.is('android') ? (e.coin ? 'card card-md coin' : 'card card-md') : (e.coin ? 'card card-ios coin' : 'card card-ios')" *ngIf="e.priv == '0'">
+          <div class="fundo_card" (click)="openEvent(e.$key)">
             <div class="amigos_list" *ngIf="e.coin"><img src="assets/selo.png"></div>
             <div class="info_list">
               <!--<div class="icon_list" *ngIf="e.distancia < 1000" style="font-weight:900;"><ion-icon name="icon-events"></ion-icon><div>{{e.distancia}} m</div></div>
@@ -83,16 +83,42 @@
               </div>
               <div class="present_list">
                 <div class="name_event">{{e.nome}}</div>
-                <div class="name_create" id="c">{{e.nomeCriador}}</div>
                 <div class="name_locale" id="l">{{e.cidade}}</div>
               </div>
+            </div>
+          </div>
+          <div class="estab_perfil" (click)="openPerfilEstab(e.criador)">
+            <div class="info_estab">
+              <div class="ft_perfil_estab"><div class="img_perfil" [ngStyle]="{'background-image': 'url('+e.casa.img+')' }"></div></div>
+              <div class="name_estab">{{e.nomeCriador}}</div>
+            </div>
+            <div class="ava_estab">
+              <ion-icon name="icon-star-void" *ngIf="(e.nota < 0.5 && e.nota >= 0) || e.nota == null"></ion-icon>
+              <ion-icon name="icon-star-half" *ngIf="e.nota < 1 && e.nota >= 0.5"></ion-icon>
+              <ion-icon name="icon-star-full" *ngIf="e.nota >= 1"></ion-icon>
+
+              <ion-icon name="icon-star-void" *ngIf="e.nota < 1.5 && e.nota >= 1 || e.nota == null"></ion-icon>
+              <ion-icon name="icon-star-half" *ngIf="e.nota < 2 && e.nota >= 1.5"></ion-icon>
+              <ion-icon name="icon-star-full" *ngIf="e.nota >= 2"></ion-icon>
+
+              <ion-icon name="icon-star-void" *ngIf="e.nota < 2.5 && e.nota >= 2 || e.nota == null"></ion-icon>
+              <ion-icon name="icon-star-half" *ngIf="e.nota < 3 && e.nota >= 2.5"></ion-icon>
+              <ion-icon name="icon-star-full" *ngIf="e.nota >= 3"></ion-icon>
+
+              <ion-icon name="icon-star-void" *ngIf="e.nota < 3.5 && e.nota >= 3 || e.nota == null"></ion-icon>
+              <ion-icon name="icon-star-half" *ngIf="e.nota < 4 && e.nota >= 3.5"></ion-icon>
+              <ion-icon name="icon-star-full" *ngIf="e.nota >= 4"></ion-icon>
+
+              <ion-icon name="icon-star-void" *ngIf="e.nota < 4.5 && e.nota >= 4 || e.nota == null"></ion-icon>
+              <ion-icon name="icon-star-half" *ngIf="e.nota < 5 && e.nota >= 4.5"></ion-icon>
+              <ion-icon name="icon-star-full" *ngIf="e.nota >= 5"></ion-icon>
             </div>
           </div>
         </ion-card>
       </div>
       <div *ngFor="let e of eve" class="card-background-page">
-        <ion-card [ngStyle]="{'background-image': 'url('+e.img+')' }" *ngIf="e.priv == '0'" (click)="openEvent(e.$key)">
-          <div class="" [attr.class]="e.coin ? 'coin fundo_card' : 'fundo_card'">
+        <ion-card [ngStyle]="{'background-image': 'url('+e.img+')' }" *ngIf="e.priv == '0'">
+          <div class="" [attr.class]="e.coin ? 'coin fundo_card' : 'fundo_card'" (click)="openEvent(e.$key)">
             <div class="amigos_list" *ngIf="e.coin"><img src="assets/selo.png"></div>
             <div class="info_list">
               <!--<div class="icon_list" *ngIf="e.distancia < 1000" style="font-weight:900;"><ion-icon name="icon-events"></ion-icon><div>{{e.distancia}} m</div></div>
@@ -123,9 +149,35 @@
               </div>
               <div class="present_list">
                 <div class="name_event">{{e.nome}}</div>
-                <div class="name_create" id="c">{{e.nomeCriador}}</div>
                 <div class="name_locale" id="l">{{e.cidade}}</div>
               </div>
+            </div>
+          </div>
+          <div class="estab_perfil" (click)="openPerfilEstab(e.criador)">
+            <div class="info_estab">
+              <div class="ft_perfil_estab"><div class="img_perfil" [ngStyle]="{'background-image': 'url('+e.casa.img+')' }"></div></div>
+              <div class="name_estab">{{e.nomeCriador}}</div>
+            </div>
+            <div class="ava_estab">
+              <ion-icon name="icon-star-void" *ngIf="(e.nota < 0.5 && e.nota >= 0) || e.nota == null"></ion-icon>
+              <ion-icon name="icon-star-half" *ngIf="e.nota < 1 && e.nota >= 0.5"></ion-icon>
+              <ion-icon name="icon-star-full" *ngIf="e.nota >= 1"></ion-icon>
+
+              <ion-icon name="icon-star-void" *ngIf="e.nota < 1.5 && e.nota >= 1 || e.nota == null"></ion-icon>
+              <ion-icon name="icon-star-half" *ngIf="e.nota < 2 && e.nota >= 1.5"></ion-icon>
+              <ion-icon name="icon-star-full" *ngIf="e.nota >= 2"></ion-icon>
+
+              <ion-icon name="icon-star-void" *ngIf="e.nota < 2.5 && e.nota >= 2 || e.nota == null"></ion-icon>
+              <ion-icon name="icon-star-half" *ngIf="e.nota < 3 && e.nota >= 2.5"></ion-icon>
+              <ion-icon name="icon-star-full" *ngIf="e.nota >= 3"></ion-icon>
+
+              <ion-icon name="icon-star-void" *ngIf="e.nota < 3.5 && e.nota >= 3 || e.nota == null"></ion-icon>
+              <ion-icon name="icon-star-half" *ngIf="e.nota < 4 && e.nota >= 3.5"></ion-icon>
+              <ion-icon name="icon-star-full" *ngIf="e.nota >= 4"></ion-icon>
+
+              <ion-icon name="icon-star-void" *ngIf="e.nota < 4.5 && e.nota >= 4 || e.nota == null"></ion-icon>
+              <ion-icon name="icon-star-half" *ngIf="e.nota < 5 && e.nota >= 4.5"></ion-icon>
+              <ion-icon name="icon-star-full" *ngIf="e.nota >= 5"></ion-icon>
             </div>
           </div>
         </ion-card>
