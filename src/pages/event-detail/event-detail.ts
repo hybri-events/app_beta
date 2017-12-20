@@ -711,8 +711,7 @@ export class EventDetailPage {
     }
     if ( !this.isAvaliado ){
       let dtNoti = new Date(Date.now());
-      //dtNoti.setDate(dtNoti.getDate()+1);
-      dtNoti.setMinutes(dtNoti.getMinutes()+1);
+      dtNoti.setHours(dtNoti.getHours()+15);
       console.log(dtNoti)
       this.localNotifications.schedule({
         id: 65290,

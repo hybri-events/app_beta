@@ -102,7 +102,7 @@ export class EventsPage {
       } else if ( val != null ){
         if ( firebase.auth().currentUser.uid == "2LPZQZZoiBXWx7uMmdAw6aJKYRk1" ||
               firebase.auth().currentUser.uid == "ckspDANNqcaeoKJ4FSMigwlGmju2" ||
-              firebase.auth().currentUser.uid == "Y51FCxmbWQPRzh4XL7dzUj6KBQu1" ){
+              firebase.auth().currentUser.uid == "8Q3XxcYFvydQ9khbCizB1QFyHLf1" ){
           this.mixpanel.init("66e05c6d77d15c37e397e5c0873329e6").then(()=>{
             console.log("Mixpanel ready: Testes (Estabelecimentos)");
             this.mixpanelPeople.identify(val);
@@ -177,7 +177,7 @@ export class EventsPage {
           let e = new Date(Date.now() - tzoffset);
           console.log(d.getHours());
           if ( d.getDate() == e.getDate() && d.getMonth() == e.getMonth() && d.getFullYear() == e.getFullYear() ){
-            d.setHours(d.getHours()-3); 
+            d.setHours(d.getHours()-3);
           }
           console.log(d.getHours());
           this.date = d.getFullYear()+"/"+("0"+(d.getMonth()+1)).slice(-2)+"/"+("0"+d.getDate()).slice(-2);

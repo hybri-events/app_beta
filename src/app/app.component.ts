@@ -123,7 +123,6 @@ export class MyApp {
             this.perfilPrin = this.perfilUser;
             this.capaUser = eventListSnap[0].ft_capa;
             let token = eventListSnap[0].token;
-            console.log(user);
             if ( token != undefined ){
               const facebookCredential = firebase.auth.FacebookAuthProvider.credential(token);
               let me = this;
@@ -135,6 +134,15 @@ export class MyApp {
                   me.userData.update(u[0].$key,"https://graph.facebook.com/"+success["providerData"][0]["uid"]+"/picture?type=large&access_token="+token,token);
                 })
               })
+            } else if ( user["providerData"][0]["providerId"] == "facebook.com" ) {
+              let alert = this.alertCtrl.create({
+                title: "Ação necessária!",
+                message: "Por favor, faça seu login com o Facebook novamente.",
+                buttons: [{text: 'OK', handler: () => {
+                  this.exit();
+                }}]
+              });
+              alert.present();
             }
 
             this.storage.set('nomeUsu', this.nomeUser);
@@ -187,6 +195,7 @@ export class MyApp {
       }
     });
     platform.ready().then(() => {
+      this.splashScreen.hide();
       let att = db.list("versao");
       let cont = 0;
       att.forEach(a => {

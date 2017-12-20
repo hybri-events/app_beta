@@ -15,25 +15,31 @@ export class UserDataProvider {
     let promo = this.db.list('/promocoes/convite/');
     let cod = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
     promo.push({cod: cod, uid: firebase.auth().currentUser.uid});
-    return firebase.database().ref(`usuario/${firebase.auth().currentUser.uid}`).push({
+    return firebase.database().ref(`usuario/${firebase.auth().currentUser.uid}/0`).update({
         nome, dt_nasc, email, ft_perfil, ft_capa: "http://usevou.com/profile/ft_capa/padrao.png", codcad: false
     });
   }
 
-  cadUserFace(nome, dt_nasc, email, ft_perfil, token): firebase.Promise<any> {
+  cadUserFace(nome, dt_nasc, email, ft_perfil, nasc, gender, token): firebase.Promise<any> {
     this.c.cadConta(0);
     this.authData.sendEmailVerification();
     let promo = this.db.list('/promocoes/convite/');
     let cod = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
     promo.push({cod: cod, uid: firebase.auth().currentUser.uid});
-    return firebase.database().ref(`usuario/${firebase.auth().currentUser.uid}`).push({
-        nome, dt_nasc, email, ft_perfil, ft_capa: "http://usevou.com/profile/ft_capa/padrao.png", codcad: false, token
+    return firebase.database().ref(`usuario/${firebase.auth().currentUser.uid}/0`).update({
+        nome, dt_nasc, email, ft_perfil, ft_capa: "http://usevou.com/profile/ft_capa/padrao.png", codcad: false, token, nasc, gender
     });
   }
 
   update(path, ft_perfil, token): firebase.Promise<any> {
     return firebase.database().ref(`usuario/${firebase.auth().currentUser.uid}/${path}`).update({
         ft_perfil, token
+    });
+  }
+
+  updateLogin(path, ft_perfil, nasc, gender, token): firebase.Promise<any> {
+    return firebase.database().ref(`usuario/${firebase.auth().currentUser.uid}/${path}`).update({
+        ft_perfil, token, nasc, gender
     });
   }
 

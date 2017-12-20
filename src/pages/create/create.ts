@@ -35,25 +35,35 @@ export class CreatePage {
         let casa = db.list('/casas/'+estab[i].id);
         casa.forEach(cas => {
           let c = [];
+          c['edit'] = false;
           let index = estab[i].id.indexOf('/');
           if ( estab[i].id.slice(0,index) == firebase.auth().currentUser.uid ){
             c['edit'] = true;
-          } else {
-            c['edit'] = false;
           }
           for ( let j=0;j<cas.length;j++ ){
-            if ( cas[j].$key == 'adms' ){
-              c['adms'] = [];
-              for ( let k=0;k<cas[j].length;k++ ){
-                c['adms'].push(cas[j][k]);
-              }
+            if ( cas[j].$key == 'adms' || cas[j].$key == 'permissoes' ){
+              c[cas[j].$key] = cas[j];
             } else {
               c[cas[j].$key] = cas[j].$value;
             }
           }
+          for ( let k=0;k<c['adms'];k++ ){
+            if ( c['adms'][k].uid == firebase.auth().currentUser.uid && c['permissoes'][c['adms'][k].perm].perfil ){
+              c['edit'] = true;
+            }
+          }
           c['key'] = estab[i].$key;
           c['id'] = estab[i].id;
-          this.allCasas.push(c);
+          let m=0
+          for ( m;m<this.allCasas.length;m++ ){
+            if ( this.allCasas[m].id == c['id'] ){
+              this.allCasas[m] = c;
+              break;
+            }
+          }
+          if ( m == this.allCasas.length ){
+            this.allCasas.push(c);
+          }
         })
       }
     })
@@ -66,15 +76,15 @@ export class CreatePage {
   changeProfile(key){
     this.mixpanel.track("Trocar perfil",{"for":"estabelecimento"});
   	this.loading = this.loadingCtrl.create({
-        content: "Trocando de perfil, aguarde...",
-        dismissOnPageChange: true,
-      });
-      this.loading.present();
-      this.storage.set('casa', key);
+      content: "Trocando de perfil, aguarde...",
+      dismissOnPageChange: true,
+    });
+    this.loading.present();
+    this.storage.set('casa', key);
   	setTimeout(() => {
-  	  this.loading.dismiss();
-        this.splashScreen.show();
-        window.location.reload();
+	    this.loading.dismiss();
+      this.splashScreen.show();
+      window.location.reload();
   	},2000)
   }
 

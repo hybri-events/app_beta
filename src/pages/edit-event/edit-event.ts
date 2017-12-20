@@ -143,7 +143,7 @@ export class EditEventPage {
           this.img = e.$value;
           if ( this.img[0] == 'h' ){
             document.getElementById("foto_evento").style.backgroundImage = "url("+this.img+")";
-            document.getElementById("button").innerHTML = "Trocar imagem";
+            document.getElementById("button").innerHTML = "Alterar imagem";
           }
         }
         if ( e.$key == 'gat' ){
@@ -357,7 +357,7 @@ export class EditEventPage {
       let base64Image = 'data:image/jpeg;base64,' + imageData;
       this.img = imageData;
       document.getElementById("foto_evento").style.backgroundImage = "url("+base64Image+")";
-      document.getElementById("button").innerHTML = "Trocar imagem";
+      document.getElementById("button").innerHTML = "Alterar imagem";
     }, (err) => {
 
     });

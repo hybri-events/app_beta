@@ -1,13 +1,7 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>Selecionar administradores</ion-title>
-    <ion-buttons end *ngIf="pular">
-      <button ion-button icon-only color="primary" (click)="continuar()" class="btn_search">Pular</button>
-    </ion-buttons>
-    <ion-buttons end *ngIf="!pular">
-      <button ion-button icon-only color="primary" (click)="continuar()" class="btn_search"><ion-icon name="icon-one-check"></ion-icon></button>
-    </ion-buttons>
+    <ion-title>Adicionar administradores</ion-title>
   </ion-navbar>
 
 </ion-header>
@@ -15,21 +9,24 @@
 
 <ion-content>
   <ion-searchbar [(ngModel)]="search" (ionInput)="updateSearch()"></ion-searchbar>
+  <div class="breve" *ngIf="carregando" style="width:100%;">
+    <div class="txt_breve" style="width:100%;"><img src="assets/loading.gif" style="width:150px;margin:0px auto;"></div>
+  </div>
+  <div class="breve" *ngIf="groupedContacts.length == 0" style="width:100%;">
+    <div class="txt_breve" style="width:100%;">Nenhum usuário encontrado.</div>
+  </div>
   <ion-item-group *ngFor="let group of groupedContacts">
     <ion-item-divider light>{{group.letter}}</ion-item-divider>
-    <button ion-item *ngFor="let usu of group.nomes" (click)="addAdm(usu[2],usu[1])">
-      <ion-avatar item-start>
-        <img src="{{usu[1]}}">
-      </ion-avatar>
-      {{usu[0]}}
-      <ion-icon id="icon-{{usu[2]}}" style="color:#AFAFAF" name="icon-select-off" item-end></ion-icon>
-    </button>
+    <div *ngFor="let usu of group.nomes">
+      <button ion-item (click)="addAdm(usu)">
+        <ion-avatar item-start>
+          <img src="{{usu[1]}}">
+        </ion-avatar>
+        {{usu[0]}}
+      </button>
+    </div>
   </ion-item-group>
+  <ion-infinite-scroll (ionInfinite)="onInfiniteScroll($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 </ion-content>
-
-<ion-footer style="background-color:#652C90;">
-  <div class="adms" *ngFor="let a of adms" id="add-a[0]">
-    <div class="perfil" [ngStyle]="{'background-image': 'url('+a[1]+')' }"></div>
-    <div class="remover" (click)="removeAdm(a[0])"><ion-icon style="color:white" name="icon-cancel"></ion-icon></div>
-  </div>
-</ion-footer>

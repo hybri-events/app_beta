@@ -9,13 +9,18 @@ import { Mixpanel } from '@ionic-native/mixpanel';
   templateUrl: 'list-adm.html',
 })
 export class ListAdmPage {
+  callback;
+
   search: string = '';
   usuarios: FirebaseListObservable<any>;
   users = [];
   groupedContacts = [];
   adms = [];
-  param;
   pular = true;
+  carregando = true;
+  interval;
+  interval2;
+  limit = 20;
 
   constructor(
     public platform: Platform,
@@ -27,99 +32,88 @@ export class ListAdmPage {
     this.mixpanel.track("Adicionar administradores do estabelecimento");
     this.usuarios = db.list('/usuario/');
     this.updateSearch();
-    setTimeout(() => {
-      this.updateSearch();
-    },1000);
-    this.param = navParams.data;
+    this.adms = navParams.data.adms;
+    this.callback = navParams.data.callback;
   }
 
-  continuar(){
-    this.param['adms'] = this.adms;
-    this.navCtrl.push(SetLocationCasaPage, this.param);
+  onInfiniteScroll($event){
+    this.limit += 20;
+    this.groupContacts(this.users);
+    $event.state = "closed";
+  }
+
+  checkAdm(uid){
+    for (let i=0; i<this.adms.length; i++){
+      if ( this.adms[i].uid == uid ){
+        return false;
+      }
+    }
+    return true;
   }
 
   updateSearch(){
     this.users = [];
     this.groupedContacts = [];
+    this.limit = 20;
+    this.carregando = true;
     this.usuarios.forEach(usuario => {
       usuario.forEach(usu => {
         let user = this.db.list('/usuario/'+usu.$key)
         user.forEach(us => {
           if ( (""+us[0].nome).toLowerCase().indexOf(this.search.toLowerCase()) > -1 ){
-            this.users.push([us[0].nome,us[0].ft_perfil,usu.$key])
+            this.users.push([us[0].nome, us[0].ft_perfil, usu.$key])
           }
         });
       });
     });
-    this.groupContacts(this.users);
+    clearInterval(this.interval);
+    this.interval = setInterval(() => {
+      if ( this.users.length != 0 ){
+        this.carregando = false;
+        this.groupContacts(this.users);
+        clearInterval(this.interval);
+      }
+    }, 500);
   }
 
   groupContacts(nomes){
-    let userSort = nomes.sort();
-    let currentLetter = false;
-    let currentContacts = [];
-
-    userSort.forEach((value, index) => {
-      if(value[0].charAt(0) != currentLetter){
-        currentLetter = value[0].charAt(0);
-        let newGroup = {
-            letter: currentLetter,
-            nomes: []
-        };
-        currentContacts = newGroup.nomes;
-        this.groupedContacts.push(newGroup);
+    var j = 0;
+    nomes.sort().some((value, index) => {
+      j++;
+      if ( j > (this.limit - 20) ){
+        let i=0;
+        var letter = value[0].charAt(0).toUpperCase();
+        var accents = 'ÀÁÂÃÄÅÒÓÔÕÕÖØÈÉÊËÇÐÌÍÎÏÙÚÛÜÑŠŸŽ';
+        var accentsOut = "AAAAAAOOOOOOOEEEECDIIIIUUUUNSYZ";
+        if ( accents.indexOf(letter) > -1 ){
+          letter = accentsOut[accents.indexOf(letter)];
+        }
+        for ( i;i<this.groupedContacts.length;i++ ){
+          if ( letter == this.groupedContacts[i].letter && this.checkAdm(value[2]) ){
+            this.groupedContacts[i].nomes.push(value)
+            break;
+          }
+        }
+        if ( i == this.groupedContacts.length && this.checkAdm(value[2]) ){
+          let newGroup = {
+              letter: letter,
+              nomes: []
+          };
+          this.groupedContacts.push(newGroup);
+          this.groupedContacts[i].nomes.push(value)
+        }
+        if ( j == this.limit ){
+          return true;
+        }
       }
-      currentContacts.push(value);
     });
   }
 
-  addAdm(uid,ft_perfil){
-    if ( document.getElementById('icon-'+uid).getAttribute('name') == 'icon-select-off' ){
-      if ( this.platform.is('android') ){
-        document.getElementById('icon-'+uid).setAttribute('class','icon icon-md ion-md-icon-select-on item-icon');
-      } else {
-        document.getElementById('icon-'+uid).setAttribute('class','icon icon-ios ion-ios-icon-select-on item-icon');
-      }
-      document.getElementById('icon-'+uid).setAttribute('name','icon-select-on');
-      document.getElementById('icon-'+uid).setAttribute('aria-label','icon select-on');
-      document.getElementById('icon-'+uid).setAttribute('ng-reflect-name','icon-select-on');
-      document.getElementById('icon-'+uid).style.color = '#25AA25';
-      this.adms.push([uid,ft_perfil]);
-    } else {
-      this.removeAdm(uid);
-    }
-    if ( this.adms.length > 0 ){
-      document.getElementsByClassName('scroll-content')[5].setAttribute('style','margin-top: 56px;margin-bottom:64px;');
-      this.pular = false;
-    } else {
-      document.getElementsByClassName('scroll-content')[5].setAttribute('style','margin-top: 56px;');
-      this.pular = true;
-    }
-  }
-
-  removeAdm(uid){
-    if ( this.platform.is('android') ){
-      document.getElementById('icon-'+uid).setAttribute('class','icon icon-md ion-md-icon-select-off item-icon');
-    } else {
-      document.getElementById('icon-'+uid).setAttribute('class','icon icon-ios ion-ios-icon-select-off item-icon');
-    }
-    document.getElementById('icon-'+uid).setAttribute('name','icon-select-off');
-    document.getElementById('icon-'+uid).setAttribute('aria-label','icon select-off');
-    document.getElementById('icon-'+uid).setAttribute('ng-reflect-name','icon-select-off');
-    document.getElementById('icon-'+uid).style.color = '#AFAFAF';
-    for (let i=0; i<this.adms.length; i++){
-      if ( this.adms[i][0] == uid ){
-        this.adms.splice(i,1);
-        break;
-      }
-    }
-    if ( this.adms.length > 0 ){
-      document.getElementsByClassName('scroll-content')[5].setAttribute('style','margin-top: 56px;margin-bottom:64px;');
-      this.pular = false;
-    } else {
-      document.getElementsByClassName('scroll-content')[5].setAttribute('style','margin-top: 56px;');
-      this.pular = true;
-    }
+  addAdm(adm){
+    this.adms.push({nome: adm[0], perfil: adm[1], uid: adm[2], perm: 0});
+    this.callback({adms: this.adms}).then(()=>{
+      this.navCtrl.pop();
+    });
   }
 
 }

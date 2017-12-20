@@ -55,10 +55,7 @@ import { SettingsPage } from '../pages/settings/settings';
 import { NewEstabPage } from '../pages/new-estab/new-estab';
 import { SetLocationCasaPage } from '../pages/set-location-casa/set-location-casa';
 import { ListAdmPage } from '../pages/list-adm/list-adm';
-import { EditListAdmPage } from '../pages/edit-list-adm/edit-list-adm';
 import { EditCasaPage } from '../pages/edit-casa/edit-casa';
-import { EditLocationCasaPage } from '../pages/edit-location-casa/edit-location-casa';
-import { SwitchEventPage } from '../pages/switch-event/switch-event';
 
 import { CadastroPage } from '../pages/cadastro/cadastro';
 import { CodCadastroPage } from '../pages/cod-cadastro/cod-cadastro';
@@ -82,6 +79,7 @@ import { OneSignal } from '@ionic-native/onesignal';
 import { Mixpanel, MixpanelPeople } from '@ionic-native/mixpanel';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { Market } from '@ionic-native/market';
+import { MaskDirective } from '../directives/mask/mask';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDddpec8MwZts4DyXIRvR9t9kAtEU3Bgh0",
@@ -123,16 +121,14 @@ const firebaseConfig = {
     SetLocationCasaPage,
     EditCasaPage,
     EditEventPage,
-    EditLocationCasaPage,
     EditLocationEventPage,
     ListPromoPage,
     TutorialPage,
     IndicacaoPage,
     ReportBugPage,
     ListAdmPage,
-    EditListAdmPage,
-    SwitchEventPage,
-    PerfilEstabPage
+    PerfilEstabPage,
+    MaskDirective
   ],
   imports: [
     BrowserModule,
@@ -175,15 +171,12 @@ const firebaseConfig = {
     SetLocationCasaPage,
     EditCasaPage,
     EditEventPage,
-    EditLocationCasaPage,
     EditLocationEventPage,
     ListPromoPage,
     TutorialPage,
     IndicacaoPage,
     ReportBugPage,
     ListAdmPage,
-    EditListAdmPage,
-    SwitchEventPage,
     PerfilEstabPage
   ],
   providers: [

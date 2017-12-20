@@ -17,6 +17,8 @@ declare var google;
   templateUrl: 'set-location-casa.html',
 })
 export class SetLocationCasaPage {
+  callback;
+
   @ViewChild('map') mapElement: ElementRef;
   map: any;
   lat: any;
@@ -24,7 +26,6 @@ export class SetLocationCasaPage {
   address;
   marker: any;
 
-  param: any;
   public loading:Loading;
 
   constructor(
@@ -44,10 +45,21 @@ export class SetLocationCasaPage {
     this.address = {
       place: ''
     };
-    this.param = navParams.data;
+    this.lat = navParams.data.lat;
+    this.lng = navParams.data.lng;
+  }
+
+  ionViewWillEnter() {
+    this.callback = this.navParams.get("callback")
   }
 
   continuar(){
+    this.callback({lat: this.lat, lng: this.lng}).then(()=>{
+      this.navCtrl.pop();
+    });
+  }
+
+  /*continuar(){
     this.loading = this.loadingCtrl.create({
       content: "Cadastrando o estabelecimento, aguarde...",
       dismissOnPageChange: true,
@@ -93,7 +105,7 @@ export class SetLocationCasaPage {
         });
       });
     });
-  }
+  }*/
 
   showAddressModal () {
     let modal = this.modalCtrl.create(AutocompletePage);
@@ -111,16 +123,17 @@ export class SetLocationCasaPage {
   }
 
   ionViewDidLoad(){
-    this.geolocation.getCurrentPosition().then((position) => {
+    /*this.geolocation.getCurrentPosition().then((position) => {
 
       this.lat = position.coords.latitude;
       this.lng = position.coords.longitude;
 
-      this.loadMap();
+
 
     }, (err) => {
       console.log(err);
-    });
+    });*/
+    this.loadMap();
   }
 
   loadMap(){
@@ -149,10 +162,10 @@ export class SetLocationCasaPage {
 
   }
 
-  saveImg(key,img){
+  /*saveImg(key,img){
     firebase.storage().ref('/ft_estab/').child(key+'.png').putString(img, 'base64', {contentType: 'image/png'}).then((savedPicture) => {
       firebase.database().ref(`evento`).child(key).child('img').set(savedPicture.downloadURL);
     });
-  }
+  }*/
 
 }

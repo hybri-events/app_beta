@@ -26,6 +26,4 @@ export class AuthProvider {
   signupUser(newEmail: string, newPassword: string): firebase.Promise<any> {
     return this.afAuth.auth.createUserWithEmailAndPassword(newEmail, newPassword);
   }
-
-
 }

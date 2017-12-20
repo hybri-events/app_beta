@@ -67,6 +67,7 @@ export class MyEventPage {
         } else {
           id = con[i].event;
         }
+        console.log(id)
         this.db.list("/eventos/"+id).subscribe(list => {
           for ( let i=0;i<list.length;i++ ) {
             if ( list[i].$key == 'criador' ){
@@ -80,14 +81,15 @@ export class MyEventPage {
             }
             p[list[i].$key] = list[i].$value;
           }
+          console.log(p)
           let tzoffset = (new Date()).getTimezoneOffset() * 60000;
           if ( this.tabs == 'pro' ){
-            if ( p['dti'] > new Date(Date.now() - tzoffset).toISOString().slice(0,-1) ){
+            if ( new Date(p['dti']) > new Date(Date.now() - tzoffset) ){
               p['key'] = id;
               t.push(p);
             }
           } else {
-            if ( p['dti'] <= new Date(Date.now() - tzoffset).toISOString().slice(0,-1) ){
+            if ( new Date(p['dti']) <= new Date(Date.now() - tzoffset) ){
               p['key'] = id;
               t.push(p);
             }
